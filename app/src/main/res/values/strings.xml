@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">CalendarioPrueba</string>
+    <string name="edit_message">Vacío</string>
+    <string name="button_html">cargar</string>
+    <string name="descripcion_portada">Portada</string>
+    <string name="flecha">flecha</string>
+    <string name="texto_muestra">Esto es un texto de muestra</string>
+</resources>
