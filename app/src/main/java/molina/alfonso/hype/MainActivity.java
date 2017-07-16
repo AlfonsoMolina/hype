@@ -1,5 +1,6 @@
 package molina.alfonso.hype;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +12,11 @@ import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -56,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
 
         mDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
@@ -77,8 +83,7 @@ public class MainActivity extends AppCompatActivity {
                     String [] f = p.getFecha_estreno().split("/");
                     int[] fecha = {Integer.parseInt(f[0]), Integer.parseInt(f[1]),Integer.parseInt(f[2])};
                     beginTime.set(fecha[0], fecha[1]-1, fecha[2], 0, 0);
-                   // Calendar endTime = Calendar.getInstance();
-                  //  endTime.set(fecha[0], fecha[1]-1, fecha[2], 1, 0);
+                   // Primero comprobar si puedo editar el evento.
                     Intent intent = new Intent(Intent.ACTION_INSERT)
                             .setData(CalendarContract.Events.CONTENT_URI)
                             .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
@@ -87,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                             .putExtra(CalendarContract.Events.DESCRIPTION, p.getSinopsis());
 //                            .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
                     //                        .putExtra(Intent.EXTRA_EMAIL, "rowan@example.com,trevor@example.com");
-                    startActivity(intent);
+                  //  startActivity(intent);
                 }
 
                 SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -115,10 +120,39 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
 
-    public void cargarHTML(View view) throws IOException {
+    public void cargarHTML() throws IOException {
         Hilo hilo = new Hilo(listaAdapter);
         hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.action_favorite:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                Hilo hilo = new Hilo(listaAdapter);
+                hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
 }

@@ -143,8 +143,7 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
                     values.put(FeedReaderContract.FeedEntry.COLUMN_FECHA, f);
 
                     db[1].insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
-                    //peliculas.add(new Pelicula(l,p,t,s,e,f));
-                    peliculas.add(new Pelicula(l, p, t, f, e, f, false));
+                    peliculas.add(new Pelicula(l,p,t,s,e,f,false));
                     values.clear();
 
                 }

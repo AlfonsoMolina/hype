@@ -154,11 +154,12 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         ((TextView) fila.findViewById(R.id.sinopsis)).setText(p.getSinopsis());
         ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstreno());
         ((ImageView) fila.findViewById(R.id.portada)).setImageBitmap(p.getPortada());
-
+/*      Aquí tengo que cambiar esto y añadir el mensaje de hype
         if (p.getisPressed()){
             fila.setBackgroundResource(R.drawable.gradient_bg_hover);
         } else
             fila.setBackgroundResource(R.drawable.gradient_bg);
+            */
         return fila;
     }
 

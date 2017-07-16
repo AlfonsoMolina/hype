@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/list_selector"
     android:orientation="horizontal"
+    android:listSelector="@android:color/transparent"
     android:padding="5dip" >
 
     <ImageView
@@ -36,8 +36,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:text="viertnes, 12 de julio"
-                android:textColor="#10bcc9"
+                android:textColor="#f26464"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
@@ -49,9 +48,8 @@
                 android:layout_alignParentLeft="true"
                 android:layout_toLeftOf="@id/estreno"
                 android:layout_toStartOf="@id/estreno"
-                android:textColor="#040404"
+                android:textColor="#f5f5f5"
                 android:textSize="15sp"
-                android:text="titulo muy largo de pelicula que pisa la fechha"
                 android:textStyle="bold"
                 android:typeface="sans" />
 
@@ -80,7 +78,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_toLeftOf="@id/imageView"
                 android:layout_toStartOf="@id/imageView"
-                android:textColor="#343434"
+                android:textColor="#d5d5d5"
                 android:textSize="12sp" />
 
         </RelativeLayout>
