@@ -15,17 +15,19 @@ public class Pelicula {
     private String titulo;
     private Bitmap portada;
     private String sinopsis;
-    private String estreno;
-    private String fecha_estreno;
+    private String estreno_letras;
+    private String estreno_fecha;
+    private String estreno_corto;
     private String enlace;
     private boolean isPressed;
 
-    Pelicula (String l, String p, String t, String s, String e, String f, Boolean h){
+    Pelicula (String l, String p, String t, String s, String e, String f, String fc,Boolean h){
         this.titulo = t;
         this.sinopsis = s;
-        this.estreno = e;
+        this.estreno_letras = e;
         this.enlace = l;
-        this.fecha_estreno = f;
+        this.estreno_fecha = f;
+        this.estreno_corto = fc;
         this.isPressed = h;
 
         try {
@@ -51,7 +53,7 @@ public class Pelicula {
     }
 
     public String getEstreno() {
-        return estreno;
+        return estreno_letras;
     }
 
     public String getEnlace() {
@@ -59,7 +61,11 @@ public class Pelicula {
     }
 
     public String getFecha_estreno() {
-        return fecha_estreno;
+        return estreno_fecha;
+    }
+
+    public String getEstreno_corto() {
+        return estreno_corto;
     }
     
     public void setisPressed(boolean b) {

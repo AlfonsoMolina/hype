@@ -41,6 +41,7 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
         String html = "";
         ArrayList<Pelicula> peliculas = new ArrayList<>();
         String[] meses = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
+        String[] meses_corto = {"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"};
 
         try {
             html = getHTML("https://m.filmaffinity.com/es/rdcat.php?id=upc_th_es");
@@ -57,6 +58,7 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
             String s;
             String e;
             String f;
+            String fc;
             Boolean h;
             int ind;
 
@@ -113,6 +115,9 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
                         fecha_dia = ee.substring(0, ee.indexOf(" "));
                         fecha_mes = ee.substring(ee.indexOf("de ") + 3);
 
+                        if (fecha_dia.length() == 1)
+                            fecha_dia = '0' + fecha_dia;
+
                         int m = 0;
 
                         while (!fecha_mes.matches(meses[m++])) ;
@@ -139,11 +144,14 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
 
                     }
 
+                    fc = fecha_dia + " " + meses_corto[Integer.parseInt(fecha_mes)];
+
+                    values.put(FeedReaderContract.FeedEntry.COLUMN_CORTO, fc);
                     values.put(FeedReaderContract.FeedEntry.COLUMN_ESTRENO, e);
                     values.put(FeedReaderContract.FeedEntry.COLUMN_FECHA, f);
 
                     db[1].insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
-                    peliculas.add(new Pelicula(l,p,t,s,e,f,false));
+                    peliculas.add(new Pelicula(l,p,t,s,e,f,fc,false));
                     values.clear();
 
                 }

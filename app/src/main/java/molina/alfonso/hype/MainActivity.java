@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         //mDbHelper.getWritableDatabase().execSQL("delete from "+ TABLE_NAME);   //Para cuando haya que cambiar la bbdd.
         ListView lista = (ListView) findViewById(R.id.lista);
-        listaAdapter = new ListaModificadaAdapter(getApplicationContext(), R.layout.fila_pelicula2, mDbHelper.getReadableDatabase());
+        listaAdapter = new ListaModificadaAdapter(getApplicationContext(), R.layout.fila_pelicula3, mDbHelper);
         lista.setAdapter(listaAdapter);
         lista.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         lista.setItemsCanFocus(false);
@@ -77,42 +78,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Pelicula p = listaAdapter.getPelicula(position);
-                p.setisPressed(!p.getisPressed());
-                if (p.getisPressed()) {
-                    Calendar beginTime = Calendar.getInstance();
-                    String [] f = p.getFecha_estreno().split("/");
-                    int[] fecha = {Integer.parseInt(f[0]), Integer.parseInt(f[1]),Integer.parseInt(f[2])};
-                    beginTime.set(fecha[0], fecha[1]-1, fecha[2], 0, 0);
-                   // Primero comprobar si puedo editar el evento.
-                    Intent intent = new Intent(Intent.ACTION_INSERT)
-                            .setData(CalendarContract.Events.CONTENT_URI)
-                            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
-                            .putExtra("allDay", true)
-                            .putExtra(CalendarContract.Events.TITLE, p.getTitulo())
-                            .putExtra(CalendarContract.Events.DESCRIPTION, p.getSinopsis());
-//                            .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
-                    //                        .putExtra(Intent.EXTRA_EMAIL, "rowan@example.com,trevor@example.com");
-                  //  startActivity(intent);
-                }
 
-                SQLiteDatabase db = mDbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-                String h;
-                if (p.getisPressed()) {
-                    h = "T";
-                } else
-                    h = "F";
+                listaAdapter.setExpandido(position);
 
-                values.put(FeedEntry.COLUMN_HYPE, h);
-
-                String selection = FeedEntry.COLUMN_REF + " LIKE ?";
-                String[] selectionArgs = {p.getEnlace()};
-
-                int count = db.update(
-                        FeedReaderContract.FeedEntry.TABLE_NAME,
-                        values,
-                        selection,
-                        selectionArgs);
+                ((TextView) view.findViewById(R.id.av_fecha)).setText(p.getEstreno_corto());
+                view.findViewById(R.id.avanzado).setVisibility(View.VISIBLE);
+                ((TextView) view.findViewById(R.id.av_sinopsis)).setText(p.getSinopsis());
 
                 listaAdapter.notifyDataSetChanged();
             }
@@ -154,5 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
 
 }

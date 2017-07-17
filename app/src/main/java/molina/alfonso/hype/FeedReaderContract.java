@@ -23,6 +23,7 @@ public final class FeedReaderContract {
         public static final String COLUMN_SINOPSIS = "Sinopsis";
         public static final String COLUMN_ESTRENO = "Estreno";
         public static final String COLUMN_FECHA = "Fecha";
+        public static final String COLUMN_CORTO = "Corto";
         public static final String COLUMN_HYPE = "Guardado";
     }
 
@@ -35,6 +36,7 @@ public final class FeedReaderContract {
                     FeedEntry.COLUMN_SINOPSIS + " TEXT," +
                     FeedEntry.COLUMN_ESTRENO + " TEXT," +
                     FeedEntry.COLUMN_FECHA + " TEXT," +
+                    FeedEntry.COLUMN_CORTO + " TEXT," +
                     FeedEntry.COLUMN_HYPE + " TEXT)";
 
     public static final String SQL_DELETE_ENTRIES =
