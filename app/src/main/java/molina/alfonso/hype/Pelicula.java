@@ -7,7 +7,7 @@ import android.widget.ImageView;
 import java.net.URL;
 
 /**
- * Created by Usuario on 02/07/2017.
+ * Created by Clacks Department on 02/07/2017.
  */
 
 public class Pelicula {
