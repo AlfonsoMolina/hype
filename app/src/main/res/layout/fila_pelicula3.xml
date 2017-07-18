@@ -112,7 +112,6 @@
                 android:text="@string/get_hype"
                 android:drawableStart="@drawable/arrow"
                 android:textColor="#f5f5f5"
-                android:onClick="get_hype"
                 />
 
         </LinearLayout>

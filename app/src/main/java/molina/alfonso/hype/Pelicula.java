@@ -2,6 +2,7 @@ package molina.alfonso.hype;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ImageView;
 
 import java.net.URL;
@@ -11,6 +12,8 @@ import java.net.URL;
  */
 
 public class Pelicula {
+
+    private static final String TAG = "Pelicula";
 
     private String titulo;
     private Bitmap portada;
@@ -22,6 +25,7 @@ public class Pelicula {
     private boolean isPressed;
 
     Pelicula (String l, String p, String t, String s, String e, String f, String fc,Boolean h){
+        Log.d(TAG, "Pelicula");
         this.titulo = t;
         this.sinopsis = s;
         this.estreno_letras = e;
@@ -41,38 +45,47 @@ public class Pelicula {
     }
 
     public String getTitulo() {
+        Log.d(TAG, "getTitulo");
         return titulo;
     }
 
     public Bitmap getPortada() {
+        Log.d(TAG, "getPortada");
         return portada;
     }
 
     public String getSinopsis() {
+        Log.d(TAG, "getSinopsis");
         return sinopsis;
     }
 
     public String getEstreno() {
+        Log.d(TAG, "getEstreno");
         return estreno_letras;
     }
 
     public String getEnlace() {
+        Log.d(TAG, "getEnlace");
         return enlace;
     }
 
     public String getFecha_estreno() {
+        Log.d(TAG, "getFecha_estreno");
         return estreno_fecha;
     }
 
     public String getEstreno_corto() {
+        Log.d(TAG, "getEstreno_corto");
         return estreno_corto;
     }
     
     public void setisPressed(boolean b) {
+        Log.d(TAG, "setisPressed");
         this.isPressed = b;
     }
 
     public boolean getisPressed() {
+        Log.d(TAG, "getisPressed");
         return isPressed;
     }
 }

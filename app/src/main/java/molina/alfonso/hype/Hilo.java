@@ -29,14 +29,18 @@ import java.util.Locale;
 
 public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>> {
 
+    private static final String TAG = "Hilo";
+
     private ListaModificadaAdapter lista;
 
     public Hilo(ListaModificadaAdapter lista) {
+        Log.d(TAG, "Hilo");
         this.lista = lista;
     }
 
     @Override
     protected ArrayList<Pelicula> doInBackground(SQLiteDatabase... db) {
+        Log.d(TAG, "doInBackground");
         //db[0] para leer db[1] para escribir
         String html = "";
         ArrayList<Pelicula> peliculas = new ArrayList<>();
@@ -166,6 +170,7 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
 
     @Override
     protected void onPostExecute(ArrayList<Pelicula> peliculas) {
+        Log.d(TAG, "onPostExecute");
         lista.add(peliculas);
         lista.notifyDataSetChanged();
         // log.setText(logtext);
@@ -174,6 +179,7 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
 
     @NonNull
     private static String getHTML(String url) throws IOException {
+        Log.d(TAG, "getHTML");
         // Build and set timeout values for the request.
         URLConnection connection = (new URL(url)).openConnection();
         connection.setConnectTimeout(5000);
