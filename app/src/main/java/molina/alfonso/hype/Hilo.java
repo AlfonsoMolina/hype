@@ -24,7 +24,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 /**
- * Created by Clacks Department on 11/07/2017.
+ * Created by Usuario on 11/07/2017.
  */
 
 public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>> {
