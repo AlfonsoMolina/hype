@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,8 @@ import java.util.Calendar;
  */
 public class ListaModificadaAdapter extends ArrayAdapter {
 
+    private static final String TAG = "ListaModificadaAdapter";
+
     private ArrayList<Pelicula> lista = new ArrayList<>();  //Los elementos de la lista
     private int resourceID;                                           //El layout en que se va a mostrar
     private FeedReaderDbHelper db;
@@ -43,6 +46,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      */
     public ListaModificadaAdapter(Context context, int resourceID, FeedReaderDbHelper db) {
         super(context,resourceID);
+        Log.d(TAG, "ListaModificadaAdapter");
         this.resourceID = resourceID;
         this.db = db;
         //Inicia la lista con las pelis en la bbdd
@@ -51,6 +55,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     }
 
     private void leerBBDD(){
+        Log.d(TAG, "leerBBDD");
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
@@ -129,6 +134,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      */
     @Override
     public int getCount() {
+        Log.d(TAG, "getCount");
         return this.lista.size();
     }
 
@@ -139,6 +145,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      */
     @Override
     public Object getItem(int position) {
+        Log.d(TAG, "getItem");
         return this.lista.get(position);
     }
 
@@ -152,7 +159,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
+        Log.d(TAG, "getView");
         View fila = convertView;
 
         if (convertView == null) {
@@ -195,10 +202,12 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      * @param p Pelicua con el nuevo elemento a introducir.
      */
     public void add(Pelicula p){
+        Log.d(TAG, "add");
         lista.add(p);
     }
 
     public void add(ArrayList<Pelicula> p) {
+        Log.d(TAG, "add");
         lista.addAll(p);
     }
      /**
@@ -207,29 +216,35 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      * @param posicion entero con la posición del elemento a eliminar
      */
     public void remove(int posicion){
+        Log.d(TAG, "remove");
         lista.remove(posicion);
     }
 
 
     public void actualizar() {
+        Log.d(TAG, "actualizar");
         lista.clear();
         leerBBDD();
     }
 
     public void delete(int i) {
+        Log.d(TAG, "delete");
         for (int j = 0; j<i; j++)
             lista.remove(j);
     }
 
     public Pelicula getPelicula (int position) {
+        Log.d(TAG, "getPelicula");
         return lista.get(position);
     }
 
     public void setIsPressed(int position, boolean isPressed) {
+        Log.d(TAG, "setIsPressed");
         lista.get(position).setisPressed(isPressed);
     }
 
     public void setExpandido(int position){
+        Log.d(TAG, "setExpandido");
         if (expandido == position){
             expandido = -1;
         } else
@@ -239,6 +254,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private View.OnClickListener enviar_Calendario = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Log.d(TAG, "enviar_Calendario");
             int position = expandido;
 
             Pelicula p = lista.get(position);
@@ -262,7 +278,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private View.OnClickListener get_hype = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
+            Log.d(TAG, "get_hype");
             Pelicula p = lista.get(expandido);
 
             SQLiteDatabase dbw = db.getWritableDatabase();
@@ -298,6 +314,9 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
         @Override
         public void onClick(View view) {
+
+            Log.d(TAG, "get_info");
+
             // Cogemos la peli seleccionada
             Pelicula p = lista.get(expandido);
 
