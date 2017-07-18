@@ -4,4 +4,9 @@
     <string name="descripcion_portada">Portada</string>
     <string name="flecha">flecha</string>
     <string name="get_hype">get hype!</string>
+    <string name="previous_button">Anterior</string>
+    <string name="next_button">Siguiente</string>
+    <string name="actual_page_header">Página actual: </string>
+    <string name="actual_page_number">0</string>
+
 </resources>
