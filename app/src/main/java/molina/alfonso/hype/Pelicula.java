@@ -3,7 +3,6 @@ package molina.alfonso.hype;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
-import android.widget.ImageView;
 
 import java.net.URL;
 
@@ -12,6 +11,10 @@ import java.net.URL;
  */
 
 public class Pelicula {
+
+    /*
+     * Declaración de variables
+     */
 
     private static final String TAG = "Pelicula";
 
@@ -23,6 +26,10 @@ public class Pelicula {
     private String estreno_corto;
     private String enlace;
     private boolean isPressed;
+
+    /*
+     * Constructor
+     */
 
     Pelicula (String l, String p, String t, String s, String e, String f, String fc,Boolean h){
         Log.d(TAG, "Pelicula");
@@ -43,6 +50,10 @@ public class Pelicula {
 
         }
     }
+
+    /*
+     * Getters y setters
+     */
 
     public String getTitulo() {
         Log.d(TAG, "getTitulo");

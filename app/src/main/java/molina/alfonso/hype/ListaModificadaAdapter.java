@@ -7,18 +7,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,6 +25,10 @@ import java.util.Calendar;
  * @author Alfonso Molina
  */
 public class ListaModificadaAdapter extends ArrayAdapter {
+
+    /*
+     * Declaración de variables
+     */
 
     private static final String TAG = "ListaModificadaAdapter";
 

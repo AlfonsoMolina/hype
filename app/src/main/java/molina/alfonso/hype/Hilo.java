@@ -3,31 +3,28 @@ package molina.alfonso.hype;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
 
 /**
- * Created by Usuario on 11/07/2017.
+ * Created by Clacks Department on 11/07/2017.
  */
 
 public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>> {
+
+    /*
+     * Declaración de variables
+     */
 
     private static final String TAG = "Hilo";
 

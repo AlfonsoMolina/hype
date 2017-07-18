@@ -5,16 +5,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import molina.alfonso.hype.FeedReaderContract.*;
-
-import static molina.alfonso.hype.FeedReaderContract.*;
+import static molina.alfonso.hype.FeedReaderContract.SQL_CREATE_ENTRIES;
+import static molina.alfonso.hype.FeedReaderContract.SQL_DELETE_ENTRIES;
 
 /**
  * Created by Usuario on 11/07/2017.
  */
 
 public class FeedReaderDbHelper extends SQLiteOpenHelper {
-    // If you change the database schema, you must increment the database version.
+
+    /*
+     * Declaración de variables
+     */
+
     private static final String TAG = "FeedReaderDbHelper";
 
     public static final int DATABASE_VERSION = 1;

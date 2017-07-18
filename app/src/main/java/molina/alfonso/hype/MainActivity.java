@@ -1,105 +1,110 @@
 package molina.alfonso.hype;
 
-import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
-import android.os.StrictMode;
-import android.provider.CalendarContract;
-import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
-import molina.alfonso.hype.FeedReaderContract.FeedEntry;
-
-import static java.security.AccessController.getContext;
-import static molina.alfonso.hype.FeedReaderContract.FeedEntry.TABLE_NAME;
-
-/*
-4. poner en el calendario
-5. Que salga un popup
-6. Añadir un enlace a FA
-
-ponerlo mas bonito en general
- */
 public class MainActivity extends AppCompatActivity {
 
+    /*
+     * Declaración de variables
+     */
+
+    // Etiqueta para logs
     private static final String TAG = "MainActivity";
 
+    // Adaptador de la lista
     private ListaModificadaAdapter listaAdapter;
-
+    // Helper para manipular la BBDD
     private FeedReaderDbHelper mDbHelper;
 
-    // Create a new map of values, where column names are the keys
+    /*
+     * Métodos override
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Log.d(TAG, "onCreate");
 
+        // Fijamos el layout a usar
         setContentView(R.layout.activity_main);
+
+        // Relajamos políticas de Threads
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        // Hook y setup del Toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        // Creamos el helper de la BBDD
         mDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
-        //mDbHelper.getWritableDatabase().execSQL("delete from "+ TABLE_NAME);   //Para cuando haya que cambiar la bbdd.
+        // Borrado de la BBDD
+        //mDbHelper.getWritableDatabase().execSQL("delete from "+ TABLE_NAME);
+
+        // Hook de la lista
         ListView lista = (ListView) findViewById(R.id.lista);
+
+        // Creación del adaptador de la lista
         listaAdapter = new ListaModificadaAdapter(getApplicationContext(), R.layout.fila_pelicula3, mDbHelper);
+
+        // Setup de la lista
         lista.setAdapter(listaAdapter);
         lista.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         lista.setItemsCanFocus(false);
-
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 listaAdapter.setExpandido(position);
                 listaAdapter.notifyDataSetChanged();
             }
-
         });
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "onCreateOptionsMenu");
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Expande el menu, añade las opciones
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected");
+
+        // Interpretamos lo seleccionado en el menu
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+
+            case R.id.action_favorite:
+                // Lanzamos el Thread que maneja la lista
+                Hilo hilo = new Hilo(listaAdapter);
+                hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    /*
+     * Métodos custom
+     */
 
     public void cargarHTML() throws IOException {
         Log.d(TAG, "cargarHTML");
@@ -107,35 +112,10 @@ public class MainActivity extends AppCompatActivity {
         hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d(TAG, "onOptionsItemSelected");
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
-                return true;
-
-            case R.id.action_favorite:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
-                Hilo hilo = new Hilo(listaAdapter);
-                hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
-
-                return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
-
-        }
-    }
-
-
     public void mostrarHype(View view) {
         listaAdapter.toogleHype();
         listaAdapter.setExpandido(-1);
         listaAdapter.notifyDataSetChanged();
-
     }
+
 }
