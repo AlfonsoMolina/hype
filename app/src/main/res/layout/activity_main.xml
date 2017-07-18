@@ -23,15 +23,19 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat"/>
+        app:popupTheme="@style/ThemeOverlay.AppCompat">
 
-    <!--
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_html"
-        android:onClick="cargarHTML"/>
--->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hype!"
+            android:id="@+id/toolbar_title"
+            android:onClick="mostrarHype"
+            android:textSize="20dp"
+            android:textColor="#ffffff"
+            />
+
+    </android.support.v7.widget.Toolbar>
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -36,6 +36,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private ArrayList<Pelicula> lista = new ArrayList<>();  //Los elementos de la lista
     private int resourceID;                                           //El layout en que se va a mostrar
     private FeedReaderDbHelper db;
+    private boolean mostrarHype = false;
 
     private int expandido = -1;
 
@@ -135,7 +136,21 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     @Override
     public int getCount() {
         Log.d(TAG, "getCount");
-        return this.lista.size();
+
+        int count = 0;
+
+        if(mostrarHype){
+            int i = 0;
+            while(i < lista.size()) {
+                if (lista.get(i).getisPressed())
+                    count++;
+                i++;
+            }
+            return count;
+        }
+
+        else
+            return this.lista.size();
     }
 
     /**
@@ -146,7 +161,22 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     @Override
     public Object getItem(int position) {
         Log.d(TAG, "getItem");
-        return this.lista.get(position);
+
+        if(mostrarHype){
+            int i = 0;
+            while (i < lista.size()){
+                if (lista.get(i).getisPressed()) {
+                    if (position == 0) {
+                        return lista.get(i);
+                    }
+                    position--;
+
+                }
+                i++;
+            }
+            return lista.get(0);
+        } else
+            return this.lista.get(position);
     }
 
      /**
@@ -169,7 +199,27 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             fila = inflater.inflate(resourceID, parent, false);
         }
 
-        Pelicula p = lista.get(position);
+        Pelicula p = null;
+        int cuenta = -1;
+        if(mostrarHype){
+            int i = 0;
+            while (i < lista.size()){
+                if (lista.get(i).getisPressed() && position >= 0) {
+                    cuenta++;
+                    if (position == 0) {
+                        p = lista.get(i);
+                    }
+                    position--;
+                }
+                i++;
+            }
+
+        } else {
+            p = this.lista.get(position);
+            cuenta = position;
+        }
+        if (p == null)
+            p = lista.get(0);
 
         ((TextView) fila.findViewById(R.id.titulo)).setText(p.getTitulo());
         ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstreno());
@@ -180,7 +230,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         } else
             fila.findViewById(R.id.hype_msg).setVisibility(View.GONE);
 
-        if (expandido == position){
+        if (expandido == cuenta){
             fila.findViewById(R.id.avanzado).setVisibility(View.VISIBLE);
             ((TextView) fila.findViewById(R.id.av_fecha)).setText(p.getEstreno_corto());
             ((TextView) fila.findViewById(R.id.av_sinopsis)).setText(p.getSinopsis());
@@ -188,9 +238,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             fila.findViewById(R.id.av_hype).setOnClickListener(get_hype);
             fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
         } else
-            fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
-
-        if(position != expandido)
             fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
 
         return fila;
@@ -213,13 +260,26 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      /**
      * Elimina una fila de la lista.
      *
-     * @param posicion entero con la posición del elemento a eliminar
+     * @param position entero con la posición del elemento a eliminar
      */
-    public void remove(int posicion){
+    public void remove(int position) {
         Log.d(TAG, "remove");
-        lista.remove(posicion);
-    }
+        int cuenta = -1;
+        if (mostrarHype) {
+            int i = 0;
+            while (i < lista.size()) {
+                if (lista.get(i).getisPressed() && position >= 0) {
+                    position--;
+                }
+                i++;
+            }
 
+        } else {
+            cuenta = position;
+        }
+
+        lista.remove(cuenta);
+    }
 
     public void actualizar() {
         Log.d(TAG, "actualizar");
@@ -235,13 +295,31 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
     public Pelicula getPelicula (int position) {
         Log.d(TAG, "getPelicula");
-        return lista.get(position);
-    }
+        Pelicula p = null;
+        if(mostrarHype){
+            int i = 0;
+            while (i < lista.size()){
+                if (lista.get(i).getisPressed() && position >= 0) {
+                    if (position == 0) {
+                        p = lista.get(i);
+                    }
+                    position--;
+                }
+                i++;
+            }
+        } else {
+            p = this.lista.get(position);
+        }
+        if (p == null)
+            p = lista.get(0);
 
+        return p;
+    }
     public void setIsPressed(int position, boolean isPressed) {
         Log.d(TAG, "setIsPressed");
         lista.get(position).setisPressed(isPressed);
     }
+
 
     public void setExpandido(int position){
         Log.d(TAG, "setExpandido");
@@ -255,9 +333,26 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         @Override
         public void onClick(View v) {
             Log.d(TAG, "enviar_Calendario");
-            int position = expandido;
 
-            Pelicula p = lista.get(position);
+            int position = expandido;
+            Pelicula p = null;
+            if(mostrarHype){
+                int i = 0;
+                while (i < lista.size()){
+                    if (lista.get(i).getisPressed() && position >= 0) {
+                        if (position == 0) {
+                            p = lista.get(i);
+                        }
+                        position--;
+                    }
+                    i++;
+                }
+
+            } else {
+                p = lista.get(position);
+            }
+            if (p == null)
+                p = lista.get(0);
 
             Calendar beginTime = Calendar.getInstance();
             String [] f = p.getFecha_estreno().split("/");
@@ -279,7 +374,26 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         @Override
         public void onClick(View v) {
             Log.d(TAG, "get_hype");
-            Pelicula p = lista.get(expandido);
+            Pelicula p = null;
+            int position = expandido;
+            if(mostrarHype){
+                int i = 0;
+                while (i < lista.size()){
+                    if (lista.get(i).getisPressed() && position >= 0) {
+                        if (position == 0) {
+                            p = lista.get(i);
+                        }
+                        position--;
+                    }
+                    i++;
+                }
+
+            } else {
+                p = lista.get(position);
+            }
+
+            if (p == null)
+                p = lista.get(0);
 
             SQLiteDatabase dbw = db.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -307,6 +421,9 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         }
     };
 
+    public void toogleHype() {
+        this.mostrarHype = !this.mostrarHype;
+    }
     /*
      * Método llamado al pedir más info en una peli seleccionada.
      */
@@ -317,52 +434,38 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
             Log.d(TAG, "get_info");
 
-            // Cogemos la peli seleccionada
-            Pelicula p = lista.get(expandido);
+            Pelicula p = null;
+            int position = expandido;
+            if(mostrarHype){
+                int i = 0;
+                while (i < lista.size()){
+                    if (lista.get(i).getisPressed() && position >= 0) {
+                        if (position == 0) {
+                            p = lista.get(i);
+                        }
+                        position--;
+                    }
+                    i++;
+                }
+
+            } else {
+                p = lista.get(position);
+            }
+
+            if (p == null)
+                p = lista.get(0);
+
 
             // Instanciamos el intent de navegador
             Intent i = new Intent(Intent.ACTION_VIEW);
             // Se le pasa la web parseada
             i.setData(Uri.parse(p.getEnlace()));
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             // Lanzamos el intent
             getContext().startActivity(i);
             // profit!
 
         }
     };
-
-/*
-    public void get_hype(View v) {
-        View parentRow = (View) v.getParent();
-        ListView listView = (ListView) parentRow.getParent();
-        int position = listView.getPositionForView(parentRow);
-
-        Pelicula p = lista.get(position);
-
-        SQLiteDatabase db = db.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        String h;
-
-        p.setisPressed(!p.getisPressed());
-
-        if (p.getisPressed()) {
-            h = "T";
-        } else
-            h = "F";
-
-        values.put(FeedReaderContract.FeedEntry.COLUMN_HYPE, h);
-
-        String selection = FeedReaderContract.FeedEntry.COLUMN_REF + " LIKE ?";
-        String[] selectionArgs = {p.getEnlace()};
-
-        int count = db.update(
-                FeedReaderContract.FeedEntry.TABLE_NAME,
-                values,
-                selection,
-                selectionArgs);
-
-        this.notifyDataSetChanged();
-
-    }*/
 
 }
