@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -178,6 +179,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             ((TextView) fila.findViewById(R.id.av_sinopsis)).setText(p.getSinopsis());
             fila.findViewById(R.id.av_fecha).setOnClickListener(enviar_Calendario);
             fila.findViewById(R.id.av_hype).setOnClickListener(get_hype);
+            fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
         } else
             fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
 
@@ -286,6 +288,27 @@ public class ListaModificadaAdapter extends ArrayAdapter {
                     selectionArgs);
 
             notifyDataSetChanged();
+        }
+    };
+
+    /*
+     * Método llamado al pedir más info en una peli seleccionada.
+     */
+    private View.OnClickListener get_info = new View.OnClickListener(){
+
+        @Override
+        public void onClick(View view) {
+            // Cogemos la peli seleccionada
+            Pelicula p = lista.get(expandido);
+
+            // Instanciamos el intent de navegador
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            // Se le pasa la web parseada
+            i.setData(Uri.parse(p.getEnlace()));
+            // Lanzamos el intent
+            getContext().startActivity(i);
+            // profit!
+
         }
     };
 
