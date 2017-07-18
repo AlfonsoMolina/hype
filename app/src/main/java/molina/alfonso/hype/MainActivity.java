@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -77,14 +78,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Pelicula p = listaAdapter.getPelicula(position);
-
                 listaAdapter.setExpandido(position);
-
                 listaAdapter.notifyDataSetChanged();
             }
 
         });
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
     }
 
     @Override
@@ -123,5 +124,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void mostrarHype(View view) {
+        listaAdapter.toogleHype();
+        listaAdapter.setExpandido(-1);
+        listaAdapter.notifyDataSetChanged();
 
+    }
 }
