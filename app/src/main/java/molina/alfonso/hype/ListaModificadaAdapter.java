@@ -136,7 +136,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     @Override
     public int getCount() {
         Log.d(TAG, "getCount");
-        return this.lista.size();
+
         int count = 0;
 
         if(mostrarHype){
@@ -161,7 +161,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     @Override
     public Object getItem(int position) {
         Log.d(TAG, "getItem");
-        return this.lista.get(position);
+
         if(mostrarHype){
             int i = 0;
             while (i < lista.size()){
@@ -260,14 +260,14 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      /**
      * Elimina una fila de la lista.
      *
-     * @param posicion entero con la posición del elemento a eliminar
+     * @param position entero con la posición del elemento a eliminar
      */
-    public void remove(int position){
+    public void remove(int position) {
         Log.d(TAG, "remove");
         int cuenta = -1;
-        if(mostrarHype){
+        if (mostrarHype) {
             int i = 0;
-            while (i < lista.size()){
+            while (i < lista.size()) {
                 if (lista.get(i).getisPressed() && position >= 0) {
                     position--;
                 }
@@ -279,7 +279,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         }
 
         lista.remove(cuenta);
-
+    }
 
     public void actualizar() {
         Log.d(TAG, "actualizar");
@@ -374,8 +374,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         @Override
         public void onClick(View v) {
             Log.d(TAG, "get_hype");
-            Pelicula p = lista.get(expandido);
-
             Pelicula p = null;
             int position = expandido;
             if(mostrarHype){
@@ -449,12 +447,5 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
         }
     };
-
-/*
-    public void get_hype(View v) {
-        View parentRow = (View) v.getParent();
-        ListView listView = (ListView) parentRow.getParent();
-        int position = listView.getPositionForView(parentRow);
-
 
 }
