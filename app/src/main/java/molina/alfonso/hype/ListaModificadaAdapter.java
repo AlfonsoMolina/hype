@@ -434,13 +434,33 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
             Log.d(TAG, "get_info");
 
-            // Cogemos la peli seleccionada
-            Pelicula p = lista.get(expandido);
+            Pelicula p = null;
+            int position = expandido;
+            if(mostrarHype){
+                int i = 0;
+                while (i < lista.size()){
+                    if (lista.get(i).getisPressed() && position >= 0) {
+                        if (position == 0) {
+                            p = lista.get(i);
+                        }
+                        position--;
+                    }
+                    i++;
+                }
+
+            } else {
+                p = lista.get(position);
+            }
+
+            if (p == null)
+                p = lista.get(0);
+
 
             // Instanciamos el intent de navegador
             Intent i = new Intent(Intent.ACTION_VIEW);
             // Se le pasa la web parseada
             i.setData(Uri.parse(p.getEnlace()));
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             // Lanzamos el intent
             getContext().startActivity(i);
             // profit!
