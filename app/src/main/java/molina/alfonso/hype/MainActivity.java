@@ -81,10 +81,6 @@ public class MainActivity extends AppCompatActivity {
 
                 listaAdapter.setExpandido(position);
 
-                ((TextView) view.findViewById(R.id.av_fecha)).setText(p.getEstreno_corto());
-                view.findViewById(R.id.avanzado).setVisibility(View.VISIBLE);
-                ((TextView) view.findViewById(R.id.av_sinopsis)).setText(p.getSinopsis());
-
                 listaAdapter.notifyDataSetChanged();
             }
 
