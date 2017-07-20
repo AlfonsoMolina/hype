@@ -36,6 +36,9 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private int resourceID;                                           //El layout en que se va a mostrar
     private FeedReaderDbHelper db;
     private boolean mostrarHype = false;
+    private int pagina = 0;
+    private int maxPaginas = 10;
+    private int peliculaPorPagina = 25;
 
     private int expandido = -1;
 
@@ -52,10 +55,12 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         //Inicia la lista con las pelis en la bbdd
         leerBBDD();
 
+        maxPaginas = lista.size()/peliculaPorPagina;  //Las paginas siempre tendran 25, si hay más peliculas no se muestran
     }
 
     private void leerBBDD(){
         Log.d(TAG, "leerBBDD");
+
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
@@ -148,8 +153,11 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             return count;
         }
 
+        else if (lista.size() == 0)
+            return 0;
         else
-            return this.lista.size();
+            return peliculaPorPagina;
+
     }
 
     /**
@@ -161,21 +169,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     public Object getItem(int position) {
         Log.d(TAG, "getItem");
 
-        if(mostrarHype){
-            int i = 0;
-            while (i < lista.size()){
-                if (lista.get(i).getisPressed()) {
-                    if (position == 0) {
-                        return lista.get(i);
-                    }
-                    position--;
-
-                }
-                i++;
-            }
-            return lista.get(0);
-        } else
-            return this.lista.get(position);
+        return lista.get(getPosicionReal(position));
     }
 
      /**
@@ -198,27 +192,8 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             fila = inflater.inflate(resourceID, parent, false);
         }
 
-        Pelicula p = null;
-        int cuenta = -1;
-        if(mostrarHype){
-            int i = 0;
-            while (i < lista.size()){
-                if (lista.get(i).getisPressed() && position >= 0) {
-                    cuenta++;
-                    if (position == 0) {
-                        p = lista.get(i);
-                    }
-                    position--;
-                }
-                i++;
-            }
-
-        } else {
-            p = this.lista.get(position);
-            cuenta = position;
-        }
-        if (p == null)
-            p = lista.get(0);
+        int cuenta = getPosicionReal(position);
+        Pelicula p = lista.get(cuenta);
 
         ((TextView) fila.findViewById(R.id.titulo)).setText(p.getTitulo());
         ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstreno());
@@ -229,7 +204,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         } else
             fila.findViewById(R.id.hype_msg).setVisibility(View.GONE);
 
-        if (expandido == cuenta){
+        if (expandido == position){
             fila.findViewById(R.id.avanzado).setVisibility(View.VISIBLE);
             ((TextView) fila.findViewById(R.id.av_fecha)).setText(p.getEstreno_corto());
             ((TextView) fila.findViewById(R.id.av_sinopsis)).setText(p.getSinopsis());
@@ -263,20 +238,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      */
     public void remove(int position) {
         Log.d(TAG, "remove");
-        int cuenta = -1;
-        if (mostrarHype) {
-            int i = 0;
-            while (i < lista.size()) {
-                if (lista.get(i).getisPressed() && position >= 0) {
-                    position--;
-                }
-                i++;
-            }
-
-        } else {
-            cuenta = position;
-        }
-
+        int cuenta = getPosicionReal(position);
         lista.remove(cuenta);
     }
 
@@ -294,29 +256,11 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
     public Pelicula getPelicula (int position) {
         Log.d(TAG, "getPelicula");
-        Pelicula p = null;
-        if(mostrarHype){
-            int i = 0;
-            while (i < lista.size()){
-                if (lista.get(i).getisPressed() && position >= 0) {
-                    if (position == 0) {
-                        p = lista.get(i);
-                    }
-                    position--;
-                }
-                i++;
-            }
-        } else {
-            p = this.lista.get(position);
-        }
-        if (p == null)
-            p = lista.get(0);
-
-        return p;
+        return lista.get(getPosicionReal(position));
     }
     public void setIsPressed(int position, boolean isPressed) {
         Log.d(TAG, "setIsPressed");
-        lista.get(position).setisPressed(isPressed);
+        lista.get(getPosicionReal(position)).setisPressed(isPressed);
     }
 
 
@@ -334,24 +278,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             Log.d(TAG, "enviar_Calendario");
 
             int position = expandido;
-            Pelicula p = null;
-            if(mostrarHype){
-                int i = 0;
-                while (i < lista.size()){
-                    if (lista.get(i).getisPressed() && position >= 0) {
-                        if (position == 0) {
-                            p = lista.get(i);
-                        }
-                        position--;
-                    }
-                    i++;
-                }
-
-            } else {
-                p = lista.get(position);
-            }
-            if (p == null)
-                p = lista.get(0);
+            Pelicula p = lista.get(getPosicionReal(position));
 
             Calendar beginTime = Calendar.getInstance();
             String [] f = p.getFecha_estreno().split("/");
@@ -373,26 +300,9 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         @Override
         public void onClick(View v) {
             Log.d(TAG, "get_hype");
-            Pelicula p = null;
+
             int position = expandido;
-            if(mostrarHype){
-                int i = 0;
-                while (i < lista.size()){
-                    if (lista.get(i).getisPressed() && position >= 0) {
-                        if (position == 0) {
-                            p = lista.get(i);
-                        }
-                        position--;
-                    }
-                    i++;
-                }
-
-            } else {
-                p = lista.get(position);
-            }
-
-            if (p == null)
-                p = lista.get(0);
+            Pelicula p = lista.get(getPosicionReal(position));
 
             SQLiteDatabase dbw = db.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -420,8 +330,9 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         }
     };
 
-    public void toogleHype() {
+    public boolean toogleHype() {
         this.mostrarHype = !this.mostrarHype;
+        return mostrarHype;
     }
     /*
      * Método llamado al pedir más info en una peli seleccionada.
@@ -432,27 +343,8 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         public void onClick(View view) {
 
             Log.d(TAG, "get_info");
-
-            Pelicula p = null;
             int position = expandido;
-            if(mostrarHype){
-                int i = 0;
-                while (i < lista.size()){
-                    if (lista.get(i).getisPressed() && position >= 0) {
-                        if (position == 0) {
-                            p = lista.get(i);
-                        }
-                        position--;
-                    }
-                    i++;
-                }
-
-            } else {
-                p = lista.get(position);
-            }
-
-            if (p == null)
-                p = lista.get(0);
+            Pelicula p = lista.get(getPosicionReal(position));
 
 
             // Instanciamos el intent de navegador
@@ -467,4 +359,44 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         }
     };
 
+    public void pasarPagina(int i){
+        pagina = i;
+    }
+
+    public int getPagina(){
+        return pagina;
+    }
+
+    public int getMaxPaginas() {
+        return maxPaginas;
+    }
+
+
+    //Este método devuelve la posición en la lista de Peliculas según la posición en la lista.
+    //No siempre es el mismo valor porque se usan varias páginas y a veces se muestran las que están
+    //guardadas unicamente.
+    private int getPosicionReal(int p){
+        int posicion = 0;
+        if(mostrarHype){
+            int i = 0;
+            while (i < lista.size()){
+                if (lista.get(i).getisPressed()) {
+                    if (p == 0) {
+                        posicion = i;
+                    }
+                    p--;
+                }
+                i++;
+            }
+        } else {
+            posicion = p+pagina*peliculaPorPagina;
+        }
+
+        return posicion;
+
+    }
+
+    public void actualizarBBDD() {
+        maxPaginas = lista.size()/peliculaPorPagina;
+    }
 }

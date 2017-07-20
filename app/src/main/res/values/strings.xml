@@ -7,5 +7,6 @@
     <string name="previous_button">Anterior</string>
     <string name="next_button">Siguiente</string>
     <string name="actual_page_header">Página actual: </string>
-    <string name="actual_page_number">0</string>
+    <string name="actual_page_number">1</string>
+    <string name="no_pelis">No hay películas aún :(</string>
 </resources>

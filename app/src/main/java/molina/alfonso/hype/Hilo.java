@@ -25,8 +25,14 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
     /*
      * Declaración de variables
      */
-
     private static final String TAG = "Hilo";
+
+    String[] meses = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
+    String[] meses_corto = {"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"};
+    String idioma = "es";
+    String pais = "es";
+    int pagina = 1;
+
 
     private ListaModificadaAdapter lista;
 
@@ -40,126 +46,132 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
         Log.d(TAG, "doInBackground");
         //db[0] para leer db[1] para escribir
         String html = "";
+        String dir = "";
         ArrayList<Pelicula> peliculas = new ArrayList<>();
-        String[] meses = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
-        String[] meses_corto = {"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"};
 
-        try {
-            html = getHTML("https://m.filmaffinity.com/es/rdcat.php?id=upc_th_es");
-        } catch (IOException ee) {
-            html = null;
-        }
+        while (pagina <= 10) {
+            try {
+                dir = "https://m.filmaffinity.com/" + idioma + "/rdcat.php?id=upc_th_" + pais + "&page=" + pagina;
+                html = getHTML(dir);
+                pagina++;
+            } catch (IOException ee) {
+                html = null;
+            }
 
-        if (html != null) {
+            if (html != null) {
 
-            String[] peliculasHTML = html.split("-item\" href=\"");
-            String l;
-            String p;
-            String t;
-            String s;
-            String e;
-            String f;
-            String fc;
-            Boolean h;
-            int ind;
+                String[] peliculasHTML = html.split("-item\" href=\"");
+                String l;
+                String p;
+                String t;
+                String s;
+                String e;
+                String f;
+                String fc;
+                Boolean h;
+                int ind;
 
-            String[] projection = {
-                    FeedReaderContract.FeedEntry.COLUMN_REF
-            };
+                String[] projection = {
+                        FeedReaderContract.FeedEntry.COLUMN_REF
+                };
 
-            // Filter results WHERE "title" = 'My Title'
-            String selection = FeedReaderContract.FeedEntry.COLUMN_REF + " = ?";
-            Cursor cursor;
+                // Filter results WHERE "title" = 'My Title'
+                String selection = FeedReaderContract.FeedEntry.COLUMN_REF + " = ?";
+                Cursor cursor;
 
-            ContentValues values = new ContentValues();
+                ContentValues values = new ContentValues();
 
-            for (int i = 1; i < peliculasHTML.length; i++) {
-                l = peliculasHTML[i].substring(0, peliculasHTML[i].indexOf("\""));
+                for (int i = 1; i < peliculasHTML.length; i++) {
+                    l = peliculasHTML[i].substring(0, peliculasHTML[i].indexOf("\""));
 
-                String[] selectionArgs = {l};
+                    String[] selectionArgs = {l};
 
-                cursor = db[0].query(
-                        FeedReaderContract.FeedEntry.TABLE_NAME,                     // The table to query
-                        projection,                               // The columns to return
-                        selection,                                // The columns for the WHERE clause
-                        selectionArgs,                            // The values for the WHERE clause
-                        null,                                     // don't group the rows
-                        null,                                     // don't filter by row groups
-                        null                                    // The sort order
-                );
+                    cursor = db[0].query(
+                            FeedReaderContract.FeedEntry.TABLE_NAME,                     // The table to query
+                            projection,                               // The columns to return
+                            selection,                                // The columns for the WHERE clause
+                            selectionArgs,                            // The values for the WHERE clause
+                            null,                                     // don't group the rows
+                            null,                                     // don't filter by row groups
+                            null                                    // The sort order
+                    );
+
+                    //Si la película no está guardada, se añade
+                    //TODO que la edite con nueva info, sin borrar si se ha guardado
+                    if (cursor.getCount() == 0) {
+
+                        ind = peliculasHTML[i].indexOf("src=\"");
+                        p = peliculasHTML[i].substring(ind + 5, peliculasHTML[i].indexOf("\"", ind + 5));
+                        ind = peliculasHTML[i].indexOf("mc-title ft\">");
+                        t = peliculasHTML[i].substring(ind + 13, peliculasHTML[i].indexOf("   ", ind + 13));
+                        ind = peliculasHTML[i].indexOf("synop-text\">");
+                        s = peliculasHTML[i].substring(ind + 12, peliculasHTML[i].indexOf("</li>", ind + 12));
+                        ind = peliculasHTML[i].indexOf("date\">");
+                        e = peliculasHTML[i].substring(ind + 6, peliculasHTML[i].indexOf("</span>", ind + 6));
+
+                        values.put(FeedReaderContract.FeedEntry.COLUMN_REF, l);
+                        values.put(FeedReaderContract.FeedEntry.COLUMN_TITULO, t);
+                        values.put(FeedReaderContract.FeedEntry.COLUMN_PORTADA, p);
+                        values.put(FeedReaderContract.FeedEntry.COLUMN_SINOPSIS, s);
+                        values.put(FeedReaderContract.FeedEntry.COLUMN_HYPE, false);
+
+                        int ind2 = e.indexOf(", ");
+                        String ee = "";
+                        String fecha_dia = "";
+                        String fecha_mes = "";
+                        String fecha_ano = "";
+                        if (ind2 > 0) {
+                            ee = e.substring(e.indexOf(", ") + 2);
+                            fecha_dia = ee.substring(0, ee.indexOf(" "));
+                            fecha_mes = ee.substring(ee.indexOf("de ") + 3);
+
+                            if (fecha_dia.length() == 1)
+                                fecha_dia = '0' + fecha_dia;
+
+                            int m = 0;
+
+                            //Pasa el mes a número
+                            while (!fecha_mes.matches(meses[m++])) ;
+
+                            fecha_mes = "" + m;
+                            if (fecha_mes.length() == 1)
+                                fecha_mes = '0' + fecha_mes;
+
+                            f = "" + Calendar.getInstance().get(Calendar.YEAR) + '/' + fecha_mes + '/' + fecha_dia;
+                        } else {
+                            fecha_dia = e.split("/")[0];
+                            fecha_mes = e.split("/")[1];
+                            fecha_ano = e.split("/")[2];
+
+                            e = fecha_dia + " de " + meses[Integer.parseInt(fecha_mes) - 1];
+
+                            if (fecha_dia.length() == 1)
+                                fecha_dia = '0' + fecha_dia;
+
+                            if (fecha_mes.length() == 1)
+                                fecha_mes = '0' + fecha_mes;
+
+                            f = "" + fecha_ano + '/' + fecha_mes + '/' + fecha_dia;
+
+                        }
+
+                        fc = fecha_dia + " " + meses_corto[Integer.parseInt(fecha_mes)-1];
+
+                        values.put(FeedReaderContract.FeedEntry.COLUMN_CORTO, fc);
+                        values.put(FeedReaderContract.FeedEntry.COLUMN_ESTRENO, e);
+                        values.put(FeedReaderContract.FeedEntry.COLUMN_FECHA, f);
 
 
-                if (cursor.getCount() == 0) {
-
-                    ind = peliculasHTML[i].indexOf("src=\"");
-                    p = peliculasHTML[i].substring(ind + 5, peliculasHTML[i].indexOf("\"", ind + 5));
-                    ind = peliculasHTML[i].indexOf("mc-title ft\">");
-                    t = peliculasHTML[i].substring(ind + 13, peliculasHTML[i].indexOf("   ", ind + 13));
-                    ind = peliculasHTML[i].indexOf("synop-text\">");
-                    s = peliculasHTML[i].substring(ind + 12, peliculasHTML[i].indexOf("</li>", ind + 12));
-                    ind = peliculasHTML[i].indexOf("date\">");
-                    e = peliculasHTML[i].substring(ind + 6, peliculasHTML[i].indexOf("</span>", ind + 6));
-
-                    values.put(FeedReaderContract.FeedEntry.COLUMN_REF, l);
-                    values.put(FeedReaderContract.FeedEntry.COLUMN_TITULO, t);
-                    values.put(FeedReaderContract.FeedEntry.COLUMN_PORTADA, p);
-                    values.put(FeedReaderContract.FeedEntry.COLUMN_SINOPSIS, s);
-                    values.put(FeedReaderContract.FeedEntry.COLUMN_HYPE, false);
-
-                    int ind2 = e.indexOf(", ");
-                    String ee = "";
-                    String fecha_dia = "";
-                    String fecha_mes = "";
-                    String fecha_ano = "";
-                    if (ind2 > 0) {
-                        ee = e.substring(e.indexOf(", ") + 2);
-                        fecha_dia = ee.substring(0, ee.indexOf(" "));
-                        fecha_mes = ee.substring(ee.indexOf("de ") + 3);
-
-                        if (fecha_dia.length() == 1)
-                            fecha_dia = '0' + fecha_dia;
-
-                        int m = 0;
-
-                        while (!fecha_mes.matches(meses[m++])) ;
-
-                        fecha_mes = "" + m;
-                        if (fecha_mes.length() == 1)
-                            fecha_mes = '0' + fecha_mes;
-
-                        f = "" + Calendar.getInstance().get(Calendar.YEAR) + '/' + fecha_mes + '/' + fecha_dia;
-                    } else {
-                        fecha_dia = e.split("/")[0];
-                        fecha_mes = e.split("/")[1];
-                        fecha_ano = e.split("/")[2];
-
-                        e = fecha_dia + " de " + meses[Integer.parseInt(fecha_mes) - 1];
-
-                        if (fecha_dia.length() == 1)
-                            fecha_dia = '0' + fecha_dia;
-
-                        if (fecha_mes.length() == 1)
-                            fecha_mes = '0' + fecha_mes;
-
-                        f = "" + fecha_ano + '/' + fecha_mes + '/' + fecha_dia;
+                        db[1].insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
+                        peliculas.add(new Pelicula(l, p, t, s, e, f, fc, false));
+                        values.clear();
 
                     }
 
-                    fc = fecha_dia + " " + meses_corto[Integer.parseInt(fecha_mes)];
-
-                    values.put(FeedReaderContract.FeedEntry.COLUMN_CORTO, fc);
-                    values.put(FeedReaderContract.FeedEntry.COLUMN_ESTRENO, e);
-                    values.put(FeedReaderContract.FeedEntry.COLUMN_FECHA, f);
-
-                    db[1].insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
-                    peliculas.add(new Pelicula(l,p,t,s,e,f,fc,false));
-                    values.clear();
-
+                    cursor.close();
                 }
 
-                cursor.close();
             }
-
         }
         return peliculas;
     }
@@ -170,8 +182,7 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
         Log.d(TAG, "onPostExecute");
         lista.add(peliculas);
         lista.notifyDataSetChanged();
-        // log.setText(logtext);
-
+        lista.actualizarBBDD();
     }
 
     @NonNull

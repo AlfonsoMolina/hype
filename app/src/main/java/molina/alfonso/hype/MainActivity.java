@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.IOException;
 
@@ -71,6 +72,12 @@ public class MainActivity extends AppCompatActivity {
                 listaAdapter.notifyDataSetChanged();
             }
         });
+
+        //Si la lista está vacía, desaparece la barra de navegación y aparece un texto diciéndolo.
+        if (listaAdapter.getCount()==0) {
+            findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
+            findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -94,6 +101,10 @@ public class MainActivity extends AppCompatActivity {
                 // Lanzamos el Thread que maneja la lista
                 Hilo hilo = new Hilo(listaAdapter);
                 hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+
+                //Estoy habría que ponerlo cuando termine de actualizar, y no al principio, pero estoy cansado ya todo
+                findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
+                findViewById(R.id.nopelis).setVisibility(View.INVISIBLE);
                 return true;
 
             default:
@@ -106,16 +117,53 @@ public class MainActivity extends AppCompatActivity {
      * Métodos custom
      */
 
-    public void cargarHTML() throws IOException {
-        Log.d(TAG, "cargarHTML");
-        Hilo hilo = new Hilo(listaAdapter);
-        hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
-    }
 
     public void mostrarHype(View view) {
-        listaAdapter.toogleHype();
+        if(listaAdapter.toogleHype()){
+            findViewById(R.id.navegacion).setVisibility(View.GONE);
+        } else if (listaAdapter.getCount()!=0)
+            findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
+
         listaAdapter.setExpandido(-1);
+        listaAdapter.notifyDataSetChanged();
+        ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+
+
+    }
+
+    public void pasarPaginaAtras(View view) {
+        int pagina = listaAdapter.getPagina();
+        findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
+        if (pagina > 0) {
+            listaAdapter.pasarPagina(pagina - 1);
+            ((TextView) findViewById(R.id.actualPageText)).setText(""+pagina);
+            //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
+            //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
+            //porque se ha cogido del adaptador. Así que, se queda igual.
+            ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+            if (pagina == 1) {
+                findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
+            }
+        }
+
         listaAdapter.notifyDataSetChanged();
     }
 
+    public void pasarPaginaAdelante(View view) {
+        int pagina = listaAdapter.getPagina();
+        findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
+        if (pagina < listaAdapter.getMaxPaginas()) {
+            listaAdapter.pasarPagina(pagina + 1);
+            ((TextView) findViewById(R.id.actualPageText)).setText(""+(pagina+2));
+            //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
+            //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
+            //porque se ha cogido del adaptador.
+            ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+            if (pagina+2 == listaAdapter.getMaxPaginas()) {
+                findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
+            }
+        }
+
+        listaAdapter.notifyDataSetChanged();
+    }
 }
