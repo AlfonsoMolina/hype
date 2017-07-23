@@ -35,132 +35,42 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private static final String TAG = "ListaModificadaAdapter";
 
     private ArrayList<Pelicula> lista = new ArrayList<>();  //Los elementos de la lista
-    private int resourceID;                                           //El layout en que se va a mostrar
-    private FeedReaderDbHelper db;
-    private boolean mostrarHype = false;
-    private int pagina = 0;
-    private int maxPaginas = 10;
-    private int peliculaPorPagina = 25;
-    private Activity activity;
-
-    private int expandido = -1;
+    private int resourceID;                                 //El layout en que se va a mostrar
+    private FeedReaderDbHelper db;                          //Base de datos
+    private boolean mostrarHype = false;                    //¿Se están mostrando las guardadas o todas?
+    private int pagina = 0;                                 //La página que se está mostrando (empezando por 0)
+    private int ultPagina;                                  //El número (empezando por 1) de la última página
+    private int peliculaPorPagina = 25;                     //Número de películas por página
+    private Activity activity;                              //Actividad, para cambiar la IU
+    private int expandido = -1;                             //Posición del elemento expandido
 
     /**
      * Constructor.
      * @param resourceID recurso con el layout de cada fila.
+     * @param activity actividad principal, para acutalizar la IU
+     * @param db la base de datos
      */
-    public ListaModificadaAdapter(Activity activity, int resourceID, SQLiteDatabase db) {
+    public ListaModificadaAdapter(Activity activity, int resourceID, FeedReaderDbHelper db) {
         super(activity.getApplicationContext(),resourceID);
         Log.d(TAG, "ListaModificadaAdapter");
         this.resourceID = resourceID;
         this.activity = activity;
-        //Inicia la lista con las pelis en la bbdd
-        //leerBBDD();
-        maxPaginas = 1;  //Las paginas siempre tendran 25, si hay más peliculas no se muestran
-        HiloLeerBBDD hilo = new HiloLeerBBDD(db,this,(LinearLayout)activity.findViewById(R.id.carga_barra),(TextView) activity.findViewById(R.id.carga_mensaje));
+        this.db = db;
+        ultPagina = 1;  //Temporal
+        HiloLeerBBDD hilo = new HiloLeerBBDD(db.getReadableDatabase(),this,
+                (LinearLayout)activity.findViewById(R.id.carga_barra),
+                (TextView) activity.findViewById(R.id.carga_mensaje));
         hilo.execute();
 
     }
 
-    public void actualizarInterfaz(){
-        if (!mostrarHype) {
-            if (lista.size() == 0) {
-                activity.findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
-                activity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
-            } else {
-                activity.findViewById(R.id.nopelis).setVisibility(View.GONE);
-                activity.findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
-                if (pagina + 1 < getMaxPaginas()) {
-                    activity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
-                } else
-                    activity.findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
-            }
-        }
-    }
 
-    public void noHayPelis(){
-        if (lista.size()==0) {
-            ((TextView) activity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
-            activity.findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
-            activity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);        }
-    }
-    private void leerBBDD(){
-        Log.d(TAG, "leerBBDD");
-
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
-        String[] projection = {
-                FeedReaderContract.FeedEntry._ID,
-                FeedReaderContract.FeedEntry.COLUMN_TITULO,
-                FeedReaderContract.FeedEntry.COLUMN_PORTADA,
-                FeedReaderContract.FeedEntry.COLUMN_REF,
-                FeedReaderContract.FeedEntry.COLUMN_SINOPSIS,
-                FeedReaderContract.FeedEntry.COLUMN_ESTRENO,
-                FeedReaderContract.FeedEntry.COLUMN_FECHA,
-                FeedReaderContract.FeedEntry.COLUMN_HYPE,
-                FeedReaderContract.FeedEntry.COLUMN_CORTO
-        };
-
-        SQLiteDatabase dbr = db.getReadableDatabase();
-        Cursor cursor = dbr.query(
-                FeedReaderContract.FeedEntry.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                                     // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                FeedReaderContract.FeedEntry.COLUMN_FECHA+" ASC"                                    // The sort order
-        );
-
-        String l, p, t, s, e, f, h, fc;
-
-        String year = "" + Calendar.getInstance().get(Calendar.YEAR);
-        int month_i = Calendar.getInstance().get(Calendar.MONTH)+1;
-        int day_i = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-
-        String month;
-        String day;
-
-        if (month_i < 10)
-            month = "0" + month_i;
-        else
-            month = ""+month_i;
-
-        if (day_i < 10)
-            day = "0" + day_i;
-        else
-            day = "" + day_i;
-
-        String fecha_hoy = year + '/' + month + '/' + day;
-
-        while(cursor.moveToNext()) {
-            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_REF));
-            p = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_PORTADA));
-            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_TITULO));
-            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_SINOPSIS));
-            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_ESTRENO));
-            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_FECHA));
-            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_HYPE));
-            fc = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_CORTO));
-
-
-            //Si fecha_hoy después que f, >0
-            // si al revés, < 0
-            if(fecha_hoy.compareTo(f)>0) {
-                String selection = FeedReaderContract.FeedEntry.COLUMN_REF + " LIKE ?";
-                // Specify arguments in placeholder order.
-                String[] selectionArgs = { l };
-                // Issue SQL statement.
-                dbr.delete(FeedReaderContract.FeedEntry.TABLE_NAME, selection, selectionArgs);
-            }else
-                this.add(new Pelicula(l,p,t,s,e,f,fc,h.equalsIgnoreCase("T")));
-        }
-        cursor.close();
-
-    }
 
     /**
-     * Devuelve el número de filas en la lista.
+     * Devuelve el número de filas en la lista. Puede ser:
+     *      0, si la fila está vaciá
+     *      peliculaPorPagina, porque solo muestra paginas completas en teoría
+     *      las que sea si están guardadas
      * @return devuelve un entero con el número de elementos en la lista.
      */
     @Override
@@ -172,17 +82,48 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         if(mostrarHype){
             int i = 0;
             while(i < lista.size()) {
-                if (lista.get(i).getisPressed())
+                if (lista.get(i).setisHyped())
                     count++;
                 i++;
             }
             return count;
         }
 
-        else if (lista.size() == 0)
+        else if (lista.size() > peliculaPorPagina)
+            return peliculaPorPagina;
+        else if (lista.size() > 0 )
+            return lista.size();
+        else
+            return 0;
+
+    /*    else if (lista.size() == 0)
             return 0;
         else
-            return peliculaPorPagina;
+            return peliculaPorPagina;*/
+    }
+
+    //Este método devuelve la posición en la lista de Peliculas según la posición en la lista.
+    //No siempre es el mismo valor porque se usan varias páginas y a veces se muestran las que están
+    //guardadas unicamente.
+    //p es la posición en la lista mostrada en pantalla. posicion es la posición en la lista.
+    private int getPosicionReal(int p) {
+        int posicion = 0;
+        if (mostrarHype) {
+            int i = 0;
+            while (i < lista.size()) {
+                if (lista.get(i).setisHyped()) {
+                    if (p == 0) {
+                        posicion = i;
+                    }
+                    p--;
+                }
+                i++;
+            }
+        } else {
+            posicion = p + pagina * peliculaPorPagina;
+        }
+
+        return posicion;
 
     }
 
@@ -194,7 +135,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     @Override
     public Object getItem(int position) {
         Log.d(TAG, "getItem");
-
         return lista.get(getPosicionReal(position));
     }
 
@@ -211,12 +151,12 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         Log.d(TAG, "getView");
         // workaround para que no se rompa si aún no está lista la lectura
         View mView;
-        try {
+     //   try {
             mView = prepareView(position, convertView, parent);
-        }catch (Exception e) {
-            Log.e(TAG, e.toString());
-            mView = getView(position, convertView, parent);
-        }
+       // }catch (Exception e) {
+      //      Log.e(TAG, e.toString());
+      //      mView = getView(position, convertView, parent);
+     //   }
         return mView;
     }
 
@@ -240,7 +180,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstreno());
             ((ImageView) fila.findViewById(R.id.portada)).setImageBitmap(p.getPortada());
 
-            if (p.getisPressed()) {
+            if (p.setisHyped()) {
                 fila.findViewById(R.id.hype_msg).setVisibility(View.VISIBLE);
             } else
                 fila.findViewById(R.id.hype_msg).setVisibility(View.GONE);
@@ -267,37 +207,8 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         lista.add(p);
     }
 
-    public void add(ArrayList<Pelicula> p) {
-        Log.d(TAG, "add");
-        lista.addAll(p);
-    }
-     /**
-     * Elimina una fila de la lista.
-     *
-     * @param position entero con la posición del elemento a eliminar
-     */
-    public void remove(int position) {
-        Log.d(TAG, "remove");
-        int cuenta = getPosicionReal(position);
-        lista.remove(cuenta);
-    }
-
-    public void delete(int i) {
-        Log.d(TAG, "delete");
-        for (int j = 0; j<i; j++)
-            lista.remove(j);
-    }
-
-    public Pelicula getPelicula (int position) {
-        Log.d(TAG, "getPelicula");
-        return lista.get(getPosicionReal(position));
-    }
-    public void setIsPressed(int position, boolean isPressed) {
-        Log.d(TAG, "setIsPressed");
-        lista.get(getPosicionReal(position)).setisPressed(isPressed);
-    }
-
-
+    //Guarda el elemento que está expandido con más información.
+    //Si se pulsa otra vez, se oculta
     public void setExpandido(int position){
         Log.d(TAG, "setExpandido");
         if (expandido == position){
@@ -306,6 +217,41 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             expandido = position;
     }
 
+    //Lo que hace este método es mostrar los elementos de la interfaz adecuados.
+    //Cuando la lista ya no esté vacía, muestra la barra de navegación y esconde el mensaje
+    //Cuando haya una página nueva, mostrará el botón para pasar la página.
+    public void actualizarInterfaz(){
+        if (!mostrarHype) {
+            if (lista.size() == 0) {
+                activity.findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
+                activity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
+            } else {
+                activity.findViewById(R.id.nopelis).setVisibility(View.GONE);
+                activity.findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
+                if (pagina + 1 < getUltPagina()) {
+                    activity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
+                } else
+                    activity.findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    //Si la lista está vacía, muestra el mensaje de que no hay películas.
+    public void noHayPelis(){
+        if (lista.size()==0) {
+            ((TextView) activity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
+            activity.findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
+            activity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);        }
+    }
+
+    //Guarda si se muestran las películas guardadas o todas
+    public boolean toogleHype() {
+        this.mostrarHype = !this.mostrarHype;
+        expandido = -1;
+        return mostrarHype;
+    }
+
+    //Envía la película al calendario en forma de evento
     private View.OnClickListener enviar_Calendario = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -330,6 +276,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         }
     };
 
+    //Guarda la película
     private View.OnClickListener get_hype = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -342,9 +289,9 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             ContentValues values = new ContentValues();
             String h;
 
-            p.setisPressed(!p.getisPressed());
+            p.setisHyped(!p.setisHyped());
 
-            if (p.getisPressed()) {
+            if (p.setisHyped()) {
                 h = "T";
             } else
                 h = "F";
@@ -364,11 +311,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         }
     };
 
-    public boolean toogleHype() {
-        this.mostrarHype = !this.mostrarHype;
-        expandido = -1;
-        return mostrarHype;
-    }
     /*
      * Método llamado al pedir más info en una peli seleccionada.
      */
@@ -403,37 +345,12 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         return pagina;
     }
 
-    public int getMaxPaginas() {
-        return maxPaginas;
+    public int getUltPagina() {
+        return ultPagina;
     }
 
-    public void setMaxPaginas(){
-        this.maxPaginas = lista.size()/peliculaPorPagina;
-    }
-
-
-    //Este método devuelve la posición en la lista de Peliculas según la posición en la lista.
-    //No siempre es el mismo valor porque se usan varias páginas y a veces se muestran las que están
-    //guardadas unicamente.
-    private int getPosicionReal(int p) {
-        int posicion = 0;
-        if (mostrarHype) {
-            int i = 0;
-            while (i < lista.size()) {
-                if (lista.get(i).getisPressed()) {
-                    if (p == 0) {
-                        posicion = i;
-                    }
-                    p--;
-                }
-                i++;
-            }
-        } else {
-            posicion = p + pagina * peliculaPorPagina;
-        }
-
-        return posicion;
-
+    public void setMaxPaginas() {
+        this.ultPagina = lista.size() / peliculaPorPagina;
     }
 
 }

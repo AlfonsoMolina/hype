@@ -1,7 +1,6 @@
 package molina.alfonso.hype;
 
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -56,18 +55,19 @@ public class MainActivity extends AppCompatActivity {
         // Creamos el helper de la BBDD
         mDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
-        // Borrado de la BBDD
-        //mDbHelper.getWritableDatabase().execSQL("delete from "+ TABLE_NAME);
-
         // Hook de la lista
         ListView lista = (ListView) findViewById(R.id.lista);
 
-        listaAdapter = new ListaModificadaAdapter(this, R.layout.fila, mDbHelper.getReadableDatabase());
+        //Se le manda a la lista esta actividad, para poder modificar la interfaz,
+        //el layout de la row y la bbdd
+        listaAdapter = new ListaModificadaAdapter(this, R.layout.fila, mDbHelper);
 
         // Setup de la lista
         lista.setAdapter(listaAdapter);
         lista.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         lista.setItemsCanFocus(false);
+
+        //Al pulsar en una fila se expande y muestra más información.
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -92,14 +92,19 @@ public class MainActivity extends AppCompatActivity {
 
         // Interpretamos lo seleccionado en el menu
         switch (item.getItemId()) {
+
+            //Mostrar las opciones (pendiente)
             case R.id.action_settings:
                 return true;
 
-            case R.id.action_favorite:
-                // Lanzamos el Thread que maneja la lista
-                HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(listaAdapter,((LinearLayout) findViewById(R.id.carga_barra)),((TextView) findViewById(R.id.carga_mensaje)));
-                hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+            //Actualiza las películas guardadas..
+            case R.id.actualizar:
+                // Lanzamos el Thread que descargará la información.
+                HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(listaAdapter,
+                        ((LinearLayout) findViewById(R.id.carga_barra)),
+                        ((TextView) findViewById(R.id.carga_mensaje)));
 
+                hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
                 return true;
 
             default:
@@ -113,15 +118,19 @@ public class MainActivity extends AppCompatActivity {
      */
 
 
+    //Muestra las películas guardadas
     public void mostrarHype(View view) {
         Log.d(TAG, "mostrarHype");
 
         if(listaAdapter.toogleHype()){
             findViewById(R.id.navegacion).setVisibility(View.GONE);
+            //Si no hay ninguna guardada, se muestra un mensaje
             if (listaAdapter.getCount()== 0){
                 findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
-                ((TextView) findViewById(R.id.nopelis)).setText("Ninguna película guardada.\nPor ahora.");
+                ((TextView) findViewById(R.id.nopelis)).setText("\n\nNinguna película guardada.\nPor ahora.");
             }
+
+
         } else if (listaAdapter.getCount()!=0) {
             findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
             findViewById(R.id.nopelis).setVisibility(View.GONE);
@@ -157,14 +166,14 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "pasarPaginaAdelante");
         int pagina = listaAdapter.getPagina();
         findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
-        if (pagina < listaAdapter.getMaxPaginas()) {
+        if (pagina < listaAdapter.getUltPagina()) {
             listaAdapter.pasarPagina(pagina + 1);
             ((TextView) findViewById(R.id.actualPageText)).setText(""+(pagina+2));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
             //porque se ha cogido del adaptador.
             ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
-            if (pagina+2 == listaAdapter.getMaxPaginas()) {
+            if (pagina+2 == listaAdapter.getUltPagina()) {
                 findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
             }
         }

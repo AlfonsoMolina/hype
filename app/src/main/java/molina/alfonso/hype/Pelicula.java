@@ -2,6 +2,7 @@ package molina.alfonso.hype;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.util.Log;
 
 import java.net.URL;
@@ -21,16 +22,17 @@ public class Pelicula {
     private String titulo;
     private Bitmap portada;
     private String sinopsis;
-    private String estreno_letras;
-    private String estreno_fecha;
-    private String estreno_corto;
+    private String estreno_letras;      //Viernes, 4 de febrero
+    private String estreno_fecha;       //2018/02/04
+    private String estreno_corto;       //4 feb
     private String enlace;
-    private boolean isPressed;
+    private boolean isHyped;
 
     /*
      * Constructor
      */
 
+    //link, portada, titulo, sinopsis, estreno (con letras), fecha (exacto), fecha corta, hay hype?
     Pelicula (String l, String p, String t, String s, String e, String f, String fc,Boolean h){
         Log.d(TAG, "Pelicula");
         this.titulo = t;
@@ -39,15 +41,19 @@ public class Pelicula {
         this.enlace = l;
         this.estreno_fecha = f;
         this.estreno_corto = fc;
-        this.isPressed = h;
+        this.isHyped = h;
 
+        //Descarga el bitmap de la portada cada vez que se coge la película de la bbdd.
+        //Si no hay, se pone negro.
         try {
             URL url = new URL(p);
             Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
             this.portada = Bitmap.createScaledBitmap(bmp, 50, 80, false);
 
         }catch (Exception ee){
-
+            Bitmap bmp = Bitmap.createBitmap(50, 80, Bitmap.Config.ARGB_8888);
+            bmp.eraseColor(Color.BLACK);
+            this.portada = bmp;
         }
     }
 
@@ -90,14 +96,14 @@ public class Pelicula {
         return estreno_corto;
     }
     
-    public void setisPressed(boolean b) {
-        Log.d(TAG, "setisPressed");
-        this.isPressed = b;
+    public void setisHyped (boolean b) {
+        Log.d(TAG, "setisHyped");
+        this.isHyped = b;
     }
 
-    public boolean getisPressed() {
-        Log.d(TAG, "getisPressed");
-        return isPressed;
+    public boolean setisHyped () {
+        Log.d(TAG, "setisHyped");
+        return isHyped;
     }
 }
 
