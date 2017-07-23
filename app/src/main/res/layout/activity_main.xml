@@ -34,6 +34,7 @@
         android:layout_height="?attr/actionBarSize"
         android:orientation="horizontal"
         android:layout_below="@id/my_toolbar"
+        android:visibility="invisible"
         android:id="@+id/navegacion">
         <Button
             android:id="@+id/previousPageButton"
@@ -73,15 +74,16 @@
 
     <TextView
         android:id="@+id/nopelis"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/navegacion"
-        android:visibility="gone"
-        android:text="@string/no_pelis"
+        android:visibility="visible"
+        android:text="@string/leyendo"
         android:textAlignment="center"
         android:textSize="14sp"
         android:textColor="#e3e3e3"
-        android:textStyle="italic"/>
+        android:textStyle="italic"
+        />
 
 
     <ListView

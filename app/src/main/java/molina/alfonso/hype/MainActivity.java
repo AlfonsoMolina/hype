@@ -2,11 +2,13 @@ package molina.alfonso.hype;
 
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -26,6 +28,11 @@ public class MainActivity extends AppCompatActivity {
     private ListaModificadaAdapter listaAdapter;
     // Helper para manipular la BBDD
     private FeedReaderDbHelper mDbHelper;
+
+    private float x1=0;
+    private float x2=0;
+    static final int MIN_DISTANCE = 150;
+
 
     /*
      * Métodos override
@@ -57,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         // Hook de la lista
         ListView lista = (ListView) findViewById(R.id.lista);
 
-        listaAdapter = new ListaModificadaAdapter(getApplicationContext(), R.layout.fila_pelicula3, mDbHelper.getReadableDatabase(),((LinearLayout) findViewById(R.id.carga_barra)),((TextView) findViewById(R.id.carga_mensaje)));
+        listaAdapter = new ListaModificadaAdapter(this, R.layout.fila_pelicula3, mDbHelper.getReadableDatabase());
 
         // Setup de la lista
         lista.setAdapter(listaAdapter);
@@ -71,11 +78,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Si la lista está vacía, desaparece la barra de navegación y aparece un texto diciéndolo.
-        /*if (listaAdapter.getCount()==0) {
-            findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
-            findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
-        }*/
     }
 
     @Override
@@ -100,9 +102,6 @@ public class MainActivity extends AppCompatActivity {
                 HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(listaAdapter,((LinearLayout) findViewById(R.id.carga_barra)),((TextView) findViewById(R.id.carga_mensaje)));
                 hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
 
-                //Estoy habría que ponerlo cuando termine de actualizar, y no al principio, pero estoy cansado ya todo
-                findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
-                findViewById(R.id.nopelis).setVisibility(View.INVISIBLE);
                 return true;
 
             default:
@@ -117,10 +116,18 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void mostrarHype(View view) {
+        Log.d(TAG, "mostrarHype");
+
         if(listaAdapter.toogleHype()){
             findViewById(R.id.navegacion).setVisibility(View.GONE);
-        } else if (listaAdapter.getCount()!=0)
+            if (listaAdapter.getCount()== 0){
+                findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.nopelis)).setText("Ninguna película guardada.\nPor ahora.");
+            }
+        } else if (listaAdapter.getCount()!=0) {
             findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
+            findViewById(R.id.nopelis).setVisibility(View.GONE);
+        }
 
         listaAdapter.setExpandido(-1);
         listaAdapter.notifyDataSetChanged();
@@ -130,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void pasarPaginaAtras(View view) {
+        Log.d(TAG, "pasarPaginaAtras");
         int pagina = listaAdapter.getPagina();
         findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
         if (pagina > 0) {
@@ -148,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void pasarPaginaAdelante(View view) {
+        Log.d(TAG, "pasarPaginaAdelante");
         int pagina = listaAdapter.getPagina();
         findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
         if (pagina < listaAdapter.getMaxPaginas()) {

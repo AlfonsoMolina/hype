@@ -1,5 +1,6 @@
 package molina.alfonso.hype;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,26 +43,50 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private int pagina = 0;
     private int maxPaginas = 10;
     private int peliculaPorPagina = 25;
+    private Activity activity;
 
     private int expandido = -1;
 
     /**
      * Constructor.
-     * @param context contexto de la actividad.
      * @param resourceID recurso con el layout de cada fila.
      */
-    public ListaModificadaAdapter(Context context, int resourceID, SQLiteDatabase db, LinearLayout carga_barra,TextView carga_mensaje) {
-        super(context,resourceID);
+    public ListaModificadaAdapter(Activity activity, int resourceID, SQLiteDatabase db) {
+        super(activity.getApplicationContext(),resourceID);
         Log.d(TAG, "ListaModificadaAdapter");
         this.resourceID = resourceID;
+        this.activity = activity;
         //Inicia la lista con las pelis en la bbdd
         //leerBBDD();
         maxPaginas = 1;  //Las paginas siempre tendran 25, si hay más peliculas no se muestran
-        HiloLeerBBDD hilo = new HiloLeerBBDD(db,this,carga_barra,carga_mensaje);
+        HiloLeerBBDD hilo = new HiloLeerBBDD(db,this,(LinearLayout)activity.findViewById(R.id.carga_barra),(TextView) activity.findViewById(R.id.carga_mensaje));
         hilo.execute();
+
 
     }
 
+    public void actualizarInterfaz(){
+        if (!mostrarHype) {
+            if (lista.size() == 0) {
+                activity.findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
+                activity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
+            } else {
+                activity.findViewById(R.id.nopelis).setVisibility(View.GONE);
+                activity.findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
+                if (pagina + 1 < getMaxPaginas()) {
+                    activity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
+                } else
+                    activity.findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    public void noHayPelis(){
+        if (lista.size()==0) {
+            ((TextView) activity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
+            activity.findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
+            activity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);        }
+    }
     private void leerBBDD(){
         Log.d(TAG, "leerBBDD");
 
@@ -328,6 +355,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
     public boolean toogleHype() {
         this.mostrarHype = !this.mostrarHype;
+        expandido = -1;
         return mostrarHype;
     }
     /*
@@ -357,6 +385,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
     public void pasarPagina(int i){
         pagina = i;
+        expandido = -1;
     }
 
     public int getPagina(){
@@ -394,10 +423,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
         return posicion;
 
-    }
-
-    public void actualizarBBDD() {
-        maxPaginas = lista.size()/peliculaPorPagina;
     }
 
 }

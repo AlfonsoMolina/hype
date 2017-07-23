@@ -111,7 +111,12 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                         ind = peliculasHTML[i].indexOf("mc-title ft\">");
                         t = peliculasHTML[i].substring(ind + 13, peliculasHTML[i].indexOf("   ", ind + 13));
                         ind = peliculasHTML[i].indexOf("synop-text\">");
-                        s = peliculasHTML[i].substring(ind + 12, peliculasHTML[i].indexOf("</li>", ind + 12));
+                        int ind2 = peliculasHTML[i].indexOf("</li>",ind + 12);
+                        int ind3 =  peliculasHTML[i].indexOf("(FILM",ind + 12);
+
+                        if (ind3 >0 && ind3 < ind2)
+                            ind2=ind3;
+                        s = peliculasHTML[i].substring(ind + 12, ind2);
                         ind = peliculasHTML[i].indexOf("date\">");
                         e = peliculasHTML[i].substring(ind + 6, peliculasHTML[i].indexOf("</span>", ind + 6));
 
@@ -121,7 +126,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                         values.put(FeedReaderContract.FeedEntry.COLUMN_SINOPSIS, s);
                         values.put(FeedReaderContract.FeedEntry.COLUMN_HYPE, false);
 
-                        int ind2 = e.indexOf(", ");
+                        ind2 = e.indexOf(", ");
                         String ee = "";
                         String fecha_dia = "";
                         String fecha_mes = "";
@@ -186,16 +191,6 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     }
 
 
-    @Override
-    protected void onPostExecute(Void v) {
-        Log.d(TAG, "onPostExecute");
-        lista.notifyDataSetChanged();
-        lista.actualizarBBDD();
-        carga_mensaje.setText("Actualizando...");
-        carga_mensaje.setVisibility(View.GONE);
-        carga_barra.setVisibility(View.GONE);
-
-    }
 
     @NonNull
     private static String getHTML(String url) throws IOException {
@@ -219,19 +214,33 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     }
 
     @Override
-    protected void onProgressUpdate(Integer... i) {
-        Log.d(TAG, "onProgressUpdate");
-        carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.GREEN);
-        lista.notifyDataSetChanged();
-    }
-
-    @Override
     protected void onPreExecute (){
         Log.d(TAG, "onPreExecute");
-
         for(int i = 0; i < 9; i++)
             carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
         carga_barra.setVisibility(View.VISIBLE);
         carga_mensaje.setVisibility(View.VISIBLE);
     }
+    @Override
+    protected void onProgressUpdate(Integer... i) {
+        Log.d(TAG, "onProgressUpdate");
+        carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.GREEN);
+        lista.setMaxPaginas();
+        lista.notifyDataSetChanged();
+        lista.actualizarInterfaz();
+    }
+    @Override
+    protected void onPostExecute(Void v) {
+        Log.d(TAG, "onPostExecute");
+        lista.notifyDataSetChanged();
+        lista.setMaxPaginas();
+        lista.actualizarInterfaz();
+        carga_mensaje.setText("Actualizando...");
+        carga_mensaje.setVisibility(View.GONE);
+        carga_barra.setVisibility(View.GONE);
+
+    }
+
+
+
 }

@@ -120,14 +120,6 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     }
 
     @Override
-    protected void onProgressUpdate(Integer... i) {
-        Log.d(TAG, "onProgressUpdate");
-        carga_barra.getChildAt(i[0]).setBackgroundColor(Color.GREEN);
-        lista.setMaxPaginas();
-        lista.notifyDataSetChanged();
-    }
-
-    @Override
     protected void onPreExecute (){
         Log.d(TAG, "onPreExecute");
         for(int i = 0; i < 9; i++)
@@ -136,14 +128,24 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
         carga_mensaje.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    protected void onProgressUpdate(Integer... i) {
+        Log.d(TAG, "onProgressUpdate");
+        carga_barra.getChildAt(i[0]).setBackgroundColor(Color.GREEN);
+        lista.setMaxPaginas();
+        lista.notifyDataSetChanged();
+        lista.actualizarInterfaz();
+    }
 
     @Override
     protected void onPostExecute(Void v) {
         Log.d(TAG, "onPostExecute");
         lista.setMaxPaginas();
         lista.notifyDataSetChanged();
+        lista.actualizarInterfaz();
+        lista.noHayPelis();
         carga_mensaje.setVisibility(View.GONE);
         carga_barra.setVisibility(View.GONE);
-        
+
     }
 }
