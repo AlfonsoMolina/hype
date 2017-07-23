@@ -17,8 +17,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -61,7 +59,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         maxPaginas = 1;  //Las paginas siempre tendran 25, si hay más peliculas no se muestran
         HiloLeerBBDD hilo = new HiloLeerBBDD(db,this,(LinearLayout)activity.findViewById(R.id.carga_barra),(TextView) activity.findViewById(R.id.carga_mensaje));
         hilo.execute();
-
 
     }
 
@@ -213,18 +210,31 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.d(TAG, "getView");
         // workaround para que no se rompa si aún no está lista la lectura
+        View mView;
         try {
-            View fila = convertView;
+            mView = prepareView(position, convertView, parent);
+        }catch (Exception e) {
+            Log.e(TAG, e.toString());
+            mView = getView(position, convertView, parent);
+        }
+        return mView;
+    }
+
+    public View prepareView(int position, View convertView, ViewGroup parent) {
+        Log.d(TAG, "prepareView");
+        // workaround para que no se rompa si aún no está lista la lectura
+            View fila;
 
             if (convertView == null) {
                 //Se añade una nueva view a la lista.
                 LayoutInflater inflater = (LayoutInflater) this.getContext()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 fila = inflater.inflate(resourceID, parent, false);
+            }else{
+                fila = convertView;
             }
 
-            int cuenta = getPosicionReal(position);
-            Pelicula p = lista.get(cuenta);
+            Pelicula p = lista.get(getPosicionReal(position));
 
             ((TextView) fila.findViewById(R.id.titulo)).setText(p.getTitulo());
             ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstreno());
@@ -244,13 +254,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
                 fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
             } else
                 fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
-
             return fila;
-
-        }catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-            return getView(position, convertView, parent);
-        }
     }
 
     /**
@@ -411,11 +415,11 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     //Este método devuelve la posición en la lista de Peliculas según la posición en la lista.
     //No siempre es el mismo valor porque se usan varias páginas y a veces se muestran las que están
     //guardadas unicamente.
-    private int getPosicionReal(int p){
+    private int getPosicionReal(int p) {
         int posicion = 0;
-        if(mostrarHype){
+        if (mostrarHype) {
             int i = 0;
-            while (i < lista.size()){
+            while (i < lista.size()) {
                 if (lista.get(i).getisPressed()) {
                     if (p == 0) {
                         posicion = i;
@@ -425,7 +429,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
                 i++;
             }
         } else {
-            posicion = p+pagina*peliculaPorPagina;
+            posicion = p + pagina * peliculaPorPagina;
         }
 
         return posicion;
