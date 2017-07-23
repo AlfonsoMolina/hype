@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -11,6 +11,7 @@
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
@@ -32,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:orientation="horizontal"
+        android:layout_below="@id/my_toolbar"
         android:id="@+id/navegacion">
         <Button
             android:id="@+id/previousPageButton"
@@ -68,19 +70,12 @@
             android:text="@string/next_button"
             android:onClick="pasarPaginaAdelante"/>
     </RelativeLayout>
-    <ListView
-        android:id="@+id/lista"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:divider="#b5b5b5"
-        android:dividerHeight="1dp"
-        android:padding="10dp"
-        />
 
     <TextView
         android:id="@+id/nopelis"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/navegacion"
         android:layout_gravity="center"
         android:visibility="gone"
         android:text="@string/no_pelis"
@@ -89,4 +84,79 @@
         android:textColor="#e3e3e3"
         android:textStyle="italic"/>
 
-</LinearLayout>
+
+    <ListView
+        android:id="@+id/lista"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/carga_mensaje"
+        android:layout_below="@id/nopelis"
+        android:divider="#b5b5b5"
+        android:dividerHeight="1dp"
+        android:padding="10dp"
+        />
+
+    <TextView
+        android:id="@id/carga_mensaje"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/carga_barra"
+        android:text="@string/cargando"
+        android:textAlignment="center"
+        />
+
+    <LinearLayout
+        android:id="@id/carga_barra"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#bebebe"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#bebebe"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#bebebe"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#bebebe"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#bebebe"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#bebebe"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#bebebe"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#bebebe"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#bebebe"/>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -9,10 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -99,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.action_favorite:
                 // Lanzamos el Thread que maneja la lista
-                Hilo hilo = new Hilo(listaAdapter);
+                HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(listaAdapter,((LinearLayout) findViewById(R.id.carga_barra)),((TextView) findViewById(R.id.carga_mensaje)));
                 hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
 
                 //Estoy habría que ponerlo cuando termine de actualizar, y no al principio, pero estoy cansado ya todo

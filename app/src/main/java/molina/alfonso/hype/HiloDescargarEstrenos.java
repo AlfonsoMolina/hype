@@ -3,9 +3,13 @@ package molina.alfonso.hype;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,26 +24,29 @@ import java.util.Calendar;
  * Created by Clacks Department on 11/07/2017.
  */
 
-public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>> {
+public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,ArrayList<Pelicula>> {
 
     /*
      * Declaración de variables
      */
-    private static final String TAG = "Hilo";
+    private static final String TAG = "HiloDescargarEstrenos";
 
-    String[] meses = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
-    String[] meses_corto = {"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"};
-    String idioma = "es";
-    String pais = "es";
-    int pagina = 1;
-
+    private String[] meses = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
+    private String[] meses_corto = {"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"};
+    private String idioma = "es";
+    private String pais = "es";
+    private int pagina = 1;
 
     private ListaModificadaAdapter lista;
+    private LinearLayout carga_barra;
+    private TextView carga_mensaje;
 
-    public Hilo(ListaModificadaAdapter lista) {
-        Log.d(TAG, "Hilo");
+    public HiloDescargarEstrenos(ListaModificadaAdapter lista, LinearLayout carga_barra, TextView carga_mensaje) {
+        Log.d(TAG, "HiloDescargarEstrenos");
         this.lista = lista;
-    }
+        this.carga_barra = carga_barra;
+        this.carga_mensaje = carga_mensaje;
+     }
 
     @Override
     protected ArrayList<Pelicula> doInBackground(SQLiteDatabase... db) {
@@ -53,7 +60,6 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
             try {
                 dir = "https://m.filmaffinity.com/" + idioma + "/rdcat.php?id=upc_th_" + pais + "&page=" + pagina;
                 html = getHTML(dir);
-                pagina++;
             } catch (IOException ee) {
                 html = null;
             }
@@ -172,6 +178,9 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
                 }
 
             }
+            if (pagina<10)
+                publishProgress(pagina);
+            pagina++;
         }
         return peliculas;
     }
@@ -183,6 +192,10 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
         lista.add(peliculas);
         lista.notifyDataSetChanged();
         lista.actualizarBBDD();
+        carga_mensaje.setText("Actualizando...");
+        carga_mensaje.setVisibility(View.GONE);
+        carga_barra.setVisibility(View.GONE);
+
     }
 
     @NonNull
@@ -204,5 +217,19 @@ public class Hilo extends AsyncTask<SQLiteDatabase, String, ArrayList<Pelicula>>
         in.close();
 
         return html.toString();
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... i) {
+        //TODO código del onProgressUpdate (HiloDescargarEstrenos Principal)
+        carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.GREEN);
+    }
+
+    @Override
+    protected void onPreExecute (){
+        for(int i = 0; i < 10; i++)
+            carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
+        carga_barra.setVisibility(View.VISIBLE);
+        carga_mensaje.setVisibility(View.VISIBLE);
     }
 }
