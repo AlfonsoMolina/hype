@@ -57,8 +57,7 @@ public class MainActivity extends AppCompatActivity {
         // Hook de la lista
         ListView lista = (ListView) findViewById(R.id.lista);
 
-        // Creación del adaptador de la lista
-        listaAdapter = new ListaModificadaAdapter(getApplicationContext(), R.layout.fila_pelicula3, mDbHelper);
+        listaAdapter = new ListaModificadaAdapter(getApplicationContext(), R.layout.fila_pelicula3, mDbHelper.getReadableDatabase(),((LinearLayout) findViewById(R.id.carga_barra)),((TextView) findViewById(R.id.carga_mensaje)));
 
         // Setup de la lista
         lista.setAdapter(listaAdapter);
@@ -73,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Si la lista está vacía, desaparece la barra de navegación y aparece un texto diciéndolo.
-        if (listaAdapter.getCount()==0) {
+        /*if (listaAdapter.getCount()==0) {
             findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
             findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
-        }
+        }*/
     }
 
     @Override

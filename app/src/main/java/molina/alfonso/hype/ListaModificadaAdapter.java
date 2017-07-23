@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -47,15 +48,16 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      * @param context contexto de la actividad.
      * @param resourceID recurso con el layout de cada fila.
      */
-    public ListaModificadaAdapter(Context context, int resourceID, FeedReaderDbHelper db) {
+    public ListaModificadaAdapter(Context context, int resourceID, SQLiteDatabase db, LinearLayout carga_barra,TextView carga_mensaje) {
         super(context,resourceID);
         Log.d(TAG, "ListaModificadaAdapter");
         this.resourceID = resourceID;
-        this.db = db;
         //Inicia la lista con las pelis en la bbdd
-        leerBBDD();
+        //leerBBDD();
+        maxPaginas = 1;  //Las paginas siempre tendran 25, si hay más peliculas no se muestran
+        HiloLeerBBDD hilo = new HiloLeerBBDD(db,this,carga_barra,carga_mensaje);
+        hilo.execute();
 
-        maxPaginas = lista.size()/peliculaPorPagina;  //Las paginas siempre tendran 25, si hay más peliculas no se muestran
     }
 
     private void leerBBDD(){
@@ -242,12 +244,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         lista.remove(cuenta);
     }
 
-    public void actualizar() {
-        Log.d(TAG, "actualizar");
-        lista.clear();
-        leerBBDD();
-    }
-
     public void delete(int i) {
         Log.d(TAG, "delete");
         for (int j = 0; j<i; j++)
@@ -371,6 +367,10 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         return maxPaginas;
     }
 
+    public void setMaxPaginas(){
+        this.maxPaginas = lista.size()/peliculaPorPagina;
+    }
+
 
     //Este método devuelve la posición en la lista de Peliculas según la posición en la lista.
     //No siempre es el mismo valor porque se usan varias páginas y a veces se muestran las que están
@@ -399,4 +399,5 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     public void actualizarBBDD() {
         maxPaginas = lista.size()/peliculaPorPagina;
     }
+
 }

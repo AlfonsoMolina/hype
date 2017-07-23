@@ -24,7 +24,7 @@ import java.util.Calendar;
  * Created by Clacks Department on 11/07/2017.
  */
 
-public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,ArrayList<Pelicula>> {
+public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
     /*
      * Declaración de variables
@@ -49,7 +49,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Arra
      }
 
     @Override
-    protected ArrayList<Pelicula> doInBackground(SQLiteDatabase... db) {
+    protected Void doInBackground(SQLiteDatabase... db) {
         Log.d(TAG, "doInBackground");
         //db[0] para leer db[1] para escribir
         String html = "";
@@ -169,7 +169,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Arra
 
 
                         db[1].insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
-                        peliculas.add(new Pelicula(l, p, t, s, e, f, fc, false));
+                        lista.add(new Pelicula(l, p, t, s, e, f, fc, false));
                         values.clear();
 
                     }
@@ -182,14 +182,13 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Arra
                 publishProgress(pagina);
             pagina++;
         }
-        return peliculas;
+        return null;
     }
 
 
     @Override
-    protected void onPostExecute(ArrayList<Pelicula> peliculas) {
+    protected void onPostExecute(Void v) {
         Log.d(TAG, "onPostExecute");
-        lista.add(peliculas);
         lista.notifyDataSetChanged();
         lista.actualizarBBDD();
         carga_mensaje.setText("Actualizando...");
@@ -221,13 +220,16 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Arra
 
     @Override
     protected void onProgressUpdate(Integer... i) {
-        //TODO código del onProgressUpdate (HiloDescargarEstrenos Principal)
+        Log.d(TAG, "onProgressUpdate");
         carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.GREEN);
+        lista.notifyDataSetChanged();
     }
 
     @Override
     protected void onPreExecute (){
-        for(int i = 0; i < 10; i++)
+        Log.d(TAG, "onPreExecute");
+
+        for(int i = 0; i < 9; i++)
             carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
         carga_barra.setVisibility(View.VISIBLE);
         carga_mensaje.setVisibility(View.VISIBLE);
