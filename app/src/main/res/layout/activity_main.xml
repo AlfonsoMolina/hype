@@ -5,7 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:theme="@style/AppTheme">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
@@ -14,8 +15,8 @@
         android:layout_alignParentTop="true"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat">
+        android:backgroundTint="?attr/colorPrimary"
+        >
 
         <TextView
             android:layout_width="wrap_content"
@@ -23,8 +24,8 @@
             android:text="Hype!"
             android:id="@+id/toolbar_title"
             android:onClick="mostrarHype"
-            android:textSize="20dp"
-            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:textStyle="bold"
             />
 
     </android.support.v7.widget.Toolbar>
@@ -36,14 +37,18 @@
         android:layout_below="@id/my_toolbar"
         android:visibility="invisible"
         android:id="@+id/navegacion">
-        <Button
+        <ImageButton
             android:id="@+id/previousPageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:text="@string/previous_button"
             android:onClick="pasarPaginaAtras"
-            android:visibility="invisible"/>
+            android:src="@drawable/ic_navigate_before_black_24dp"
+            android:visibility="invisible"
+            android:tint="@color/colorAppText"
+            android:backgroundTint="@color/colorWindowBackground"
+            />
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -63,13 +68,17 @@
                 android:textSize="35sp"
                 android:text="@string/actual_page_number" />
         </RelativeLayout>
-        <Button
+        <ImageButton
             android:id="@+id/nextPageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:text="@string/next_button"
-            android:onClick="pasarPaginaAdelante"/>
+            android:src="@drawable/ic_navigate_next_black_24dp"
+            android:onClick="pasarPaginaAdelante"
+            android:tint="@color/colorAppText"
+            android:backgroundTint="@color/colorWindowBackground"
+            />
     </RelativeLayout>
 
     <TextView
@@ -104,6 +113,7 @@
         android:layout_above="@+id/carga_barra"
         android:text="@string/cargando"
         android:textAlignment="center"
+        android:visibility="gone"
         />
 
     <LinearLayout
@@ -133,11 +143,13 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#bebebe"/>
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#bebebe"/>
+            android:background="#bebebe" />
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"

@@ -1,7 +1,9 @@
 package molina.alfonso.hype;
 
-import android.os.Bundle;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Se le manda a la lista esta actividad, para poder modificar la interfaz,
         //el layout de la row y la bbdd
-        listaAdapter = new ListaModificadaAdapter(this, R.layout.fila, mDbHelper);
+        listaAdapter = new ListaModificadaAdapter(this, R.layout.fila_new, mDbHelper);
 
         // Setup de la lista
         lista.setAdapter(listaAdapter);
@@ -83,6 +85,16 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Menú de opciones creado");
         // Expande el menu, añade las opciones
         getMenuInflater().inflate(R.menu.menu, menu);
+
+        // Para dar color a los botones de la ActionBar
+        for(int i = 0; i < menu.size(); i++){
+            Drawable drawable = menu.getItem(i).getIcon();
+            if(drawable != null) {
+                drawable.mutate();
+                drawable.setColorFilter(getResources().getColor(R.color.colorAppText), PorterDuff.Mode.SRC_ATOP);
+            }
+        }
+
         return true;
     }
 

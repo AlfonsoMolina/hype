@@ -65,7 +65,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
         for(int i = 0; i < 9; i++)
             carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
         carga_barra.setVisibility(View.VISIBLE);
-        carga_mensaje.setVisibility(View.VISIBLE);
+        //carga_mensaje.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -196,6 +196,9 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
                         fc = fecha_dia + " " + meses_corto[Integer.parseInt(fecha_mes)-1];
 
+                        // Me cargo sangrías y cosas raras
+                        s = s.trim();
+
                         //Se añaden los valores que hemos cogido
                         values.put(FeedReaderContract.FeedEntry.COLUMN_REF, l);
                         values.put(FeedReaderContract.FeedEntry.COLUMN_TITULO, t);
@@ -257,7 +260,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     @Override
     protected void onProgressUpdate(Integer... i) {
         Log.d(TAG, "Descarga al " + ((i[0]+1)*10) + "%");
-        carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.GREEN);
+        carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.parseColor("#263238"));
         lista.setMaxPaginas();
         lista.notifyDataSetChanged();
         lista.actualizarInterfaz();

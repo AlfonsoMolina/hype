@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -46,7 +47,7 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
         for(int i = 0; i < 9; i++)
             carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
         carga_barra.setVisibility(View.VISIBLE);
-        carga_mensaje.setVisibility(View.VISIBLE);
+        //carga_mensaje.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -147,7 +148,7 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     @Override
     protected void onProgressUpdate(Integer... i) {
         Log.d(TAG, "Lectura al " + ((i[0]+1)*10) + "%");
-        carga_barra.getChildAt(i[0]).setBackgroundColor(Color.GREEN);
+        carga_barra.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#263238"));
         lista.setMaxPaginas();
         lista.notifyDataSetChanged();
         lista.actualizarInterfaz();

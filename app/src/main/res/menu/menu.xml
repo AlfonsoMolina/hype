@@ -5,13 +5,14 @@
     <!-- "Mark Favorite", should appear as action button if possible -->
     <item
         android:id="@+id/actualizar"
-        android:icon="@drawable/icon_update"
-        android:title="recargar"
-        app:showAsAction="ifRoom"/>
+        android:icon="@drawable/ic_refresh_black_24dp"
+        android:title="Recargar"
+        app:showAsAction="ifRoom"
+        />
 
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"
-        android:title="opciones"
+        android:title="Opciones"
         app:showAsAction="never"/>
 
 </menu>
