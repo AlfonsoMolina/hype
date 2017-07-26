@@ -34,7 +34,7 @@ public class Pelicula {
 
     //link, portada, titulo, sinopsis, estreno (con letras), fecha (exacto), fecha corta, hay hype?
     Pelicula (String l, String p, String t, String s, String e, String f, String fc,Boolean h){
-        Log.d(TAG, "Pelicula");
+        Log.v(TAG, "Objeto Pelicula construido");
         this.titulo = t;
         this.sinopsis = s;
         this.estreno_letras = e;
@@ -62,47 +62,39 @@ public class Pelicula {
      */
 
     public String getTitulo() {
-        Log.d(TAG, "getTitulo");
         return titulo;
     }
 
     public Bitmap getPortada() {
-        Log.d(TAG, "getPortada");
         return portada;
     }
 
     public String getSinopsis() {
-        Log.d(TAG, "getSinopsis");
         return sinopsis;
     }
 
     public String getEstreno() {
-        Log.d(TAG, "getEstreno");
         return estreno_letras;
     }
 
     public String getEnlace() {
-        Log.d(TAG, "getEnlace");
         return enlace;
     }
 
     public String getFecha_estreno() {
-        Log.d(TAG, "getFecha_estreno");
         return estreno_fecha;
     }
 
     public String getEstreno_corto() {
-        Log.d(TAG, "getEstreno_corto");
         return estreno_corto;
     }
     
     public void setisHyped (boolean b) {
-        Log.d(TAG, "setisHyped");
+        Log.d(TAG, "Marcando Hype=" + b + "en película " + titulo);
         this.isHyped = b;
     }
 
-    public boolean setisHyped () {
-        Log.d(TAG, "setisHyped");
+    public boolean getisHyped() {
         return isHyped;
     }
 }

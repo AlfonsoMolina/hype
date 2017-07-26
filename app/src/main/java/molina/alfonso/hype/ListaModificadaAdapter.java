@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.CalendarContract;
@@ -52,7 +51,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      */
     public ListaModificadaAdapter(Activity activity, int resourceID, FeedReaderDbHelper db) {
         super(activity.getApplicationContext(),resourceID);
-        Log.d(TAG, "ListaModificadaAdapter");
+        Log.d(TAG, "Construyendo el adaptador de la lista");
         this.resourceID = resourceID;
         this.activity = activity;
         this.db = db;
@@ -75,20 +74,16 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      */
     @Override
     public int getCount() {
-        Log.d(TAG, "getCount");
-
         int count = 0;
-
         if(mostrarHype){
             int i = 0;
             while(i < lista.size()) {
-                if (lista.get(i).setisHyped())
+                if (lista.get(i).getisHyped())
                     count++;
                 i++;
             }
             return count;
         }
-
         else if (lista.size() > peliculaPorPagina)
             return peliculaPorPagina;
         else if (lista.size() > 0 )
@@ -111,7 +106,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         if (mostrarHype) {
             int i = 0;
             while (i < lista.size()) {
-                if (lista.get(i).setisHyped()) {
+                if (lista.get(i).getisHyped()) {
                     if (p == 0) {
                         posicion = i;
                     }
@@ -134,7 +129,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      */
     @Override
     public Object getItem(int position) {
-        Log.d(TAG, "getItem");
         return lista.get(getPosicionReal(position));
     }
 
@@ -148,7 +142,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.d(TAG, "getView");
         // workaround para que no se rompa si aún no está lista la lectura
         View mView;
      //   try {
@@ -161,7 +154,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     }
 
     public View prepareView(int position, View convertView, ViewGroup parent) {
-        Log.d(TAG, "prepareView");
+
         // workaround para que no se rompa si aún no está lista la lectura
             View fila;
 
@@ -180,7 +173,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstreno());
             ((ImageView) fila.findViewById(R.id.portada)).setImageBitmap(p.getPortada());
 
-            if (p.setisHyped()) {
+            if (p.getisHyped()) {
                 fila.findViewById(R.id.hype_msg).setVisibility(View.VISIBLE);
             } else
                 fila.findViewById(R.id.hype_msg).setVisibility(View.GONE);
@@ -194,6 +187,8 @@ public class ListaModificadaAdapter extends ArrayAdapter {
                 fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
             } else
                 fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
+
+            Log.v(TAG, "Añadiendo película " + p.getTitulo() + " a la vista número " + position);
             return fila;
     }
 
@@ -203,18 +198,19 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      * @param p Pelicua con el nuevo elemento a introducir.
      */
     public void add(Pelicula p){
-        Log.d(TAG, "add");
         lista.add(p);
     }
 
     //Guarda el elemento que está expandido con más información.
     //Si se pulsa otra vez, se oculta
     public void setExpandido(int position){
-        Log.d(TAG, "setExpandido");
         if (expandido == position){
             expandido = -1;
-        } else
+            Log.d(TAG, "Contrayendo  elemento " + position);
+        } else {
             expandido = position;
+            Log.d(TAG, "Expandiendo  elemento " + position);
+        }
     }
 
     //Lo que hace este método es mostrar los elementos de la interfaz adecuados.
@@ -255,8 +251,6 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private View.OnClickListener enviar_Calendario = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "enviar_Calendario");
-
             int position = expandido;
             Pelicula p = lista.get(getPosicionReal(position));
 
@@ -272,6 +266,9 @@ public class ListaModificadaAdapter extends ArrayAdapter {
                     .putExtra(CalendarContract.Events.TITLE, p.getTitulo())
                     .putExtra(CalendarContract.Events.DESCRIPTION, p.getSinopsis());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            Log.d(TAG, "Solicitando al calendario almacenar la película " + p.getTitulo());
+
             getContext().startActivity(intent);
         }
     };
@@ -280,18 +277,19 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private View.OnClickListener get_hype = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "get_hype");
+
 
             int position = expandido;
             Pelicula p = lista.get(getPosicionReal(position));
+            Log.d(TAG, "Pulsado botón \"Hype\" en película " + p.getTitulo());
 
             SQLiteDatabase dbw = db.getWritableDatabase();
             ContentValues values = new ContentValues();
             String h;
 
-            p.setisHyped(!p.setisHyped());
+            p.setisHyped(!p.getisHyped());
 
-            if (p.setisHyped()) {
+            if (p.getisHyped()) {
                 h = "T";
             } else
                 h = "F";
@@ -318,11 +316,10 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
         @Override
         public void onClick(View view) {
-
-            Log.d(TAG, "get_info");
             int position = expandido;
             Pelicula p = lista.get(getPosicionReal(position));
 
+            Log.d(TAG, "Pulsado botón \"Info\" en película " + p.getTitulo());
 
             // Instanciamos el intent de navegador
             Intent i = new Intent(Intent.ACTION_VIEW);

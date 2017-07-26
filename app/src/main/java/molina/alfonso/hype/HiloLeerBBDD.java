@@ -32,7 +32,7 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     //El constructor necesita la bbdd, la lista y la barra de progreso
     public HiloLeerBBDD (SQLiteDatabase db, ListaModificadaAdapter lista,
                          LinearLayout carga_barra, TextView carga_mensaje) {
-        Log.d(TAG, "HiloLeerBBDD");
+        Log.d(TAG, "Inicializando el hilo encargado de leer la BBDD");
         this.db = db;
         this.lista = lista;
         this.carga_barra = carga_barra;
@@ -42,7 +42,7 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     //Se muestra la barra de carga (y se pone en gris) y un mensaje.
     @Override
     protected void onPreExecute (){
-        Log.d(TAG, "onPreExecute");
+        Log.d(TAG, "Actualizando UI antes de ejecutar el hilo");
         for(int i = 0; i < 9; i++)
             carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
         carga_barra.setVisibility(View.VISIBLE);
@@ -51,7 +51,7 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
 
     @Override
     protected Void doInBackground(Void... v) {
-        Log.d(TAG, "doInBackground");
+        Log.d(TAG, "Comenzando lectura de la BBDD");
 
         //Se lee la bbdd y se guardan los elementos en cursor
         String[] projection = {
@@ -136,7 +136,7 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
                 publishProgress(cuenta_actualizaciones++);          //Se actualiza
                 marca_sig = marcador*(cuenta_actualizaciones+1);    //Se fija el siguiente marcador
             }
-
+            Log.d(TAG, "Encontrada película: " + t + ".");
         }
         cursor.close();
 
@@ -146,7 +146,7 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     //Por cada décimo de los datos obtenidos, se avanza la barra de progreso y se actualiza la IU
     @Override
     protected void onProgressUpdate(Integer... i) {
-        Log.d(TAG, "onProgressUpdate");
+        Log.d(TAG, "Lectura al " + ((i[0]+1)*10) + "%");
         carga_barra.getChildAt(i[0]).setBackgroundColor(Color.GREEN);
         lista.setMaxPaginas();
         lista.notifyDataSetChanged();
@@ -156,7 +156,7 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     //Se actualiza la IU y se oculta la barra de progreso.
     @Override
     protected void onPostExecute(Void v) {
-        Log.d(TAG, "onPostExecute");
+        Log.d(TAG, "Lectura finalizada, actualizando interfaz");
         lista.setMaxPaginas();
         lista.notifyDataSetChanged();
         lista.actualizarInterfaz();

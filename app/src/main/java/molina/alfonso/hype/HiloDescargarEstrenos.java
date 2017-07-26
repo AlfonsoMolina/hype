@@ -51,7 +51,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
 
     public HiloDescargarEstrenos(ListaModificadaAdapter lista, LinearLayout carga_barra, TextView carga_mensaje) {
-        Log.d(TAG, "HiloDescargarEstrenos");
+        Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
         this.lista = lista;
         this.carga_barra = carga_barra;
         this.carga_mensaje = carga_mensaje;
@@ -61,7 +61,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
      //Se muestra la barra de carga (y se pone en gris) y un mensaje.
     @Override
     protected void onPreExecute (){
-        Log.d(TAG, "onPreExecute");
+        Log.d(TAG, "Actualizando UI antes de ejecutar el hilo");
         for(int i = 0; i < 9; i++)
             carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
         carga_barra.setVisibility(View.VISIBLE);
@@ -70,7 +70,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
     @Override
     protected Void doInBackground(SQLiteDatabase... db) {
-        Log.d(TAG, "doInBackground");
+        Log.d(TAG, "Comenzando descarga de estrenos");
 
         //db[0] para leer db[1] para escribir
         String html = "";
@@ -210,6 +210,8 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                         db[1].insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
                         lista.add(new Pelicula(l, p, t, s, e, f, fc, false));
                         values.clear();
+
+                        Log.d(TAG, "Encontrada película: " + t + ".");
                     }
                     cursor.close();
                 }
@@ -230,7 +232,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     //Este método lee el HTML y lo convierte en String
     @NonNull
     private static String getHTML(String url) throws IOException {
-        Log.d(TAG, "getHTML");
+        Log.d(TAG, "Obteniendo contenido HTML desde " + url);
         // Build and set timeout values for the request.
         URLConnection connection = (new URL(url)).openConnection();
         connection.setConnectTimeout(5000);
@@ -254,7 +256,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     //actualiza la interfaz con las películas hasta el momento
     @Override
     protected void onProgressUpdate(Integer... i) {
-        Log.d(TAG, "onProgressUpdate");
+        Log.d(TAG, "Descarga al " + ((i[0]+1)*10) + "%");
         carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.GREEN);
         lista.setMaxPaginas();
         lista.notifyDataSetChanged();
@@ -265,7 +267,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     //la barra de progreso
     @Override
     protected void onPostExecute(Void v) {
-        Log.d(TAG, "onPostExecute");
+        Log.d(TAG, "Descarga finalizada, actualizando interfaz");
         lista.notifyDataSetChanged();
         lista.setMaxPaginas();
         lista.actualizarInterfaz();

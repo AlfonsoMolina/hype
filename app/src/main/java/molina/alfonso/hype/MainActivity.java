@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
+        Log.d(TAG, "Actividad principal creada");
 
         // Fijamos el layout a usar
         setContentView(R.layout.activity_main);
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu");
+        Log.d(TAG, "Menú de opciones creado");
         // Expande el menu, añade las opciones
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d(TAG, "onOptionsItemSelected");
+        Log.d(TAG, "Opción seleccionada " + item.toString());
 
         // Interpretamos lo seleccionado en el menu
         switch (item.getItemId()) {
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Muestra las películas guardadas
     public void mostrarHype(View view) {
-        Log.d(TAG, "mostrarHype");
+        Log.d(TAG, "Mostrando películas guardadas");
 
         if(listaAdapter.toogleHype()){
             findViewById(R.id.navegacion).setVisibility(View.GONE);
@@ -144,17 +144,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void pasarPaginaAtras(View view) {
-        Log.d(TAG, "pasarPaginaAtras");
-        int pagina = listaAdapter.getPagina();
+        int pag = listaAdapter.getPagina();
+        Log.d(TAG, "Retrocediendo a la página " + pag);
         findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
-        if (pagina > 0) {
-            listaAdapter.pasarPagina(pagina - 1);
-            ((TextView) findViewById(R.id.actualPageText)).setText(""+pagina);
+        if (pag > 0) {
+            listaAdapter.pasarPagina(pag - 1);
+            ((TextView) findViewById(R.id.actualPageText)).setText(String.valueOf(pag));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
             //porque se ha cogido del adaptador. Así que, se queda igual.
             ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
-            if (pagina == 1) {
+            if (pag == 1) {
                 findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
             }
         }
@@ -163,17 +163,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void pasarPaginaAdelante(View view) {
-        Log.d(TAG, "pasarPaginaAdelante");
-        int pagina = listaAdapter.getPagina();
+        int pag = listaAdapter.getPagina();
+        Log.d(TAG, "Avanzando a la página " + (pag+2));
         findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
-        if (pagina < listaAdapter.getUltPagina()) {
-            listaAdapter.pasarPagina(pagina + 1);
-            ((TextView) findViewById(R.id.actualPageText)).setText(""+(pagina+2));
+        if (pag < listaAdapter.getUltPagina()) {
+            listaAdapter.pasarPagina(pag + 1);
+            ((TextView) findViewById(R.id.actualPageText)).setText(String.valueOf(pag+2));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
             //porque se ha cogido del adaptador.
             ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
-            if (pagina+2 == listaAdapter.getUltPagina()) {
+            if (pag+2 == listaAdapter.getUltPagina()) {
                 findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
             }
         }
