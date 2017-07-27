@@ -30,6 +30,8 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     private LinearLayout carga_barra;
     private TextView carga_mensaje;
 
+    private ArrayList<Pelicula> nuevasPelis = new ArrayList<>();
+
     //El constructor necesita la bbdd, la lista y la barra de progreso
     public HiloLeerBBDD (SQLiteDatabase db, ListaModificadaAdapter lista,
                          LinearLayout carga_barra, TextView carga_mensaje) {
@@ -128,18 +130,19 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
                 String[] selectionArgs = { l };
                 db.delete(FeedReaderContract.FeedEntry.TABLE_NAME, selection, selectionArgs);
             }else {
-                lista.add(new Pelicula(l, p, t, s, e, f, fc, h.equalsIgnoreCase("T")));
+                nuevasPelis.add(new Pelicula(l, p, t, s, e, f, fc, h.equalsIgnoreCase("T")));
+                //lista.add(new Pelicula(l, p, t, s, e, f, fc, h.equalsIgnoreCase("T")));
             }
             cuenta_peliculas++;
 
             //Si se ha pasado un décimo de las películas...
 
             if(cuenta_peliculas >= marca_sig && cuenta_actualizaciones<9){
+                lista.add(nuevasPelis);
+                nuevasPelis.clear();
                 publishProgress(cuenta_actualizaciones++);          //Se actualiza
                 marca_sig = marcador*(cuenta_actualizaciones+1);    //Se fija el siguiente marcador
-            }//else{
-                //publishProgress(-1);
-            //}
+            }
             Log.d(TAG, "Encontrada película: " + t + ".");
         }
         cursor.close();
@@ -150,11 +153,9 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     //Por cada décimo de los datos obtenidos, se avanza la barra de progreso y se actualiza la IU
     @Override
     protected void onProgressUpdate(Integer... i) {
-        //if(i[0]>0){
-            Log.d(TAG, "Lectura al " + ((i[0] + 1) * 10) + "%");
-            carga_barra.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#263238"));
-            lista.setMaxPaginas();
-        //}
+        Log.d(TAG, "Lectura al " + ((i[0] + 1) * 10) + "%");
+        carga_barra.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#263238"));
+        lista.setMaxPaginas();
         lista.notifyDataSetChanged();
         lista.actualizarInterfaz();
     }

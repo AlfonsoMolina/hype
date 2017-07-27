@@ -195,6 +195,10 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         lista.add(p);
     }
 
+    public void add(ArrayList <Pelicula> p){
+        lista.addAll(p);
+    }
+
     //Guarda el elemento que está expandido con más información.
     //Si se pulsa otra vez, se oculta
     public void setExpandido(int position){
