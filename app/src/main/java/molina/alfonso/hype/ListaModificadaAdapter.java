@@ -180,11 +180,15 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
             if (expandido == position) {
                 fila.findViewById(R.id.avanzado).setVisibility(View.VISIBLE);
-                ((TextView) fila.findViewById(R.id.av_fecha)).setText(p.getEstreno_corto());
+//                ((TextView) fila.findViewById(R.id.av_fecha)).setText(p.getEstreno_corto());
                 ((TextView) fila.findViewById(R.id.av_sinopsis)).setText(p.getSinopsis());
+
                 fila.findViewById(R.id.av_fecha).setOnClickListener(enviar_Calendario);
                 fila.findViewById(R.id.av_hype).setOnClickListener(get_hype);
                 fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
+
+
+
             } else
                 fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
 

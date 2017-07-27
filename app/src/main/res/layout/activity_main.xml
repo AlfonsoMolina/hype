@@ -24,8 +24,8 @@
             android:text="Hype!"
             android:id="@+id/toolbar_title"
             android:onClick="mostrarHype"
+            android:fontFamily="sans-serif-medium"
             android:textSize="20sp"
-            android:textStyle="bold"
             />
 
     </android.support.v7.widget.Toolbar>
@@ -34,14 +34,16 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:orientation="horizontal"
-        android:layout_below="@id/my_toolbar"
         android:visibility="invisible"
-        android:id="@+id/navegacion">
+        android:id="@+id/navegacion"
+        android:layout_below="@+id/my_toolbar"
+        android:layout_alignParentStart="true">
         <ImageButton
             android:id="@+id/previousPageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:text="@string/previous_button"
             android:onClick="pasarPaginaAtras"
             android:src="@drawable/ic_navigate_before_black_24dp"
@@ -49,36 +51,50 @@
             android:tint="@color/colorAppText"
             android:backgroundTint="@color/colorWindowBackground"
             />
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:orientation="vertical">
-            <TextView
-                android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/actual_page_header" />
+                android:fontFamily="sans-serif-regular"
+                android:textSize="34sp"
+                android:text="@string/actual_page_header" />-->
             <TextView
                 android:id="@+id/actualPageText"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="35sp"
+                android:fontFamily="sans-serif-regular"
+                android:textSize="34sp"
                 android:text="@string/actual_page_number" />
-        </RelativeLayout>
+
+        </LinearLayout>
+
         <ImageButton
             android:id="@+id/nextPageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:text="@string/next_button"
             android:src="@drawable/ic_navigate_next_black_24dp"
             android:onClick="pasarPaginaAdelante"
             android:tint="@color/colorAppText"
             android:backgroundTint="@color/colorWindowBackground"
             />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:id="@+id/separador1"
+            android:backgroundTint="@color/colorAppText"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorAppText"
+            />
+
     </RelativeLayout>
 
     <TextView
@@ -90,7 +106,7 @@
         android:text="@string/leyendo"
         android:textAlignment="center"
         android:textSize="16sp"
-        android:textColor="#e3e3e3"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="italic"
         />
 
@@ -101,9 +117,10 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/carga_mensaje"
         android:layout_below="@id/nopelis"
-        android:divider="#b5b5b5"
+        android:divider="@color/colorAppText"
         android:dividerHeight="1dp"
-        android:padding="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         />
 
     <TextView
