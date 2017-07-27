@@ -127,16 +127,19 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
                 String selection = FeedReaderContract.FeedEntry.COLUMN_REF + " LIKE ?";
                 String[] selectionArgs = { l };
                 db.delete(FeedReaderContract.FeedEntry.TABLE_NAME, selection, selectionArgs);
-            }else
-                lista.add(new Pelicula(l,p,t,s,e,f,fc,h.equalsIgnoreCase("T")));
-
+            }else {
+                lista.add(new Pelicula(l, p, t, s, e, f, fc, h.equalsIgnoreCase("T")));
+            }
             cuenta_peliculas++;
 
             //Si se ha pasado un décimo de las películas...
+
             if(cuenta_peliculas >= marca_sig && cuenta_actualizaciones<9){
                 publishProgress(cuenta_actualizaciones++);          //Se actualiza
                 marca_sig = marcador*(cuenta_actualizaciones+1);    //Se fija el siguiente marcador
-            }
+            }//else{
+                //publishProgress(-1);
+            //}
             Log.d(TAG, "Encontrada película: " + t + ".");
         }
         cursor.close();
@@ -147,9 +150,11 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     //Por cada décimo de los datos obtenidos, se avanza la barra de progreso y se actualiza la IU
     @Override
     protected void onProgressUpdate(Integer... i) {
-        Log.d(TAG, "Lectura al " + ((i[0]+1)*10) + "%");
-        carga_barra.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#263238"));
-        lista.setMaxPaginas();
+        //if(i[0]>0){
+            Log.d(TAG, "Lectura al " + ((i[0] + 1) * 10) + "%");
+            carga_barra.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#263238"));
+            lista.setMaxPaginas();
+        //}
         lista.notifyDataSetChanged();
         lista.actualizarInterfaz();
     }

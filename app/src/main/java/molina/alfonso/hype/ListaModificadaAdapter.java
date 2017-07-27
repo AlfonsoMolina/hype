@@ -144,56 +144,46 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         // workaround para que no se rompa si aún no está lista la lectura
         View mView;
-     //   try {
-            mView = prepareView(position, convertView, parent);
-       // }catch (Exception e) {
-      //      Log.e(TAG, e.toString());
-      //      mView = getView(position, convertView, parent);
-     //   }
+        mView = prepareView(position, convertView, parent);
         return mView;
     }
 
     public View prepareView(int position, View convertView, ViewGroup parent) {
 
         // workaround para que no se rompa si aún no está lista la lectura
-            View fila;
+        View fila;
 
-            if (convertView == null) {
-                //Se añade una nueva view a la lista.
-                LayoutInflater inflater = (LayoutInflater) this.getContext()
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                fila = inflater.inflate(resourceID, parent, false);
-            }else{
-                fila = convertView;
-            }
+        if (convertView == null) {
+            //Se añade una nueva view a la lista.
+            LayoutInflater inflater = (LayoutInflater) this.getContext()
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            fila = inflater.inflate(resourceID, parent, false);
+        }else{
+            fila = convertView;
+        }
 
-            Pelicula p = lista.get(getPosicionReal(position));
+        Pelicula p = lista.get(getPosicionReal(position));
 
-            ((TextView) fila.findViewById(R.id.titulo)).setText(p.getTitulo());
-            ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstreno());
-            ((ImageView) fila.findViewById(R.id.portada)).setImageBitmap(p.getPortada());
+        ((TextView) fila.findViewById(R.id.titulo)).setText(p.getTitulo());
+        ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstreno());
+        ((ImageView) fila.findViewById(R.id.portada)).setImageBitmap(p.getPortada());
 
-            if (p.getisHyped()) {
-                fila.findViewById(R.id.hype_msg).setVisibility(View.VISIBLE);
-            } else
-                fila.findViewById(R.id.hype_msg).setVisibility(View.GONE);
+        if (p.getisHyped()) {
+            fila.findViewById(R.id.hype_msg).setVisibility(View.VISIBLE);
+        } else
+            fila.findViewById(R.id.hype_msg).setVisibility(View.GONE);
 
-            if (expandido == position) {
-                fila.findViewById(R.id.avanzado).setVisibility(View.VISIBLE);
-//                ((TextView) fila.findViewById(R.id.av_fecha)).setText(p.getEstreno_corto());
-                ((TextView) fila.findViewById(R.id.av_sinopsis)).setText(p.getSinopsis());
+        if (expandido == position) {
+            fila.findViewById(R.id.avanzado).setVisibility(View.VISIBLE);
+            ((TextView) fila.findViewById(R.id.av_sinopsis)).setText(p.getSinopsis());
 
-                fila.findViewById(R.id.av_fecha).setOnClickListener(enviar_Calendario);
-                fila.findViewById(R.id.av_hype).setOnClickListener(get_hype);
-                fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
-
-
-
-            } else
-                fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
-
-            Log.v(TAG, "Añadiendo película " + p.getTitulo() + " a la vista número " + position);
-            return fila;
+            fila.findViewById(R.id.av_fecha).setOnClickListener(enviar_Calendario);
+            fila.findViewById(R.id.av_hype).setOnClickListener(get_hype);
+            fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
+        } else
+            fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
+        Log.v(TAG, "Añadiendo película " + p.getTitulo() + " a la vista número " + position);
+        return fila;
     }
 
     /**
