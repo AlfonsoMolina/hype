@@ -89,7 +89,7 @@
         android:visibility="visible"
         android:text="@string/leyendo"
         android:textAlignment="center"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textColor="#e3e3e3"
         android:textStyle="italic"
         />

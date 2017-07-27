@@ -33,9 +33,8 @@
                 android:id="@+id/titulo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:typeface="sans"
+                android:textSize="17sp"
+                android:fontFamily="sans-serif-medium"
                 android:paddingBottom="5dp"
                 android:text="Titulo de la pelicula"/>
 
@@ -49,9 +48,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="?attr/colorAccent"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif"
                     android:layout_weight="1"
+                    android:textAllCaps="true"
                     android:text="viernes, 7 de julio"/>
 
                 <ImageView
@@ -83,6 +83,8 @@
             android:id="@+id/av_sinopsis"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-condensed"
             />
 
         <LinearLayout
