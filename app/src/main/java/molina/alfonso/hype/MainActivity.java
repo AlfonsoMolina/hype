@@ -1,7 +1,9 @@
 package molina.alfonso.hype;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -28,11 +30,6 @@ public class MainActivity extends AppCompatActivity {
     // Helper para manipular la BBDD
     private FeedReaderDbHelper mDbHelper;
 
-    private float x1=0;
-    private float x2=0;
-    static final int MIN_DISTANCE = 150;
-
-
     /*
      * Métodos override
      */
@@ -41,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Actividad principal creada");
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         // Fijamos el layout a usar
         setContentView(R.layout.activity_main);
@@ -107,12 +106,14 @@ public class MainActivity extends AppCompatActivity {
 
             //Mostrar las opciones (pendiente)
             case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
 
             //Actualiza las películas guardadas..
             case R.id.actualizar:
                 // Lanzamos el Thread que descargará la información.
-                HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(listaAdapter,
+                HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(this, listaAdapter,
                         ((LinearLayout) findViewById(R.id.carga_barra)),
                         ((TextView) findViewById(R.id.carga_mensaje)));
 

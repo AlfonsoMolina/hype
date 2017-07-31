@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+        <ListPreference
+            android:dependency="pref_pais"
+            android:key="pref_pais"
+            android:title="@string/pref_pais"
+            android:summary="%s"
+            android:dialogTitle="@string/pref_pais"
+            android:entries="@array/pref_pais_nombres"
+            android:entryValues="@array/pref_pais_valores"
+            android:defaultValue="@string/pref_pais_def" />
+
+        <Preference android:title="Vaciar base de datos"
+            android:key="pref_db" />
+
+</PreferenceScreen>

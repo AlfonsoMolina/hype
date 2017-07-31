@@ -1,10 +1,13 @@
 package molina.alfonso.hype;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
@@ -33,13 +36,22 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
      */
     private static final String TAG = "HiloDescargarEstrenos";
 
-    private String[] meses = {"enero", "febrero", "marzo", "abril", "mayo", "junio",
+
+    //Estoy hay que pasarlo a un array o algo
+    private String[] meses_es = {"enero", "febrero", "marzo", "abril", "mayo", "junio",
             "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
-    private String[] meses_corto = {"ene", "feb", "mar", "abr", "may", "jun",
+    private String[] meses_corto_es = {"ene", "feb", "mar", "abr", "may", "jun",
             "jul", "ago", "sep", "oct", "nov", "dic"};
+
+    private String[] meses_en = {"january", "february", "march", "april", "may", "june",
+            "july", "august", "september", "october", "november", "december"};
+    private String[] meses_corto_en = {"jan", "feb", "mar", "apr", "may", "jun",
+            "jul", "aug", "sep", "oct", "nov", "dic"};
+
     private String idioma = "es";   //Idioma de sinopsis y título. (Pendiente)
     private String pais = "es";     //Pais del que mirar los estrenos. (Pendiente)
     private int pagina = 1;         //Número de páginas de las 10 que se van a descargar.
+    private SharedPreferences sharedPref;
 
     //Lista que guardará las películas
     private ListaModificadaAdapter lista;
@@ -50,12 +62,14 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
 
 
-    public HiloDescargarEstrenos(ListaModificadaAdapter lista, LinearLayout carga_barra, TextView carga_mensaje) {
+    public HiloDescargarEstrenos(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra, TextView carga_mensaje) {
         Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
         this.lista = lista;
         this.carga_barra = carga_barra;
         this.carga_mensaje = carga_mensaje;
-     }
+        this.sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+
+    }
 
 
      //Se muestra la barra de carga (y se pone en gris) y un mensaje.
@@ -66,6 +80,12 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
             carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
         carga_barra.setVisibility(View.VISIBLE);
         //carga_mensaje.setVisibility(View.VISIBLE);
+
+        //Se coge el país elegido
+        pais = sharedPref.getString("pref_pais", "");
+        idioma = pais;
+        if (pais.equalsIgnoreCase("uk") || pais.equalsIgnoreCase("us") || pais.equalsIgnoreCase("fr"))
+            idioma = "en";
     }
 
     @Override
@@ -135,7 +155,6 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                     if (cursor.getCount() == 0) {
 
                         //Se buscan y guardan los diferentes elementos
-                        //TODO añadir actores y director
                         ind = peliculasHTML[i].indexOf("src=\"");
                         p = peliculasHTML[i].substring(ind + 5, peliculasHTML[i].indexOf("\"", ind + 5));
                         ind = peliculasHTML[i].indexOf("mc-title ft\">");
@@ -148,6 +167,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
                         if (ind3 >0 && ind3 < ind2)
                             ind2=ind3;
+
                         s = peliculasHTML[i].substring(ind + 12, ind2);
                         ind = peliculasHTML[i].indexOf("date\">");
                         e = peliculasHTML[i].substring(ind + 6, peliculasHTML[i].indexOf("</span>", ind + 6));
@@ -160,29 +180,52 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                         String fecha_ano = "";
 
                         if (ind2 > 0) {
-                            ee = e.substring(e.indexOf(", ") + 2);
-                            fecha_dia = ee.substring(0, ee.indexOf(" "));
-                            fecha_mes = ee.substring(ee.indexOf("de ") + 3);
-
-                            if (fecha_dia.length() == 1)
-                                fecha_dia = '0' + fecha_dia;
 
                             int m = 0;
 
                             //Pasa el mes a número
-                            while (!fecha_mes.matches(meses[m++])) ;
+                            switch (idioma) {
+                                case "es":
+                                    ee = e.substring(e.indexOf(", ") + 2);
+                                    fecha_dia = ee.substring(0, ee.indexOf(" "));
+                                    fecha_mes = ee.substring(ee.indexOf("de ") + 3);
+
+                                    if (fecha_dia.length() == 1)
+                                        fecha_dia = '0' + fecha_dia;
+
+                                    while (!fecha_mes.equalsIgnoreCase(meses_es[m++])) ;
+                                    break;
+                                default:
+                                    ee = e.substring(e.indexOf(", ") + 2);
+                                    fecha_mes = ee.substring(0, ee.indexOf(" "));
+                                    fecha_dia = ee.substring(ee.indexOf(" "));
+
+                                    if (fecha_dia.length() == 1)
+                                        fecha_dia = '0' + fecha_dia;
+
+                                    while (!fecha_mes.equalsIgnoreCase(meses_en[m++])) ;
+                                    break;
+                            }
 
                             fecha_mes = "" + m;
                             if (fecha_mes.length() == 1)
                                 fecha_mes = '0' + fecha_mes;
 
                             f = "" + Calendar.getInstance().get(Calendar.YEAR) + '/' + fecha_mes + '/' + fecha_dia;
+
                         } else {
                             fecha_dia = e.split("/")[0];
                             fecha_mes = e.split("/")[1];
                             fecha_ano = e.split("/")[2];
 
-                            e = fecha_dia + " de " + meses[Integer.parseInt(fecha_mes) - 1];
+                            switch (idioma) {
+                                case "es":
+                                    e = fecha_dia + " de " + meses_es[Integer.parseInt(fecha_mes) - 1];
+                                    break;
+                                default:
+                                    e = meses_en[Integer.parseInt(fecha_mes) - 1] + " " + fecha_dia;
+                                    break;
+                            }
 
                             if (fecha_dia.length() == 1)
                                 fecha_dia = '0' + fecha_dia;
@@ -194,7 +237,14 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
                         }
 
-                        fc = fecha_dia + " " + meses_corto[Integer.parseInt(fecha_mes)-1];
+                        switch (idioma) {
+                            case "es":
+                                fc = fecha_dia + " " + meses_corto_es[Integer.parseInt(fecha_mes) - 1];
+                                break;
+                            default:
+                                fc = fecha_dia + " " + meses_corto_en[Integer.parseInt(fecha_mes) - 1];
+                                break;
+                        }
 
                         // Me cargo sangrías y cosas raras
                         s = s.trim();
