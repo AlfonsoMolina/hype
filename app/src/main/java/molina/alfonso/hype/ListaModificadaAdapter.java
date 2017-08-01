@@ -40,7 +40,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private int pagina = 0;                                 //La página que se está mostrando (empezando por 0)
     private int ultPagina;                                  //El número (empezando por 1) de la última página
     private int peliculaPorPagina = 25;                     //Número de películas por página
-    private Activity activity;                              //Actividad, para cambiar la IU
+    private MainActivity activity;                              //Actividad, para cambiar la IU
     private int expandido = -1;                             //Posición del elemento expandido
 
     /**
@@ -49,7 +49,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
      * @param activity actividad principal, para acutalizar la IU
      * @param db la base de datos
      */
-    public ListaModificadaAdapter(Activity activity, int resourceID, FeedReaderDbHelper db) {
+    public ListaModificadaAdapter(MainActivity activity, int resourceID, FeedReaderDbHelper db) {
         super(activity.getApplicationContext(),resourceID);
         Log.d(TAG, "Construyendo el adaptador de la lista");
         this.resourceID = resourceID;
@@ -236,6 +236,13 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             ((TextView) activity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
             activity.findViewById(R.id.navegacion).setVisibility(View.INVISIBLE);
             activity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);        }
+
+        if(activity.getMenu()!= null) {
+            activity.getMenu().findItem(R.id.actualizar).setEnabled(true);
+            activity.getMenu().findItem(R.id.actualizar).setVisible(true);
+            activity.getMenu().findItem(R.id.cancelar).setEnabled(false);
+            activity.getMenu().findItem(R.id.cancelar).setVisible(false);
+        }
     }
 
     //Guarda si se muestran las películas guardadas o todas
@@ -346,6 +353,10 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
     public void setMaxPaginas() {
         this.ultPagina = lista.size() / peliculaPorPagina;
+    }
+
+    public void eliminarLista() {
+        lista.clear();
     }
 
 }

@@ -16,8 +16,6 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-
-        // Display the fragment as the main content.
         getFragmentManager().beginTransaction()
                 .replace(R.id.fragmento, new SettingsFragment())
                 .commit();

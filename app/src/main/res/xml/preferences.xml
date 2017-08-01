@@ -11,6 +11,7 @@
             android:defaultValue="@string/pref_pais_def" />
 
         <Preference android:title="Vaciar base de datos"
-            android:key="pref_db" />
+            android:key="pref_db"
+            android:defaultValue="0"/>
 
 </PreferenceScreen>

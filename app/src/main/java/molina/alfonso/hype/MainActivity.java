@@ -1,6 +1,8 @@
 package molina.alfonso.hype;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
@@ -16,7 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.logging.Level;
+
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     /*
      * Declaración de variables
@@ -30,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     // Helper para manipular la BBDD
     private FeedReaderDbHelper mDbHelper;
 
+    private HiloDescargarEstrenos hilo;
+
+    private Menu menu;
     /*
      * Métodos override
      */
@@ -56,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         // Creamos el helper de la BBDD
         mDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
+
         // Hook de la lista
         ListView lista = (ListView) findViewById(R.id.lista);
 
@@ -77,12 +85,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "Menú de opciones creado");
         // Expande el menu, añade las opciones
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.menu, menu);
 
         // Para dar color a los botones de la ActionBar
@@ -112,12 +124,23 @@ public class MainActivity extends AppCompatActivity {
 
             //Actualiza las películas guardadas..
             case R.id.actualizar:
-                // Lanzamos el Thread que descargará la información.
-                HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(this, listaAdapter,
+                hilo = new HiloDescargarEstrenos(this, listaAdapter,
                         ((LinearLayout) findViewById(R.id.carga_barra)),
                         ((TextView) findViewById(R.id.carga_mensaje)));
-
+                // Lanzamos el Thread que descargará la información.
                 hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+                item.setEnabled(false);
+                item.setVisible(false);
+                menu.findItem(R.id.cancelar).setEnabled(true);
+                menu.findItem(R.id.cancelar).setVisible(true);
+                return true;
+
+            case R.id.cancelar:
+                hilo.cancel(true);
+                item.setEnabled(false);
+                item.setVisible(false);
+                menu.findItem(R.id.actualizar).setEnabled(true);
+                menu.findItem(R.id.actualizar).setVisible(true);
                 return true;
 
             default:
@@ -193,4 +216,29 @@ public class MainActivity extends AppCompatActivity {
 
         listaAdapter.notifyDataSetChanged();
     }
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equalsIgnoreCase("pref_db")){
+            listaAdapter.eliminarLista();
+            listaAdapter.notifyDataSetChanged();
+            listaAdapter.actualizarInterfaz();
+            listaAdapter.noHayPelis();
+        } else if (key.equalsIgnoreCase("pref_pais")){
+            //Cuando cambia el país se borra la lista anterior
+            mDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntry.TABLE_NAME, null, null);
+            listaAdapter.eliminarLista();
+            listaAdapter.notifyDataSetChanged();
+            listaAdapter.actualizarInterfaz();
+            listaAdapter.noHayPelis();
+        }
+    }
+
+    protected void onDestroy() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref.unregisterOnSharedPreferenceChangeListener(this);
+        super.onDestroy();
+    }
+
+    public Menu getMenu(){ return menu;}
+
 }

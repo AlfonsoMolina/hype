@@ -105,7 +105,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
 
         //Se van a descargar las 10 primeras páginas de estrenos de FILMAFFINITY
-        while (pagina <= 10) {
+        while (pagina <= 10 && !isCancelled()) {
             try {
                 dir = "https://m.filmaffinity.com/" + idioma + "/rdcat.php?id=upc_th_" + pais + "&page=" + pagina;
                 html = getHTML(dir);
@@ -133,7 +133,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                 ContentValues values = new ContentValues();
 
                 //Se analizan los trozos de HTML correspondientes a cada película
-                for (int i = 1; i < peliculasHTML.length; i++) {
+                for (int i = 1; i < peliculasHTML.length && !isCancelled(); i++) {
 
                     //Se utiliza en link para ver si ya está
                     l = peliculasHTML[i].substring(0, peliculasHTML[i].indexOf("\""));
@@ -324,10 +324,20 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
         lista.notifyDataSetChanged();
         lista.setMaxPaginas();
         lista.actualizarInterfaz();
-        carga_mensaje.setText("Actualizando...");
+        lista.noHayPelis(); //Y esto de chanchullo para quitar el X
         carga_mensaje.setVisibility(View.GONE);
         carga_barra.setVisibility(View.GONE);
+    }
 
+    @Override
+    protected void onCancelled(Void v){
+        Log.d(TAG, "Descarga cancelada, actualizando interfaz");
+        lista.notifyDataSetChanged();
+        lista.setMaxPaginas();
+        lista.actualizarInterfaz();
+        lista.noHayPelis(); //Y esto de chanchullo para quitar el X
+        carga_mensaje.setVisibility(View.GONE);
+        carga_barra.setVisibility(View.GONE);
     }
 
 

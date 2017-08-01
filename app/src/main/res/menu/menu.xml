@@ -10,6 +10,15 @@
         app:showAsAction="ifRoom"
         />
 
+    <item
+        android:id="@+id/cancelar"
+        android:icon="@drawable/ic_cancel_black_24dp"
+        android:title="Cancelar"
+        app:showAsAction="ifRoom"
+        android:enabled="false"
+        android:visible="false"
+        />
+
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"
         android:title="Opciones"
