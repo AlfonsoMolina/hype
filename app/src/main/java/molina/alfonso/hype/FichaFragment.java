@@ -43,6 +43,8 @@ public class FichaFragment extends Fragment {
     private String titulo;
     private String link;
 
+    private Ficha ficha;
+
     private OnFragmentInteractionListener mListener;
 
     public FichaFragment() {
@@ -92,84 +94,7 @@ public class FichaFragment extends Fragment {
 
         ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
 
-        AsyncTask task = new AsyncTask() {
-
-            String sinopsis;
-            String director;
-            String imagen_url;
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-            }
-
-            @Override
-            protected Void doInBackground(Object[] objects) {
-
-                try {
-                    String contenido = getHTML(link);
-                    // Aquí el parseo
-
-                    // Saco la sinopsis
-                    Pattern pattern = Pattern.compile("<dt>Sinopsis</dt>(.*?)<dd itemprop=\"description\">(.*?)</dd>");
-                    Matcher matcher = pattern.matcher(contenido);
-
-                    while (matcher.find()) {
-                        sinopsis = matcher.group(2);
-                        Log.d(TAG, matcher.group(2));
-                    }
-
-                    pattern = Pattern.compile("<dt id=\"full-director\">Director</dt>(.*?)<span itemprop=\"name\">(.*?)</span>");
-                    matcher = pattern.matcher(contenido);
-
-                    while (matcher.find()) {
-                        director = matcher.group(2);
-                        Log.d(TAG, matcher.group(2));
-                    }
-
-                    pattern = Pattern.compile("<a id=\"main-poster\" href=\"#\">(.*?)<img itemprop=\"image\" src=\"(.*?)\"");
-                    matcher = pattern.matcher(contenido);
-
-                    while (matcher.find()) {
-                        imagen_url = matcher.group(2);
-                        Log.d(TAG, matcher.group(2));
-                    }
-
-                }catch (Exception e){
-                    Log.e(TAG, e.toString());
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-                ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText(sinopsis);
-            }
-
-            @NonNull
-            private String getHTML(String url) throws IOException {
-                Log.d(TAG, "Obteniendo contenido HTML desde " + url);
-                // Build and set timeout values for the request.
-                URLConnection connection = (new URL(url)).openConnection();
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
-                connection.connect();
-
-                // Read and store the result line by line then return the entire string.
-                InputStream in = connection.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                StringBuilder html = new StringBuilder();
-                for (String line; (line = reader.readLine()) != null; ) {
-                    html.append(line);
-                }
-                in.close();
-
-                return html.toString();
-            }
-        };
-
-        task.execute();
+        ficha = new Ficha(link, view);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
