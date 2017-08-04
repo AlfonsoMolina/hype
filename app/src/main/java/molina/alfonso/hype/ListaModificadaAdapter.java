@@ -264,17 +264,6 @@ public class ListaModificadaAdapter extends ArrayAdapter{
         }
     };
 
-   /* private View.OnLongClickListener abre_ficha = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View view) {
-            Log.i(TAG, "Pulsado largo");
-            Pelicula p = lista.get(getPosicionReal(expandido));
-            FichaFragment ficha = FichaFragment.newInstance(p.getTitulo(), p.getEnlace());
-            fragmentManager.beginTransaction().replace(R.id.ficha_container, ficha).addToBackStack(null).commit();
-            return false;
-        }
-    };
-*/
     //Envía la película al calendario en forma de evento
     private View.OnClickListener enviar_Calendario = new View.OnClickListener() {
         @Override

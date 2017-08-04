@@ -95,6 +95,7 @@ public class FichaFragment extends Fragment {
         ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
 
         ficha = new Ficha(link, view);
+        ficha.execute();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

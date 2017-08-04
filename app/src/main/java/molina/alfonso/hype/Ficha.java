@@ -1,17 +1,24 @@
 package molina.alfonso.hype;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,121 +26,199 @@ import java.util.regex.Pattern;
  * Created by Vicente on 04/08/2017.
  */
 
-public class Ficha {
+public class Ficha extends AsyncTask<Void,Integer,Void> {
 
-    static final String TAG = "Ficha";
+    private static final String TAG = "Ficha";
 
+    // Atributos
     private String UrlFA;
-    private String titulo;
     private String ano;
     private String duracion;
-    private String pais;
     private String portadaUrl;
-    private String director;
-    private String guion;
-    private String musica;
-    private String fotografia;
-    private String reparto;
-    private String productora;
-    private String genero;
-    private String grupos;
+    private Bitmap portada;
+    private List <String> director;
+    private List <String> reparto;
+    private List <String> productora;
+    private List <String> genero;
     private String sinopsis;
 
+    // Vista a modificar
     private final View mView;
+
+    // Regex de cada cosa a leer:
+    private static final String regex_POSTER = "<a id=\"main-poster\" href=\"#\">(.*?)<img itemprop=\"image\" src=\"(.*?)\"";
+    private static final String regex_SINOPSIS = "<dd itemprop=\"description\">(.*?)</dd>";
+    private static final String regex_ANO = "itemprop=\"datePublished\">(.*?)<";
+    private static final String regex_DURACION = "itemprop=\"duration\">(.*?)<";
+    private static final String regex_DIRECTORES = "<(.*?)itemprop=\"director\"(.*?)itemprop=\"name\">(.*?)<";
+    private static final String regex_REPARTO = "<(.*?)itemprop=\"actor\"(.*?)itemprop=\"name\">(.*?)<";
+    private static final String regex_GENERO = "<(.*?)itemprop=\"genre\">(.*?)<";
+
+    // Grupo a almacenar de cada regex
+    private static final int grupo_POSTER = 2;
+    private static final int grupo_SINOPSIS = 1;
+    private static final int grupo_ANO = 1;
+    private static final int grupo_DURACION = 1;
+    private static final int grupo_DIRECTORES = 3;
+    private static final int grupo_REPARTO = 3;
+    private static final int grupo_GENERO = 2;
+
+    // Valor de progreso resultante:
+    private static final int progreso_POSTER = 0;
+    private static final int progreso_SINOPSIS = 1;
+
 
     Ficha (String url, View view){
         this.UrlFA = url;
         mView = view;
-        parseContent();
+
+        director = new ArrayList<>();
+        reparto = new ArrayList<>();
+        productora = new ArrayList<>();
+        genero = new ArrayList<>();
+
     }
 
-    private void parseContent (){
-        AsyncTask task = new AsyncTask() {
+    @Override
+    protected Void doInBackground(Void... voids) {
+        try {
+            // Setup inicial
+            Pattern pattern;
+            Matcher matcher;
 
-            String sinopsis;
-            String director;
-            String imagen_url;
+            // Leo el HTML
+            String contenido = getHTML(UrlFA);
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-            }
+            // Aquí el parseo:
 
-            @Override
-            protected Void doInBackground(Object[] objects) {
+            // Saco el poster
+            pattern = Pattern.compile(regex_POSTER);
+            matcher = pattern.matcher(contenido);
+
+            while (matcher.find()) {
+                portadaUrl = matcher.group(grupo_POSTER);
+                Log.d(TAG, matcher.group(grupo_POSTER));
 
                 try {
-                    String contenido = getHTML(UrlFA);
-                    // Aquí el parseo
+                    URL url = new URL(portadaUrl);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setDoInput(true);
+                    connection.connect();
+                    InputStream input = connection.getInputStream();
+                    portada = BitmapFactory.decodeStream(input);
 
-                    // Saco la sinopsis
-                    Pattern pattern = Pattern.compile("<dt>Sinopsis</dt>(.*?)<dd itemprop=\"description\">(.*?)</dd>");
-                    Matcher matcher = pattern.matcher(contenido);
-
-                    while (matcher.find()) {
-                        sinopsis = matcher.group(2);
-                        Log.d(TAG, matcher.group(2));
-                    }
-
-                    pattern = Pattern.compile("<dt id=\"full-director\">Director</dt>(.*?)<span itemprop=\"name\">(.*?)</span>");
-                    matcher = pattern.matcher(contenido);
-
-                    while (matcher.find()) {
-                        director = matcher.group(2);
-                        Log.d(TAG, matcher.group(2));
-                    }
-
-                    pattern = Pattern.compile("<a id=\"main-poster\" href=\"#\">(.*?)<img itemprop=\"image\" src=\"(.*?)\"");
-                    matcher = pattern.matcher(contenido);
-
-                    while (matcher.find()) {
-                        imagen_url = matcher.group(2);
-                        Log.d(TAG, matcher.group(2));
-                    }
-
-                }catch (Exception e){
-                    Log.e(TAG, e.toString());
+                    publishProgress(progreso_POSTER);
+                } catch (IOException e) {
+                    // Log exception
+                    Log.e(TAG, e.getMessage());
                 }
-                return null;
+
             }
 
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
+            // Saco la sinopsis
+            pattern = Pattern.compile(regex_SINOPSIS);
+            matcher = pattern.matcher(contenido);
+
+            while (matcher.find()) {
+                sinopsis = matcher.group(grupo_SINOPSIS);
+                Log.d(TAG, matcher.group(grupo_SINOPSIS));
+                publishProgress(progreso_SINOPSIS);
+            }
+
+            // Saco el año:
+            pattern = Pattern.compile(regex_ANO);
+            matcher = pattern.matcher(contenido);
+
+            while (matcher.find()) {
+                ano = matcher.group(grupo_ANO);
+                Log.d(TAG, matcher.group(grupo_ANO));
+            }
+
+            // Saco la duracion:
+            pattern = Pattern.compile(regex_DURACION);
+            matcher = pattern.matcher(contenido);
+
+            while (matcher.find()) {
+                duracion = matcher.group(grupo_DURACION);
+                Log.d(TAG, matcher.group(grupo_DURACION));
+            }
+
+            // Saco los directores
+            pattern = Pattern.compile(regex_DIRECTORES);
+            matcher = pattern.matcher(contenido);
+
+            while (matcher.find()) {
+                director.add(matcher.group(grupo_DIRECTORES));
+            }
+            Log.d(TAG, director.toString());
+
+            // Saco el reparto
+            pattern = Pattern.compile(regex_REPARTO);
+            matcher = pattern.matcher(contenido);
+
+            while (matcher.find()) {
+                reparto.add(matcher.group(grupo_REPARTO));
+            }
+            Log.d(TAG, reparto.toString());
+
+            // Saco el genero
+            pattern = Pattern.compile(regex_GENERO);
+            matcher = pattern.matcher(contenido);
+
+            while (matcher.find()) {
+                genero.add(matcher.group(grupo_GENERO));
+            }
+            Log.d(TAG, genero.toString());
+
+        }catch (Exception e){
+            Log.e(TAG, e.toString());
+        }
+
+        return null;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        // se supone que la ficha ya está completa!
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+
+        switch (values[0]){
+            case 0:
+                ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageBitmap(portada);
+                break;
+            case 1:
                 ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis);
-            }
+                break;
+            case 2:
+                break;
+            default:
+                break;
+        }
 
-            @NonNull
-            private String getHTML(String url) throws IOException {
-                Log.d(TAG, "Obteniendo contenido HTML desde " + url);
-                // Build and set timeout values for the request.
-                URLConnection connection = (new URL(url)).openConnection();
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
-                connection.connect();
+    }
 
-                // Read and store the result line by line then return the entire string.
-                InputStream in = connection.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                StringBuilder html = new StringBuilder();
-                for (String line; (line = reader.readLine()) != null; ) {
-                    html.append(line);
-                }
-                in.close();
+    @Override
+    protected void onCancelled(Void aVoid) {
+        super.onCancelled(aVoid);
+    }
 
-                return html.toString();
-            }
-        };
-
-        task.execute();
+    @Override
+    protected void onCancelled() {
+        super.onCancelled();
     }
 
     public String getUrlFA() {
         return UrlFA;
-    }
-
-    public String getTitulo() {
-        return titulo;
     }
 
     public String getAno() {
@@ -144,48 +229,48 @@ public class Ficha {
         return duracion;
     }
 
-    public String getPais() {
-        return pais;
-    }
-
     public String getPortadaUrl() {
         return portadaUrl;
     }
 
-    public String getDirector() {
+    public List<String> getDirector() {
         return director;
     }
 
-    public String getGuion() {
-        return guion;
-    }
-
-    public String getMusica() {
-        return musica;
-    }
-
-    public String getFotografia() {
-        return fotografia;
-    }
-
-    public String getReparto() {
+    public List<String> getReparto() {
         return reparto;
     }
 
-    public String getProductora() {
+    public List<String> getProductora() {
         return productora;
     }
 
-    public String getGenero() {
+    public List<String> getGenero() {
         return genero;
-    }
-
-    public String getGrupos() {
-        return grupos;
     }
 
     public String getSinopsis() {
         return sinopsis;
     }
 
+    @NonNull
+    private String getHTML(String url) throws IOException {
+        Log.d(TAG, "Obteniendo contenido HTML desde " + url);
+        // Build and set timeout values for the request.
+        URLConnection connection = (new URL(url)).openConnection();
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
+        connection.connect();
+
+        // Read and store the result line by line then return the entire string.
+        InputStream in = connection.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        StringBuilder html = new StringBuilder();
+        for (String line; (line = reader.readLine()) != null; ) {
+            html.append(line);
+        }
+        in.close();
+
+        return html.toString();
+    }
 }
