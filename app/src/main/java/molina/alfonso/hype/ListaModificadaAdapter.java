@@ -1,12 +1,10 @@
 package molina.alfonso.hype;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -259,10 +257,10 @@ public class ListaModificadaAdapter extends ArrayAdapter{
     View.OnClickListener abre_ficha = new View.OnClickListener(){
         @Override
         public void onClick(View view) {
-            Log.i(TAG, "Pulsado botón de abrir ficha");
+            Log.i(TAG, "Pulsado botón de abrir fichaFragment");
             Pelicula p = lista.get(getPosicionReal(expandido));
-            Ficha ficha = Ficha.newInstance(p.getTitulo(), p.getEnlace());
-            fragmentManager.beginTransaction().replace(R.id.ficha_container, ficha).addToBackStack(null).commit();
+            FichaFragment fichaFragment = FichaFragment.newInstance(p.getTitulo(), p.getEnlace());
+            fragmentManager.beginTransaction().replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();
         }
     };
 
@@ -271,7 +269,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
         public boolean onLongClick(View view) {
             Log.i(TAG, "Pulsado largo");
             Pelicula p = lista.get(getPosicionReal(expandido));
-            Ficha ficha = Ficha.newInstance(p.getTitulo(), p.getEnlace());
+            FichaFragment ficha = FichaFragment.newInstance(p.getTitulo(), p.getEnlace());
             fragmentManager.beginTransaction().replace(R.id.ficha_container, ficha).addToBackStack(null).commit();
             return false;
         }

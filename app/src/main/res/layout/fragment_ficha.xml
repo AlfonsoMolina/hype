@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="molina.alfonso.hype.Ficha"
+    tools:context="molina.alfonso.hype.FichaFragment"
     android:id="@+id/fragment_ficha"
     android:background="@color/colorPrimary"
     android:clickable="true"
