@@ -16,9 +16,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ficha_titulo_default">Título</string>
     <string name="loading_text">Cargando…</string>
-    <string name="label_year">Año: </string>
-    <string name="label_duration">Duración: </string>
-    <string name="label_director">Directores: </string>
-    <string name="label_actor">Reparto: </string>
-    <string name="label_genre">Género: </string>
+    <string name="label_year">Año</string>
+    <string name="label_duration">Duración</string>
+    <string name="label_director">Director</string>
+    <string name="label_actor">Reparto</string>
+    <string name="label_genre">Género</string>
+    <string name="hype">Hype!</string>
 </resources>

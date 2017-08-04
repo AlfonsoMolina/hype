@@ -1,21 +1,15 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="molina.alfonso.hype.FichaFragment"
     android:id="@+id/fragment_ficha"
-    android:background="@color/colorPrimary"
+    android:background="@drawable/fragment_rectangle_shape"
     android:clickable="true"
     android:focusable="true"
     android:focusableInTouchMode="true"
+
     >
-
-    <!-- TODO: Update blank fragment layout -->
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,11 +20,11 @@
                 android:id="@+id/ficha_titulo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorAccent"
                 android:fontFamily="sans-serif-smallcaps"
-                android:textSize="25sp"
                 android:padding="15dp"
-                android:text="@string/ficha_titulo_default" />
+                android:text="@string/ficha_titulo_default"
+                android:textColor="@color/colorAccent"
+                android:textSize="25sp" />
 
             <ImageView
                 android:layout_width="match_parent"
@@ -41,46 +35,70 @@
                 android:id="@+id/ficha_sinopsis"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorAccent"
                 android:fontFamily="sans-serif-condensed"
                 android:textSize="16sp"
-                android:padding="15dp"
+                android:paddingRight="15dp"
+                android:paddingLeft="15dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
                 android:text="@string/loading_text"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:orientation="horizontal">
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:backgroundTint="@color/colorAccent"
+                android:background="@color/colorAccent"
+                android:layout_margin="10dp"
+                />
 
-                <TextView
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="5dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="15dp"
+                android:stretchColumns="1"
+                android:shrinkColumns="1">
+
+                <TableRow
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/label_year"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-condensed"
+                        android:textSize="16sp"
+                        android:gravity="end"
+                        android:textColor="@color/colorAccent"
+                        android:paddingEnd="5dp"
+                        android:text="@string/label_year"/>
+
+                    <TextView
+                        android:id="@+id/ficha_year"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/loading_text"
+                        android:fontFamily="sans-serif-condensed"
+                        android:textSize="16sp"/>
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/label_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
                     android:fontFamily="sans-serif-condensed"
                     android:textSize="16sp"
-                    android:textColor="@color/colorAccent"
-                    android:text="@string/label_year"/>
-
-                <TextView
-                    android:id="@+id/ficha_ano"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed"
-                    android:textSize="16sp"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed"
-                    android:textSize="16sp"
+                    android:paddingEnd="5dp"
                     android:textColor="@color/colorAccent"
                     android:text="@string/label_duration"/>
 
@@ -88,22 +106,23 @@
                     android:id="@+id/ficha_duracion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/loading_text"
                     android:fontFamily="sans-serif-condensed"
                     android:textSize="16sp"/>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:orientation="horizontal">
-
+                </TableRow>
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
                 <TextView
+                    android:id="@+id/label_director"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
                     android:textSize="16sp"
+                    android:gravity="end"
+                    android:paddingEnd="5dp"
                     android:textColor="@color/colorAccent"
                     android:text="@string/label_director"/>
 
@@ -112,20 +131,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
+                    android:text="@string/loading_text"
                     android:textSize="16sp"/>
 
-            </LinearLayout>
+                </TableRow>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:orientation="horizontal">
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
                 <TextView
+                    android:id="@+id/label_reparto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
+                    android:gravity="end"
                     android:textSize="16sp"
+                    android:paddingEnd="5dp"
                     android:textColor="@color/colorAccent"
                     android:text="@string/label_actor"/>
 
@@ -134,20 +157,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
-                    android:textSize="16sp"/>
-            </LinearLayout>
+                    android:text="@string/loading_text"
+                    android:textSize="16sp"
+                    />
+                </TableRow>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:orientation="horizontal">
-
-                <TextView
+                <TableRow
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/label_genre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
                     android:fontFamily="sans-serif-condensed"
                     android:textSize="16sp"
+                    android:paddingEnd="5dp"
                     android:textColor="@color/colorAccent"
                     android:text="@string/label_genre"/>
 
@@ -156,10 +182,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
+                    android:text="@string/loading_text"
                     android:textSize="16sp"/>
-            </LinearLayout>
+                </TableRow>
+            </TableLayout>
 
         </LinearLayout>
 
-    </ScrollView>
-</FrameLayout>
+</ScrollView>

@@ -14,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -72,7 +71,6 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     private static final int progreso_REPARTO = 5;
     private static final int progreso_GENERO = 6;
 
-
     Ficha (String url, View view){
         this.UrlFA = url;
         mView = view;
@@ -106,16 +104,14 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
 
                 try {
                     URL url = new URL(portadaUrl);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-                    portada = BitmapFactory.decodeStream(input);
-
+                    Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                    this.portada = Bitmap.createScaledBitmap(bmp, 654, 868, false);
                     publishProgress(progreso_POSTER);
-                } catch (IOException e) {
-                    // Log exception
-                    Log.e(TAG, e.getMessage());
+
+                }catch (Exception ee) {
+                    Bitmap bmp = Bitmap.createBitmap(654, 868, Bitmap.Config.ARGB_8888);
+                    bmp.eraseColor(Color.BLACK);
+                    this.portada = bmp;
                 }
 
             }
@@ -207,22 +203,22 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
                 ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageBitmap(portada);
                 break;
             case progreso_SINOPSIS:
-                ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis);
+                ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY",""));
                 break;
             case progreso_ANO:
-                ((TextView) mView.findViewById(R.id.ficha_ano)).setText(ano);
+                ((TextView) mView.findViewById(R.id.ficha_year)).setText(ano);
                 break;
             case progreso_DURACION:
                 ((TextView) mView.findViewById(R.id.ficha_duracion)).setText(duracion);
                 break;
             case progreso_DIRECTORES:
-                ((TextView) mView.findViewById(R.id.ficha_directores)).setText(director.toString());
+                ((TextView) mView.findViewById(R.id.ficha_directores)).setText(director.toString().replace("[", "").replace("]", ""));
                 break;
             case progreso_REPARTO:
-                ((TextView) mView.findViewById(R.id.ficha_reparto)).setText(reparto.toString());
+                ((TextView) mView.findViewById(R.id.ficha_reparto)).setText(reparto.toString().replace("[", "").replace("]", ""));
                 break;
             case progreso_GENERO:
-                ((TextView) mView.findViewById(R.id.ficha_genero)).setText(genero.toString());
+                ((TextView) mView.findViewById(R.id.ficha_genero)).setText(genero.toString().replace("[", "").replace("]", ""));
                 break;
             default:
                 break;
