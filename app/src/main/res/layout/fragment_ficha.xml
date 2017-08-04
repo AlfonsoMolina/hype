@@ -47,7 +47,35 @@
                 android:padding="15dp"
                 android:text="@string/loading_text"/>
 
+            <TextView
+                android:id="@+id/ficha_ano"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"/>
 
+            <TextView
+                android:id="@+id/ficha_duracion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"/>
+
+            <TextView
+                android:id="@+id/ficha_directores"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"/>
+
+            <TextView
+                android:id="@+id/ficha_reparto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"/>
+
+            <TextView
+                android:id="@+id/ficha_genero"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"/>
 
         </LinearLayout>
 

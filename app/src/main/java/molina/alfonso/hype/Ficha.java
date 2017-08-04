@@ -66,6 +66,11 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     // Valor de progreso resultante:
     private static final int progreso_POSTER = 0;
     private static final int progreso_SINOPSIS = 1;
+    private static final int progreso_ANO = 2;
+    private static final int progreso_DURACION = 3;
+    private static final int progreso_DIRECTORES = 4;
+    private static final int progreso_REPARTO = 5;
+    private static final int progreso_GENERO = 6;
 
 
     Ficha (String url, View view){
@@ -132,6 +137,7 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
             while (matcher.find()) {
                 ano = matcher.group(grupo_ANO);
                 Log.d(TAG, matcher.group(grupo_ANO));
+                publishProgress(progreso_ANO);
             }
 
             // Saco la duracion:
@@ -141,6 +147,7 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
             while (matcher.find()) {
                 duracion = matcher.group(grupo_DURACION);
                 Log.d(TAG, matcher.group(grupo_DURACION));
+                publishProgress(progreso_DURACION);
             }
 
             // Saco los directores
@@ -150,6 +157,7 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
             while (matcher.find()) {
                 director.add(matcher.group(grupo_DIRECTORES));
             }
+            publishProgress(progreso_DIRECTORES);
             Log.d(TAG, director.toString());
 
             // Saco el reparto
@@ -159,6 +167,7 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
             while (matcher.find()) {
                 reparto.add(matcher.group(grupo_REPARTO));
             }
+            publishProgress(progreso_REPARTO);
             Log.d(TAG, reparto.toString());
 
             // Saco el genero
@@ -168,6 +177,7 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
             while (matcher.find()) {
                 genero.add(matcher.group(grupo_GENERO));
             }
+            publishProgress(progreso_GENERO);
             Log.d(TAG, genero.toString());
 
         }catch (Exception e){
@@ -193,13 +203,26 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
         super.onProgressUpdate(values);
 
         switch (values[0]){
-            case 0:
+            case progreso_POSTER:
                 ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageBitmap(portada);
                 break;
-            case 1:
+            case progreso_SINOPSIS:
                 ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis);
                 break;
-            case 2:
+            case progreso_ANO:
+                ((TextView) mView.findViewById(R.id.ficha_ano)).setText(ano);
+                break;
+            case progreso_DURACION:
+                ((TextView) mView.findViewById(R.id.ficha_duracion)).setText(duracion);
+                break;
+            case progreso_DIRECTORES:
+                ((TextView) mView.findViewById(R.id.ficha_directores)).setText(director.toString());
+                break;
+            case progreso_REPARTO:
+                ((TextView) mView.findViewById(R.id.ficha_reparto)).setText(reparto.toString());
+                break;
+            case progreso_GENERO:
+                ((TextView) mView.findViewById(R.id.ficha_genero)).setText(genero.toString());
                 break;
             default:
                 break;
