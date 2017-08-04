@@ -46,7 +46,7 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
 
     // Regex de cada cosa a leer:
     private static final String regex_POSTER = "<a id=\"main-poster\" href=\"#\">(.*?)<img itemprop=\"image\" src=\"(.*?)\"";
-    private static final String regex_SINOPSIS = "<dd itemprop=\"description\">(.*?)</dd>";
+    private static final String regex_SINOPSIS = "<dd itemprop=\"description\">(.*?)<";
     private static final String regex_ANO = "itemprop=\"datePublished\">(.*?)<";
     private static final String regex_DURACION = "itemprop=\"duration\">(.*?)<";
     private static final String regex_DIRECTORES = "<(.*?)itemprop=\"director\"(.*?)itemprop=\"name\">(.*?)<";
@@ -117,34 +117,37 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
             }
 
             // Saco la sinopsis
+            sinopsis = "No disponible";
             pattern = Pattern.compile(regex_SINOPSIS);
             matcher = pattern.matcher(contenido);
 
             while (matcher.find()) {
                 sinopsis = matcher.group(grupo_SINOPSIS);
                 Log.d(TAG, matcher.group(grupo_SINOPSIS));
-                publishProgress(progreso_SINOPSIS);
             }
+            publishProgress(progreso_SINOPSIS);
 
             // Saco el año:
+            ano = "No disponible";
             pattern = Pattern.compile(regex_ANO);
             matcher = pattern.matcher(contenido);
 
             while (matcher.find()) {
                 ano = matcher.group(grupo_ANO);
                 Log.d(TAG, matcher.group(grupo_ANO));
-                publishProgress(progreso_ANO);
             }
+            publishProgress(progreso_ANO);
 
             // Saco la duracion:
+            duracion = "No disponible";
             pattern = Pattern.compile(regex_DURACION);
             matcher = pattern.matcher(contenido);
 
             while (matcher.find()) {
                 duracion = matcher.group(grupo_DURACION);
                 Log.d(TAG, matcher.group(grupo_DURACION));
-                publishProgress(progreso_DURACION);
             }
+            publishProgress(progreso_DURACION);
 
             // Saco los directores
             pattern = Pattern.compile(regex_DIRECTORES);
@@ -203,7 +206,7 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
                 ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageBitmap(portada);
                 break;
             case progreso_SINOPSIS:
-                ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY",""));
+                ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)",""));
                 break;
             case progreso_ANO:
                 ((TextView) mView.findViewById(R.id.ficha_year)).setText(ano);
