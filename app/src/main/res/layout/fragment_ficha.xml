@@ -43,39 +43,121 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorAccent"
                 android:fontFamily="sans-serif-condensed"
-                android:textSize="17sp"
+                android:textSize="16sp"
                 android:padding="15dp"
                 android:text="@string/loading_text"/>
 
-            <TextView
-                android:id="@+id/ficha_ano"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="15dp"/>
+                android:padding="15dp"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/ficha_duracion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="15dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorAccent"
+                    android:text="@string/label_year"/>
 
-            <TextView
-                android:id="@+id/ficha_directores"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="15dp"/>
+                <TextView
+                    android:id="@+id/ficha_ano"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"/>
 
-            <TextView
-                android:id="@+id/ficha_reparto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="15dp"/>
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/ficha_genero"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="15dp"/>
+                android:padding="15dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorAccent"
+                    android:text="@string/label_duration"/>
+
+                <TextView
+                    android:id="@+id/ficha_duracion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorAccent"
+                    android:text="@string/label_director"/>
+
+                <TextView
+                    android:id="@+id/ficha_directores"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorAccent"
+                    android:text="@string/label_actor"/>
+
+                <TextView
+                    android:id="@+id/ficha_reparto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorAccent"
+                    android:text="@string/label_genre"/>
+
+                <TextView
+                    android:id="@+id/ficha_genero"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
         </LinearLayout>
 

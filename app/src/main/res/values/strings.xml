@@ -9,13 +9,16 @@
     <string name="actual_page_header">Página</string>
     <string name="actual_page_number">1</string>
     <string name="no_pelis">No hay películas aún :(</string>
-    <string name="cargando">Cargando...</string>
-    <string name="leyendo">Estamos leyendo la base de datos.\nEspere un momento...</string>
+    <string name="cargando">Cargando…</string>
+    <string name="leyendo">Estamos leyendo la base de datos.\nEspere un momento…</string>
     <string name="pref_pais">País</string>
     <string name="pref_pais_def">es</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ficha_titulo_default">Título</string>
-    <string name="loading_text">Cargando...</string>
+    <string name="loading_text">Cargando…</string>
+    <string name="label_year">Año: </string>
+    <string name="label_duration">Duración: </string>
+    <string name="label_director">Directores: </string>
+    <string name="label_actor">Reparto: </string>
+    <string name="label_genre">Género: </string>
 </resources>

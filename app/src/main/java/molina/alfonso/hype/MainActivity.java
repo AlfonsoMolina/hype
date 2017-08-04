@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         //Se le manda a la lista esta actividad, para poder modificar la interfaz,
         //el layout de la row y la bbdd
-        listaAdapter = new ListaModificadaAdapter(this, R.layout.fila_new, mDbHelper);
+        listaAdapter = new ListaModificadaAdapter(this, R.layout.fila, mDbHelper);
 
         // Setup de la lista
         lista.setAdapter(listaAdapter);
