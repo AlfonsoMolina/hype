@@ -30,6 +30,8 @@
 
     </android.support.v7.widget.Toolbar>
 
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -96,6 +98,7 @@
             />
 
     </RelativeLayout>
+
 
     <TextView
         android:id="@+id/nopelis"
@@ -188,5 +191,14 @@
             android:layout_weight="1"
             android:background="#bebebe"/>
     </LinearLayout>
+
+    <FrameLayout
+        android:orientation="vertical"
+        android:id="@+id/ficha_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/my_toolbar"
+        android:padding="20dp">
+    </FrameLayout>
 
 </RelativeLayout>

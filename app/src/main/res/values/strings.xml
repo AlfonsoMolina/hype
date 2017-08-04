@@ -13,4 +13,7 @@
     <string name="leyendo">Estamos leyendo la base de datos.\nEspere un momento...</string>
     <string name="pref_pais">País</string>
     <string name="pref_pais_def">es</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

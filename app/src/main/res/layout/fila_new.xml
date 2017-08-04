@@ -108,7 +108,7 @@
                 />
 
             <ImageButton
-                android:id="@+id/av_enlace"
+                android:id="@+id/av_ficha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -127,6 +127,18 @@
                 android:text="@string/get_hype"
                 android:gravity="center"
                 android:src="@drawable/ic_favorite_border_black_24dp"
+                android:tint="@color/colorAppText"
+                android:backgroundTint="@color/colorWindowBackground"
+                />
+
+            <ImageButton
+                android:id="@+id/av_enlace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="enlace"
+                android:gravity="center"
+                android:src="@drawable/ic_link_black_24dp"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 />

@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +27,7 @@ import java.util.Calendar;
  *
  * @author Alfonso Molina
  */
-public class ListaModificadaAdapter extends ArrayAdapter {
+public class ListaModificadaAdapter extends ArrayAdapter{
 
     /*
      * Declaración de variables
@@ -43,6 +45,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
     private MainActivity activity;                              //Actividad, para cambiar la IU
     private int expandido = -1;                             //Posición del elemento expandido
 
+    FragmentManager fragmentManager;
     /**
      * Constructor.
      * @param resourceID recurso con el layout de cada fila.
@@ -56,14 +59,13 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         this.activity = activity;
         this.db = db;
         ultPagina = 1;  //Temporal
+        fragmentManager = activity.getSupportFragmentManager();
         HiloLeerBBDD hilo = new HiloLeerBBDD(db.getReadableDatabase(),this,
                 (LinearLayout)activity.findViewById(R.id.carga_barra),
                 (TextView) activity.findViewById(R.id.carga_mensaje));
         hilo.execute();
 
     }
-
-
 
     /**
      * Devuelve el número de filas en la lista. Puede ser:
@@ -180,9 +182,11 @@ public class ListaModificadaAdapter extends ArrayAdapter {
             fila.findViewById(R.id.av_fecha).setOnClickListener(enviar_Calendario);
             fila.findViewById(R.id.av_hype).setOnClickListener(get_hype);
             fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
+            fila.findViewById(R.id.av_ficha).setOnClickListener(abre_ficha);
         } else
             fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
         Log.v(TAG, "Añadiendo película " + p.getTitulo() + " a la vista número " + position);
+
         return fila;
     }
 
@@ -252,6 +256,27 @@ public class ListaModificadaAdapter extends ArrayAdapter {
         return mostrarHype;
     }
 
+    View.OnClickListener abre_ficha = new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+            Log.i(TAG, "Pulsado botón de abrir ficha");
+            Pelicula p = lista.get(getPosicionReal(expandido));
+            Ficha ficha = Ficha.newInstance(p.getTitulo(), p.getEnlace());
+            fragmentManager.beginTransaction().replace(R.id.ficha_container, ficha).addToBackStack(null).commit();
+        }
+    };
+
+   /* private View.OnLongClickListener abre_ficha = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View view) {
+            Log.i(TAG, "Pulsado largo");
+            Pelicula p = lista.get(getPosicionReal(expandido));
+            Ficha ficha = Ficha.newInstance(p.getTitulo(), p.getEnlace());
+            fragmentManager.beginTransaction().replace(R.id.ficha_container, ficha).addToBackStack(null).commit();
+            return false;
+        }
+    };
+*/
     //Envía la película al calendario en forma de evento
     private View.OnClickListener enviar_Calendario = new View.OnClickListener() {
         @Override
@@ -337,6 +362,7 @@ public class ListaModificadaAdapter extends ArrayAdapter {
 
         }
     };
+
 
     public void pasarPagina(int i){
         pagina = i;

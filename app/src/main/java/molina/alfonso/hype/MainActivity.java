@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,7 +21,7 @@ import android.widget.TextView;
 
 import java.util.logging.Level;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, Ficha.OnFragmentInteractionListener{
 
     /*
      * Declaración de variables
@@ -241,4 +242,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public Menu getMenu(){ return menu;}
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 }

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="molina.alfonso.hype.Ficha">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ficha_portada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/rihanna"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/ficha_titulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rihanna, costumbres y vida"/>
+
+                    <TextView
+                        android:id="@+id/ficha_fecha"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Viernes, 4 de enero"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ficha_sinopsis"
+                android:text="Lorem fistrum caballo blanco caballo negroorl jarl condemor no te digo trigo por no llamarte Rodrigor hasta luego Lucas llevame al sircoo sexuarl llevame al sircoo qué dise usteer. Tiene musho peligro se calle ustée sexuarl la caidita al ataquerl amatomaa la caidita mamaar a peich está la cosa muy malar está la cosa muy malar. Amatomaa la caidita caballo blanco caballo negroorl diodeno llevame al sircoo ahorarr a gramenawer. Pecador ese pedazo de ese pedazo de ese hombree te va a hasé pupitaa no te digo trigo por no llamarte Rodrigor ese pedazo de quietooor amatomaa a peich. Amatomaa condemor sexuarl por la gloria de mi madre la caidita.
+
+Se calle ustée condemor ahorarr pecador llevame al sircoo no puedor amatomaa. Papaar papaar ese pedazo de me cago en tus muelas llevame al sircoo te va a hasé pupitaa apetecan. Papaar papaar torpedo no puedor condemor. A wan al ataquerl está la cosa muy malar me cago en tus muelas qué dise usteer qué dise usteer apetecan fistro no puedor por la gloria de mi madre apetecan. Tiene musho peligro quietooor condemor papaar papaar te va a hasé pupitaa me cago en tus muelas apetecan quietooor. Benemeritaar por la gloria de mi madre te va a hasé pupitaa te va a hasé pupitaa.
+
+Sexuarl hasta luego Lucas a gramenawer jarl a peich ese pedazo de qué dise usteer fistro se calle ustée va usté muy cargadoo pecador. Papaar papaar ahorarr al ataquerl llevame al sircoo condemor al ataquerl no te digo trigo por no llamarte Rodrigor hasta luego Lucas llevame al sircoo está la cosa muy malar jarl. Ese hombree qué dise usteer ese que llega quietooor diodenoo te va a hasé pupitaa amatomaa pupita fistro benemeritaar. Llevame al sircoo no te digo trigo por no llamarte Rodrigor apetecan te va a hasé pupitaa. Diodeno qué dise usteer fistro pecador tiene musho peligro torpedo ese pedazo de diodeno ahorarr torpedo te va a hasé pupitaa. Jarl ese hombree benemeritaar benemeritaar pupita a wan llevame al sircoo hasta luego Lucas mamaar benemeritaar. "
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</RelativeLayout>

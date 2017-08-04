@@ -97,5 +97,6 @@ public class Pelicula {
     public boolean getisHyped() {
         return isHyped;
     }
+
 }
 
