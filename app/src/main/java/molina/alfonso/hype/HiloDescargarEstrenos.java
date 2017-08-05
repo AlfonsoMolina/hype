@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Process;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -21,10 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Calendar;
-
-import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 /**
  * Created by Clacks Department on 11/07/2017.
@@ -94,7 +90,6 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     @Override
     protected Void doInBackground(SQLiteDatabase... db) {
         Log.d(TAG, "Comenzando descarga de estrenos");
-        Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
 
         //db[0] para leer db[1] para escribir
         String html = "";

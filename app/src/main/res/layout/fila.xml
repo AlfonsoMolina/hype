@@ -93,19 +93,19 @@
             android:descendantFocusability="blocksDescendants"
             >
 
-            <ImageButton
+            <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/av_fecha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="7 de jul"
+                android:src="@drawable/ic_event_black_24dp"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
-                android:src="@drawable/ic_event_black_24dp"
                 android:gravity="center"
                 />
 
-            <ImageButton
+            <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/av_ficha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
                 android:backgroundTint="@color/colorWindowBackground"
                 />
 
-            <ImageButton
+            <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/av_hype"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -129,7 +129,7 @@
                 android:backgroundTint="@color/colorWindowBackground"
                 />
 
-            <ImageButton
+            <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/av_enlace"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

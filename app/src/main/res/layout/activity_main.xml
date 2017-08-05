@@ -40,7 +40,7 @@
         android:id="@+id/navegacion"
         android:layout_below="@+id/my_toolbar"
         android:layout_alignParentStart="true">
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/previousPageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
 
         </LinearLayout>
 
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/nextPageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
