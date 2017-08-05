@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -62,7 +63,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
         HiloLeerBBDD hilo = new HiloLeerBBDD(db.getReadableDatabase(),this,
                 (LinearLayout)activity.findViewById(R.id.carga_barra),
                 (TextView) activity.findViewById(R.id.carga_mensaje));
-        hilo.execute();
+        hilo.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
     }
 
@@ -261,6 +262,8 @@ public class ListaModificadaAdapter extends ArrayAdapter{
             Log.i(TAG, "Pulsado botón de abrir fichaFragment");
             Pelicula p = lista.get(getPosicionReal(expandido));
             FichaFragment fichaFragment = FichaFragment.newInstance(p.getTitulo(), p.getEnlace());
+
+
             fragmentManager.beginTransaction().replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();
         }
     };

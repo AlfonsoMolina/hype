@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Process;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+import static android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
 
 /**
  * Created by Vicente on 04/08/2017.
@@ -100,6 +104,9 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         try {
+
+            Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
+
             // Setup inicial
             Matcher matcher;
 

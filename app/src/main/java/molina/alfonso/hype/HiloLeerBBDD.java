@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Process;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 /**
  * Created by Usuario on 23/07/2017.
@@ -55,6 +58,8 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
     @Override
     protected Void doInBackground(Void... v) {
         Log.d(TAG, "Comenzando lectura de la BBDD");
+
+        Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
 
         //Se lee la bbdd y se guardan los elementos en cursor
         String[] projection = {
@@ -175,4 +180,5 @@ public class HiloLeerBBDD extends AsyncTask<Void,Integer,Void> {
         carga_barra.setVisibility(View.GONE);
 
     }
+
 }

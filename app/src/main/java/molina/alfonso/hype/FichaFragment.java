@@ -2,6 +2,7 @@ package molina.alfonso.hype;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -84,7 +85,7 @@ public class FichaFragment extends Fragment {
         ficha = new Ficha(link, view);
 
         // Iniciamos el hilo, que trata la descarga de info y su representación
-        ficha.execute();
+        ficha.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void onButtonPressed(Uri uri) {
