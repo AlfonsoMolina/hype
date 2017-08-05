@@ -200,7 +200,7 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
                 ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageBitmap(portada);
                 break;
             case progreso_SINOPSIS:
-                ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)",""));
+                ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " "));
                 break;
             case progreso_ANO:
                 ((TextView) mView.findViewById(R.id.ficha_year)).setText(ano);
