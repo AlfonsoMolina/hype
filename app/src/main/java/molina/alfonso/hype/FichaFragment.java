@@ -21,14 +21,12 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class FichaFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String TÍTULO = "Título";
     private static final String LINK = "LINK";
 
     private static final String TAG = "FichaFragment";
 
-    // TODO: Rename and change types of parameters
     private String titulo;
     private String link;
 
@@ -48,7 +46,6 @@ public class FichaFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment FichaFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static FichaFragment newInstance(String param1, String param2) {
         FichaFragment fragment = new FichaFragment();
         Bundle args = new Bundle();
@@ -80,13 +77,16 @@ public class FichaFragment extends Fragment {
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Fijamos el título, ya conocido, para ir rellenando algo la ficha...
         ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
 
+        // Creamos la ficha con su constructor, lo que va agilizando algunas operaciones de compilación de regex
         ficha = new Ficha(link, view);
+
+        // Iniciamos el hilo, que trata la descarga de info y su representación
         ficha.execute();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -121,7 +121,6 @@ public class FichaFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

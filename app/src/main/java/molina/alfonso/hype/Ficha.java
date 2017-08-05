@@ -45,22 +45,22 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     private final View mView;
 
     // Regex de cada cosa a leer:
-    private static final String regex_POSTER = "<a id=\"main-poster\" href=\"#\">(.*?)<img itemprop=\"image\" src=\"(.*?)\"";
-    private static final String regex_SINOPSIS = "<dd itemprop=\"description\">(.*?)<";
-    private static final String regex_ANO = "itemprop=\"datePublished\">(.*?)<";
-    private static final String regex_DURACION = "itemprop=\"duration\">(.*?)<";
-    private static final String regex_DIRECTORES = "<(.*?)itemprop=\"director\"(.*?)itemprop=\"name\">(.*?)<";
-    private static final String regex_REPARTO = "<(.*?)itemprop=\"actor\"(.*?)itemprop=\"name\">(.*?)<";
-    private static final String regex_GENERO = "<(.*?)itemprop=\"genre\">(.*?)<";
+    private static final String regex_POSTER = "<a id=\"main-poster\" href=\"#\">\\p{Blank}*?<img itemprop=\"image\" src=\"(\\p{ASCII}*?)\"";
+    private static final String regex_SINOPSIS = "<dd itemprop=\"description\">([\\p{Alnum}\\p{Punct}\\p{Blank}]*?)<";
+    private static final String regex_ANO = "itemprop=\"datePublished\">(\\p{Digit}*?)<";
+    private static final String regex_DURACION = "itemprop=\"duration\">([\\p{Alnum}\\p{Punct}\\s]*?)<";
+    private static final String regex_DIRECTORES = "itemprop=\"director\" itemscope itemtype=\"http://schema.org/Person\".*?itemprop=\"name\">([\\p{Alnum}\\p{Punct}\\s]*?)<";
+    private static final String regex_REPARTO = "itemprop=\"actor\" itemscope itemtype=\"http://schema.org/Person\".*?itemprop=\"name\">([\\p{Alnum}\\p{Punct}\\s]*?)<";
+    private static final String regex_GENERO = "itemprop=\"genre\">([\\p{Alnum}\\s\\p{Punct}]*?)<";
 
     // Grupo a almacenar de cada regex
-    private static final int grupo_POSTER = 2;
+    private static final int grupo_POSTER = 1;
     private static final int grupo_SINOPSIS = 1;
     private static final int grupo_ANO = 1;
     private static final int grupo_DURACION = 1;
-    private static final int grupo_DIRECTORES = 3;
-    private static final int grupo_REPARTO = 3;
-    private static final int grupo_GENERO = 2;
+    private static final int grupo_DIRECTORES = 1;
+    private static final int grupo_REPARTO = 1;
+    private static final int grupo_GENERO = 1;
 
     // Valor de progreso resultante:
     private static final int progreso_POSTER = 0;
@@ -71,6 +71,9 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     private static final int progreso_REPARTO = 5;
     private static final int progreso_GENERO = 6;
 
+    // Patterns y matchers:
+    private ArrayList <Pattern> vPattern;
+
     Ficha (String url, View view){
         this.UrlFA = url;
         mView = view;
@@ -80,13 +83,24 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
         productora = new ArrayList<>();
         genero = new ArrayList<>();
 
+        // Precompilado de patterns:
+
+        vPattern = new ArrayList<>();
+
+        vPattern.add(Pattern.compile(regex_POSTER));
+        vPattern.add(Pattern.compile(regex_SINOPSIS));
+        vPattern.add(Pattern.compile(regex_ANO));
+        vPattern.add(Pattern.compile(regex_DURACION));
+        vPattern.add(Pattern.compile(regex_DIRECTORES));
+        vPattern.add(Pattern.compile(regex_REPARTO));
+        vPattern.add(Pattern.compile(regex_GENERO));
+
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
         try {
             // Setup inicial
-            Pattern pattern;
             Matcher matcher;
 
             // Leo el HTML
@@ -94,91 +108,71 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
 
             // Aquí el parseo:
 
-            // Saco el poster
-            pattern = Pattern.compile(regex_POSTER);
-            matcher = pattern.matcher(contenido);
+            for (int i=0; i<vPattern.size(); i++){
 
-            while (matcher.find()) {
-                portadaUrl = matcher.group(grupo_POSTER);
-                Log.d(TAG, matcher.group(grupo_POSTER));
+                matcher = vPattern.get(i).matcher(contenido);
 
-                try {
-                    URL url = new URL(portadaUrl);
-                    Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                    this.portada = Bitmap.createScaledBitmap(bmp, 654, 868, false);
-                    publishProgress(progreso_POSTER);
+                switch (i){
+                    case progreso_POSTER:
+                        while (matcher.find()) {
+                            portadaUrl = matcher.group(grupo_POSTER);
+                            Log.d(TAG, matcher.group(grupo_POSTER));
+                            try {
+                                URL url = new URL(portadaUrl);
+                                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                this.portada = Bitmap.createScaledBitmap(bmp, 654, 868, false);
+                            }catch (Exception ee) {
+                                Bitmap bmp = Bitmap.createBitmap(654, 868, Bitmap.Config.ARGB_8888);
+                                bmp.eraseColor(Color.BLACK);
+                                this.portada = bmp;
+                            }
 
-                }catch (Exception ee) {
-                    Bitmap bmp = Bitmap.createBitmap(654, 868, Bitmap.Config.ARGB_8888);
-                    bmp.eraseColor(Color.BLACK);
-                    this.portada = bmp;
+                        }
+                        break;
+                    case progreso_SINOPSIS:
+                        sinopsis = "No disponible";
+                        while (matcher.find()) {
+                            sinopsis = matcher.group(grupo_SINOPSIS);
+                            Log.d(TAG, matcher.group(grupo_SINOPSIS));
+                        }
+                        break;
+                    case progreso_ANO:
+                        ano = "No disponible";
+                        while (matcher.find()) {
+                            ano = matcher.group(grupo_ANO);
+                            Log.d(TAG, matcher.group(grupo_ANO));
+                        }
+                        break;
+                    case progreso_DURACION:
+                        duracion = "No disponible";
+                        while (matcher.find()) {
+                            duracion = matcher.group(grupo_DURACION);
+                            Log.d(TAG, matcher.group(grupo_DURACION));
+                        }
+                        break;
+                    case progreso_DIRECTORES:
+                        while (matcher.find()) {
+                            director.add(matcher.group(grupo_DIRECTORES));
+                        }
+                        Log.d(TAG, director.toString());
+                        break;
+                    case progreso_REPARTO:
+                        while (matcher.find()) {
+                            reparto.add(matcher.group(grupo_REPARTO));
+                        }
+                        Log.d(TAG, reparto.toString());
+                        break;
+                    case progreso_GENERO:
+                        while (matcher.find()) {
+                            genero.add(matcher.group(grupo_GENERO));
+                        }
+                        Log.d(TAG, genero.toString());
+                        break;
+                    default:
+                        break;
                 }
-
+                publishProgress(i);
             }
-
-            // Saco la sinopsis
-            sinopsis = "No disponible";
-            pattern = Pattern.compile(regex_SINOPSIS);
-            matcher = pattern.matcher(contenido);
-
-            while (matcher.find()) {
-                sinopsis = matcher.group(grupo_SINOPSIS);
-                Log.d(TAG, matcher.group(grupo_SINOPSIS));
-            }
-            publishProgress(progreso_SINOPSIS);
-
-            // Saco el año:
-            ano = "No disponible";
-            pattern = Pattern.compile(regex_ANO);
-            matcher = pattern.matcher(contenido);
-
-            while (matcher.find()) {
-                ano = matcher.group(grupo_ANO);
-                Log.d(TAG, matcher.group(grupo_ANO));
-            }
-            publishProgress(progreso_ANO);
-
-            // Saco la duracion:
-            duracion = "No disponible";
-            pattern = Pattern.compile(regex_DURACION);
-            matcher = pattern.matcher(contenido);
-
-            while (matcher.find()) {
-                duracion = matcher.group(grupo_DURACION);
-                Log.d(TAG, matcher.group(grupo_DURACION));
-            }
-            publishProgress(progreso_DURACION);
-
-            // Saco los directores
-            pattern = Pattern.compile(regex_DIRECTORES);
-            matcher = pattern.matcher(contenido);
-
-            while (matcher.find()) {
-                director.add(matcher.group(grupo_DIRECTORES));
-            }
-            publishProgress(progreso_DIRECTORES);
-            Log.d(TAG, director.toString());
-
-            // Saco el reparto
-            pattern = Pattern.compile(regex_REPARTO);
-            matcher = pattern.matcher(contenido);
-
-            while (matcher.find()) {
-                reparto.add(matcher.group(grupo_REPARTO));
-            }
-            publishProgress(progreso_REPARTO);
-            Log.d(TAG, reparto.toString());
-
-            // Saco el genero
-            pattern = Pattern.compile(regex_GENERO);
-            matcher = pattern.matcher(contenido);
-
-            while (matcher.find()) {
-                genero.add(matcher.group(grupo_GENERO));
-            }
-            publishProgress(progreso_GENERO);
-            Log.d(TAG, genero.toString());
-
         }catch (Exception e){
             Log.e(TAG, e.toString());
         }

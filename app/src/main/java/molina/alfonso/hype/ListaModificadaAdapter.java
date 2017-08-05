@@ -40,10 +40,11 @@ public class ListaModificadaAdapter extends ArrayAdapter{
     private int pagina = 0;                                 //La página que se está mostrando (empezando por 0)
     private int ultPagina;                                  //El número (empezando por 1) de la última página
     private int peliculaPorPagina = 25;                     //Número de películas por página
-    private MainActivity activity;                              //Actividad, para cambiar la IU
+    private MainActivity activity;                          //Actividad, para cambiar la IU
     private int expandido = -1;                             //Posición del elemento expandido
 
-    FragmentManager fragmentManager;
+    private FragmentManager fragmentManager;
+
     /**
      * Constructor.
      * @param resourceID recurso con el layout de cada fila.
