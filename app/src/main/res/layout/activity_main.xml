@@ -40,7 +40,7 @@
         android:id="@+id/navegacion"
         android:layout_below="@+id/my_toolbar"
         android:layout_alignParentStart="true">
-        <android.support.v7.widget.AppCompatImageButton
+        <ImageButton
             android:id="@+id/previousPageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
 
         </LinearLayout>
 
-        <android.support.v7.widget.AppCompatImageButton
+        <ImageButton
             android:id="@+id/nextPageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -197,9 +197,12 @@
         android:id="@+id/ficha_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/my_toolbar"
-        android:layout_margin="20dp"
-        android:elevation="50dp">
+        android:elevation="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="17dp"
+        android:layout_above="@+id/carga_barra"
+        android:layout_centerHorizontal="true">
     </FrameLayout>
 
 </RelativeLayout>
