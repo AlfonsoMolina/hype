@@ -198,9 +198,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="50dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="17dp"
+        android:layout_margin="20dp"
         android:layout_above="@+id/carga_barra"
         android:layout_centerHorizontal="true">
     </FrameLayout>
