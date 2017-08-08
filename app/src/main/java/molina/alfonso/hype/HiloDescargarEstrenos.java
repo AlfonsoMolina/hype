@@ -185,6 +185,10 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                             //Pasa el mes a número
                             switch (idioma) {
                                 case "es":
+                                case "mx":
+                                case "ar":
+                                case "co":
+                                case "cl":
                                     ee = e.substring(e.indexOf(", ") + 2);
                                     fecha_dia = ee.substring(0, ee.indexOf(" "));
                                     fecha_mes = ee.substring(ee.indexOf("de ") + 3);
