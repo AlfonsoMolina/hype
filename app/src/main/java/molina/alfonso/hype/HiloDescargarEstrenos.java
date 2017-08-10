@@ -113,8 +113,9 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
             try {
                 dir = "https://m.filmaffinity.com/" + idioma + "/rdcat.php?id=upc_th_" + pais + "&page=" + pagina;
                 html = getHTML(dir);
-            } catch (IOException ee) {
+            } catch (Exception ee) {
                 html = null;
+                this.cancel(true);
             }
 
             if (html != null) {
@@ -194,86 +195,102 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
                         s = peliculasHTML[i].substring(ind + 12, ind2);
                         ind = peliculasHTML[i].indexOf("date\">");
-                        e = peliculasHTML[i].substring(ind + 6, peliculasHTML[i].indexOf("</span>", ind + 6));
 
-                        //Ahora se mira la fecha para guardarla en el formato correcto.
-                        ind2 = e.indexOf(", ");
-                        String ee = "";
-                        String fecha_dia = "";
-                        String fecha_mes = "";
-                        String fecha_ano = "";
 
-                        if (ind2 > 0) {
+                        if (ind == -1) {
+                            e = "Sin confirmar";
+                            f = "09/09/2099";
+                            fc = "n";
 
-                            int m = 0;
+                        }else {
+                            e = peliculasHTML[i].substring(ind + 6, peliculasHTML[i].indexOf("</span>", ind + 6));
 
-                            //Pasa el mes a número
+                            //Ahora se mira la fecha para guardarla en el formato correcto.
+                            ind2 = e.indexOf(", ");
+                            String ee = "";
+                            String fecha_dia = "";
+                            String fecha_mes = "";
+                            String fecha_ano = "";
+
+                            if (ind2 > 0) {
+
+                                int m = 0;
+
+                                //Pasa el mes a número
+                                switch (idioma) {
+                                    case "es":
+                                    case "mx":
+                                    case "ar":
+                                    case "co":
+                                    case "cl":
+                                        ee = e.substring(e.indexOf(", ") + 2);
+                                        fecha_dia = ee.substring(0, ee.indexOf(" "));
+                                        fecha_mes = ee.substring(ee.indexOf("de ") + 3);
+
+                                        if (fecha_dia.length() == 1)
+                                            fecha_dia = '0' + fecha_dia;
+
+                                        while (!fecha_mes.equalsIgnoreCase(meses_es[m++])) ;
+                                        break;
+                                    default:
+                                        ee = e.substring(e.indexOf(", ") + 2);
+                                        fecha_mes = ee.substring(0, ee.indexOf(" "));
+                                        fecha_dia = ee.substring(ee.indexOf(" "));
+
+                                        if (fecha_dia.length() == 1)
+                                            fecha_dia = '0' + fecha_dia;
+
+                                        while (!fecha_mes.equalsIgnoreCase(meses_en[m++])) ;
+                                        break;
+                                }
+
+                                fecha_mes = "" + m;
+                                if (fecha_mes.length() == 1)
+                                    fecha_mes = '0' + fecha_mes;
+
+                                f = "" + Calendar.getInstance().get(Calendar.YEAR) + '/' + fecha_mes + '/' + fecha_dia;
+
+                            } else {
+                                fecha_dia = e.split("/")[0];
+                                fecha_mes = e.split("/")[1];
+                                fecha_ano = e.split("/")[2];
+
+                                switch (idioma) {
+                                    case "es":
+                                    case "mx":
+                                    case "ar":
+                                    case "co":
+                                    case "cl":
+                                        e = fecha_dia + " de " + meses_es[Integer.parseInt(fecha_mes) - 1];
+                                        break;
+                                    default:
+                                        e = meses_en[Integer.parseInt(fecha_mes) - 1] + " " + fecha_dia;
+                                        break;
+                                }
+
+                                if (fecha_dia.length() == 1)
+                                    fecha_dia = '0' + fecha_dia;
+
+                                if (fecha_mes.length() == 1)
+                                    fecha_mes = '0' + fecha_mes;
+
+                                f = "" + fecha_ano + '/' + fecha_mes + '/' + fecha_dia;
+
+                            }
+
                             switch (idioma) {
                                 case "es":
                                 case "mx":
                                 case "ar":
                                 case "co":
                                 case "cl":
-                                    ee = e.substring(e.indexOf(", ") + 2);
-                                    fecha_dia = ee.substring(0, ee.indexOf(" "));
-                                    fecha_mes = ee.substring(ee.indexOf("de ") + 3);
-
-                                    if (fecha_dia.length() == 1)
-                                        fecha_dia = '0' + fecha_dia;
-
-                                    while (!fecha_mes.equalsIgnoreCase(meses_es[m++])) ;
+                                    fc = fecha_dia + " " + meses_corto_es[Integer.parseInt(fecha_mes) - 1];
                                     break;
                                 default:
-                                    ee = e.substring(e.indexOf(", ") + 2);
-                                    fecha_mes = ee.substring(0, ee.indexOf(" "));
-                                    fecha_dia = ee.substring(ee.indexOf(" "));
-
-                                    if (fecha_dia.length() == 1)
-                                        fecha_dia = '0' + fecha_dia;
-
-                                    while (!fecha_mes.equalsIgnoreCase(meses_en[m++])) ;
+                                    fc = fecha_dia + " " + meses_corto_en[Integer.parseInt(fecha_mes) - 1];
                                     break;
                             }
-
-                            fecha_mes = "" + m;
-                            if (fecha_mes.length() == 1)
-                                fecha_mes = '0' + fecha_mes;
-
-                            f = "" + Calendar.getInstance().get(Calendar.YEAR) + '/' + fecha_mes + '/' + fecha_dia;
-
-                        } else {
-                            fecha_dia = e.split("/")[0];
-                            fecha_mes = e.split("/")[1];
-                            fecha_ano = e.split("/")[2];
-
-                            switch (idioma) {
-                                case "es":
-                                    e = fecha_dia + " de " + meses_es[Integer.parseInt(fecha_mes) - 1];
-                                    break;
-                                default:
-                                    e = meses_en[Integer.parseInt(fecha_mes) - 1] + " " + fecha_dia;
-                                    break;
-                            }
-
-                            if (fecha_dia.length() == 1)
-                                fecha_dia = '0' + fecha_dia;
-
-                            if (fecha_mes.length() == 1)
-                                fecha_mes = '0' + fecha_mes;
-
-                            f = "" + fecha_ano + '/' + fecha_mes + '/' + fecha_dia;
-
                         }
-
-                        switch (idioma) {
-                            case "es":
-                                fc = fecha_dia + " " + meses_corto_es[Integer.parseInt(fecha_mes) - 1];
-                                break;
-                            default:
-                                fc = fecha_dia + " " + meses_corto_en[Integer.parseInt(fecha_mes) - 1];
-                                break;
-                        }
-
                         // Me cargo sangrías y cosas raras
                         s = s.trim();
 
