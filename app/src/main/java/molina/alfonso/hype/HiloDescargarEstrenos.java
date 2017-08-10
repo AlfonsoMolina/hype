@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -15,12 +17,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Calendar;
+
+import static android.R.attr.bitmap;
 
 /**
  * Created by Clacks Department on 11/07/2017.
@@ -123,7 +128,8 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                 String e;
                 String f;
                 String fc;
-
+                byte[] p_byte;
+                Bitmap p_bitmap;
                 int ind;
 
 
@@ -156,6 +162,25 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                         //Se buscan y guardan los diferentes elementos
                         ind = peliculasHTML[i].indexOf("src=\"");
                         p = peliculasHTML[i].substring(ind + 5, peliculasHTML[i].indexOf("\"", ind + 5));
+
+                        try {
+                            URL url = new URL(p);
+                            p_bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                            p_bitmap = Bitmap.createScaledBitmap(p_bitmap, 50, 80, false);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            p_bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+                            p_byte = stream.toByteArray();
+
+                        }catch (Exception ee){
+                            p_bitmap = Bitmap.createBitmap(50, 80, Bitmap.Config.ARGB_8888);
+                            p_bitmap.eraseColor(Color.BLACK);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            p_bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+                            p_byte = stream.toByteArray();
+
+                            //TODO hacerlo más eficiente, directamente en stream
+                        }
+
                         ind = peliculasHTML[i].indexOf("mc-title ft\">");
                         t = peliculasHTML[i].substring(ind + 13, peliculasHTML[i].indexOf("   ", ind + 13));
                         ind = peliculasHTML[i].indexOf("synop-text\">");
@@ -255,7 +280,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                         //Se añaden los valores que hemos cogido
                         values.put(FeedReaderContract.FeedEntry.COLUMN_REF, l);
                         values.put(FeedReaderContract.FeedEntry.COLUMN_TITULO, t);
-                        values.put(FeedReaderContract.FeedEntry.COLUMN_PORTADA, p);
+                        values.put(FeedReaderContract.FeedEntry.COLUMN_PORTADA, p_byte);
                         values.put(FeedReaderContract.FeedEntry.COLUMN_SINOPSIS, s);
                         values.put(FeedReaderContract.FeedEntry.COLUMN_HYPE, false);
                         values.put(FeedReaderContract.FeedEntry.COLUMN_CORTO, fc);
@@ -264,7 +289,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
                         //Y se insertan en la bbdd y en la lista de películas de la lista
                         db[1].insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
-                        lista.add(new Pelicula(l, p, t, s, e, f, fc, false));
+                        lista.add(new Pelicula(l, p_bitmap, t, s, e, f, fc, false));
                         values.clear();
 
                         Log.d(TAG, "Encontrada película: " + t + ".");

@@ -34,7 +34,7 @@ public final class FeedReaderContract {
                     FeedEntry._ID + " INTEGER PRIMARY KEY," +
                     FeedEntry.COLUMN_REF + " TEXT," +
                     FeedEntry.COLUMN_TITULO + " TEXT," +
-                    FeedEntry.COLUMN_PORTADA + " TEXT," +
+                    FeedEntry.COLUMN_PORTADA + " BLOB," +
                     FeedEntry.COLUMN_SINOPSIS + " TEXT," +
                     FeedEntry.COLUMN_ESTRENO + " TEXT," +
                     FeedEntry.COLUMN_FECHA + " TEXT," +

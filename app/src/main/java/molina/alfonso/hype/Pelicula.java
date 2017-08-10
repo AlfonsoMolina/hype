@@ -33,7 +33,7 @@ public class Pelicula {
      */
 
     //link, portada, titulo, sinopsis, estreno (con letras), fecha (exacto), fecha corta, hay hype?
-    Pelicula (String l, String p, String t, String s, String e, String f, String fc,Boolean h){
+    Pelicula (String l, Bitmap p, String t, String s, String e, String f, String fc,Boolean h){
         Log.v(TAG, "Objeto Pelicula construido");
         this.titulo = t;
         this.sinopsis = s;
@@ -42,19 +42,11 @@ public class Pelicula {
         this.estreno_fecha = f;
         this.estreno_corto = fc;
         this.isHyped = h;
+        this.portada = p;
 
         //Descarga el bitmap de la portada cada vez que se coge la película de la bbdd.
         //Si no hay, se pone negro.
-        try {
-            URL url = new URL(p);
-            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            this.portada = Bitmap.createScaledBitmap(bmp, 50, 80, false);
 
-        }catch (Exception ee){
-            Bitmap bmp = Bitmap.createBitmap(50, 80, Bitmap.Config.ARGB_8888);
-            bmp.eraseColor(Color.BLACK);
-            this.portada = bmp;
-        }
     }
 
     /*
