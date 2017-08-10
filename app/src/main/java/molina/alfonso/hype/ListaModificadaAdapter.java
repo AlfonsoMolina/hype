@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.AppCompatImageButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -183,6 +184,10 @@ public class ListaModificadaAdapter extends ArrayAdapter{
             fila.findViewById(R.id.av_hype).setOnClickListener(get_hype);
             fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
             fila.findViewById(R.id.av_ficha).setOnClickListener(abre_ficha);
+
+            if (p.getisHyped()){
+                ((AppCompatImageButton) fila.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
+            }
         } else
             fila.findViewById(R.id.avanzado).setVisibility(View.GONE);
         Log.v(TAG, "Añadiendo película " + p.getTitulo() + " a la vista número " + position);
@@ -299,7 +304,6 @@ public class ListaModificadaAdapter extends ArrayAdapter{
         @Override
         public void onClick(View v) {
 
-
             int position = expandido;
             Pelicula p = lista.get(getPosicionReal(position));
             Log.d(TAG, "Pulsado botón \"Hype\" en película " + p.getTitulo());
@@ -312,8 +316,11 @@ public class ListaModificadaAdapter extends ArrayAdapter{
 
             if (p.getisHyped()) {
                 h = "T";
-            } else
+                ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_black_24dp);
+            } else {
                 h = "F";
+                ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
+            }
 
             values.put(FeedReaderContract.FeedEntry.COLUMN_HYPE, h);
 
