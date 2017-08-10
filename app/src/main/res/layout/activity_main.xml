@@ -8,6 +8,15 @@
     android:layout_height="match_parent"
     android:theme="@style/AppTheme">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_prov"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/logo_dscr"
+        android:alpha="0.5"/>
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
@@ -205,5 +214,7 @@
         android:layout_above="@+id/carga_barra"
         android:layout_centerHorizontal="true">
     </FrameLayout>
+
+
 
 </RelativeLayout>

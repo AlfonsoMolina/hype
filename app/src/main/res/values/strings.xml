@@ -24,4 +24,5 @@
     <string name="fecha_default">0/0/0</string>
     <string name="mas_info">+ info</string>
     <string name="enlace">link</string>
+    <string name="logo_dscr">Logo</string>
 </resources>
