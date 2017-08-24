@@ -1,10 +1,7 @@
 package molina.alfonso.hype;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 /**
  * Created by Usuario on 31/07/2017.

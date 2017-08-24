@@ -33,6 +33,8 @@ public class ListaModificadaAdapter extends ArrayAdapter{
      * Declaración de variables
      */
 
+    // TODO: AÑADIR BOTÓN DE COMPARTIR
+
     private static final String TAG = "ListaModificadaAdapter";
 
     private ArrayList<Pelicula> lista = new ArrayList<>();  //Los elementos de la lista
@@ -187,6 +189,8 @@ public class ListaModificadaAdapter extends ArrayAdapter{
 
             if (p.getisHyped()){
                 ((AppCompatImageButton) fila.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
+            }else{
+                ((AppCompatImageButton) fila.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_border_black_24dp);
             }
         } else
             fila.findViewById(R.id.avanzado).setVisibility(View.GONE);

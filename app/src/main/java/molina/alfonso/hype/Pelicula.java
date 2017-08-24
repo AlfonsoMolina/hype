@@ -1,11 +1,7 @@
 package molina.alfonso.hype;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.util.Log;
-
-import java.net.URL;
 
 /**
  * Created by Clacks Department on 02/07/2017.

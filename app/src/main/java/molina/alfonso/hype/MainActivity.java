@@ -5,14 +5,13 @@ import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -24,6 +23,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     /*
      * Declaración de variables
      */
+
+    // TODO: Refinar icono de Hype
+    // TODO: Crear icono para la aplicación
+    // TODO: Añadir "sección" cartelera (descargar la info e ya)
+    // TODO: Facilitar acceso a sección Hype (y señalizarlo)
+    // TODO: Mejorar (y completar) traducción "countrie"
 
     // Etiqueta para logs
     private static final String TAG = "MainActivity";

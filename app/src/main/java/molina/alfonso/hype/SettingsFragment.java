@@ -1,6 +1,5 @@
 package molina.alfonso.hype;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;

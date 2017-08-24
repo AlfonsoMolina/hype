@@ -33,6 +33,8 @@ import static android.R.attr.bitmap;
  * Se conecta a FilmAffinity para descargar los próximos estrenos.
  */
 
+// TODO: Actualizar también el resto de pelis
+
 public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
     /*
