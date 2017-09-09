@@ -67,7 +67,6 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     private TextView carga_mensaje;
 
 
-
     public HiloDescargarEstrenos(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra, TextView carga_mensaje) {
         Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
         this.lista = lista;
@@ -83,7 +82,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     protected void onPreExecute (){
         Log.d(TAG, "Actualizando UI antes de ejecutar el hilo");
         for(int i = 0; i < 9; i++)
-            carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
+            carga_barra.getChildAt(i).setBackgroundColor(Color.parseColor("#455a64"));
         carga_barra.setVisibility(View.VISIBLE);
         //carga_mensaje.setVisibility(View.VISIBLE);
 
@@ -357,7 +356,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     @Override
     protected void onProgressUpdate(Integer... i) {
         Log.d(TAG, "Descarga al " + ((i[0]+1)*10) + "%");
-        carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.parseColor("#263238"));
+        carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.parseColor("#37474f"));
         lista.setMaxPaginas();
         lista.notifyDataSetChanged();
         lista.actualizarInterfaz();

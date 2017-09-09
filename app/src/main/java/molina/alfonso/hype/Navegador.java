@@ -40,7 +40,7 @@ public class Navegador {
         if (mostrar){
             mainActivity.findViewById(R.id.paginador).setVisibility(View.VISIBLE);
         }else{
-            mainActivity.findViewById(R.id.paginador).setVisibility(View.GONE);
+            mainActivity.findViewById(R.id.paginador).setVisibility(View.INVISIBLE);
         }
     }
 

@@ -51,7 +51,7 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
     protected void onPreExecute() {
         Log.d(TAG, "Actualizando UI antes de ejecutar el hilo");
         for (int i = 0; i < 9; i++)
-            carga_barra.getChildAt(i).setBackgroundColor(Color.GRAY);
+            carga_barra.getChildAt(i).setBackgroundColor(Color.parseColor("#455a64"));
         carga_barra.setVisibility(View.VISIBLE);
         //carga_mensaje.setVisibility(View.VISIBLE);
     }
@@ -163,7 +163,7 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
     @Override
     protected void onProgressUpdate(Integer... i) {
         Log.d(TAG, "Lectura al " + ((i[0] + 1) * 10) + "%");
-        carga_barra.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#263238"));
+        carga_barra.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#37474f"));
         lista.setMaxPaginas();
         lista.notifyDataSetChanged();
         lista.actualizarInterfaz();

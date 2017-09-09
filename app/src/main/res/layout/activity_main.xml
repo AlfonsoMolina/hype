@@ -12,8 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/logo_prov_byn"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:contentDescription="@string/logo_dscr"
         android:alpha="0.5"/>
 
@@ -26,25 +26,6 @@
         android:elevation="4dp"
         android:backgroundTint="?attr/colorPrimary"
         >
-            <!--
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_menu_black_24dp"
-                android:tint="@color/colorAppText"
-                android:backgroundTint="?attr/colorPrimary"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/hype"
-                android:id="@+id/toolbar_title"
-                android:onClick="mostrarHype"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="20sp"
-                />
--->
     </android.support.v7.widget.Toolbar>
 
     <RelativeLayout
@@ -59,77 +40,102 @@
         android:padding="0dp"
         android:elevation="4dp"
         android:layout_alignParentStart="true"
+        android:weightSum="100"
         >
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentStart="true"
+            >
             <ImageButton
                 android:id="@+id/hype"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="0.166"
                 android:onClick="onClickHype"
                 android:src="@drawable/ic_favorite_black_24dp"
                 android:tint="@color/colorNonSelectedButton"
-                android:backgroundTint="?attr/colorPrimary" />
+                android:backgroundTint="?attr/colorPrimary"
+                style="@style/Widget.AppCompat.Button.Borderless"/>
             <ImageButton
                 android:id="@+id/cartelera"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="0.166"
                 android:src="@drawable/ic_theaters_black_24dp"
                 android:tint="@color/colorSelectedButton"
                 android:onClick="onClickCartelera"
-                android:backgroundTint="?attr/colorPrimary" />
+                android:backgroundTint="?attr/colorPrimary"
+                style="@style/Widget.AppCompat.Button.Borderless"/>
             <ImageButton
                 android:id="@+id/estrenos"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="0.166"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_today_black_24dp"
                 android:tint="@color/colorNonSelectedButton"
                 android:onClick="onClickEstrenos"
-                android:backgroundTint="?attr/colorPrimary" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/paginador"
-            android:layout_alignParentEnd="true">
-            <ImageButton
-                android:id="@+id/previousPageButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/previous_button"
-                android:contentDescription="@string/previous_button"
-                android:onClick="pasarPaginaAtras"
-                android:src="@drawable/ic_navigate_before_black_24dp"
-                android:visibility="invisible"
-                android:tint="@color/colorAppText"
                 android:backgroundTint="?attr/colorPrimary"
-                />
+                style="@style/Widget.AppCompat.Button.Borderless"/>
 
-            <TextView
-                android:id="@+id/actualPageText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-regular"
-                android:textSize="28sp"
-                android:textColor="@color/colorAccent"
-                android:text="@string/actual_page_number" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0.04" />
 
-            <ImageButton
-                android:id="@+id/nextPageButton"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/next_button"
-                android:contentDescription="@string/next_button"
-                android:src="@drawable/ic_navigate_next_black_24dp"
-                android:onClick="pasarPaginaAdelante"
-                android:tint="@color/colorAppText"
-                android:backgroundTint="?attr/colorPrimary"
-                />
+                android:layout_weight="0.4"
+                android:id="@+id/paginador">
+                <ImageButton
+                    android:id="@+id/previousPageButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.333"
+                    android:text="@string/previous_button"
+                    android:contentDescription="@string/previous_button"
+                    android:onClick="pasarPaginaAtras"
+                    android:src="@drawable/ic_navigate_before_black_24dp"
+                    android:visibility="invisible"
+                    android:tint="@color/colorAppText"
+                    android:backgroundTint="?attr/colorPrimary"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    />
+
+                <TextView
+                    android:id="@+id/actualPageText"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.333"
+                    android:gravity="center"
+                    android:textAlignment="gravity"
+                    android:fontFamily="sans-serif-regular"
+                    android:textSize="24sp"
+                    android:textColor="@color/colorAppText"
+                    android:text="@string/actual_page_number"
+                    />
+
+                <ImageButton
+                    android:id="@+id/nextPageButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.333"
+                    android:text="@string/next_button"
+                    android:contentDescription="@string/next_button"
+                    android:src="@drawable/ic_navigate_next_black_24dp"
+                    android:onClick="pasarPaginaAdelante"
+                    android:tint="@color/colorAppText"
+                    android:backgroundTint="?attr/colorPrimary"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    />
+            </LinearLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0.04" />
+
         </LinearLayout>
-
 
         <!--<View
             android:layout_width="fill_parent"
@@ -142,113 +148,115 @@
 
     </RelativeLayout>
 
-
-    <TextView
-        android:id="@+id/nopelis"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/navegacion"
-        android:visibility="visible"
-        android:text="@string/leyendo"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-medium"
-        android:textStyle="italic"
-        />
-
-
-    <ListView
-        android:id="@+id/lista"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/carga_mensaje"
-        android:layout_below="@id/nopelis"
-        android:divider="@color/colorAppText"
-        android:dividerHeight="1dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        />
-
-    <TextView
-        android:id="@id/carga_mensaje"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/carga_barra"
-        android:text="@string/cargando"
-        android:textAlignment="center"
-        android:visibility="gone"
-        />
-
     <LinearLayout
-        android:id="@id/carga_barra"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/contenido"
+        android:orientation="vertical"
+        android:layout_below="@id/navegacion"
+        android:layout_above="@+id/pie">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#bebebe"/>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#bebebe"/>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#bebebe"/>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#bebebe"/>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#bebebe" />
+        <TextView
+            android:id="@+id/nopelis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:text="@string/leyendo"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="italic"
+            />
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <ListView
+            android:id="@+id/lista"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#bebebe"/>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#bebebe"/>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#bebebe"/>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#bebebe"/>
+            android:divider="@color/colorAppText"
+            android:dividerHeight="1dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            />
+
+        <TextView
+            android:id="@+id/carga_mensaje"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cargando"
+            android:textAlignment="center"
+            android:visibility="gone"
+            />
+
     </LinearLayout>
 
-
-
     <FrameLayout
+        android:elevation="10dp"
         android:orientation="vertical"
         android:id="@+id/ficha_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:elevation="50dp"
-        android:layout_margin="20dp"
-        android:layout_above="@+id/carga_barra"
-        android:layout_centerHorizontal="true">
+        android:layout_margin="20dp">
     </FrameLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@id/pie"
+        android:layout_alignParentBottom="true">
+        <LinearLayout
+            android:id="@+id/carga_barra"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>
