@@ -37,6 +37,10 @@ public class ListaModificadaAdapter extends ArrayAdapter{
 
     private static final String TAG = "ListaModificadaAdapter";
 
+    public static final int HYPE = 0;
+    public static final int CARTELERA = 1;
+    public static final int ESTRENOS = 2;
+
     private ArrayList<Pelicula> lista = new ArrayList<>();  //Los elementos de la lista
     private int resourceID;                                 //El layout en que se va a mostrar
     private FeedReaderDbHelper db;                          //Base de datos
@@ -46,6 +50,8 @@ public class ListaModificadaAdapter extends ArrayAdapter{
     private int peliculaPorPagina = 25;                     //Número de películas por página
     private MainActivity activity;                          //Actividad, para cambiar la IU
     private int expandido = -1;                             //Posición del elemento expandido
+
+    private int estado = CARTELERA;
 
     private FragmentManager fragmentManager;
 
@@ -385,6 +391,32 @@ public class ListaModificadaAdapter extends ArrayAdapter{
 
     public void eliminarLista() {
         lista.clear();
+    }
+
+    public int getEstado(){
+        return estado;
+    }
+
+    public void mostrarEstrenos(){
+        this.mostrarHype = false;
+        expandido = -1;
+        estado = ESTRENOS;
+    }
+
+    public void mostrarHype(){
+        this.mostrarHype = true;
+        expandido = -1;
+        estado = HYPE;
+    }
+
+    // TODO: Hacer que muestre la cartelera de verdad
+    public void mostrarCartelera(){
+        mostrarEstrenos();
+        estado = CARTELERA;
+    }
+
+    public int getPeliculasPorPagina(){
+        return peliculaPorPagina;
     }
 
 }

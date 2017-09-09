@@ -3,8 +3,10 @@
     <color name="colorPrimary">#37474f</color>
     <color name="colorPrimaryDark">#263238</color>
     <color name="colorAccent">#e0f7fa</color>
-    <color name="colorNavigationBar">#263238</color>
-    <color name="colorToolbarText">#FFFFFF</color>
+    <color name="colorNavigationBar">#37474f</color>
+    <color name="colorWhite">#FFFFFF</color>
     <color name="colorAppText">#eceff1</color>
     <color name="colorWindowBackground">#455a64</color>
+    <color name="colorNonSelectedButton">#607d8b</color>
+    <color name="colorSelectedButton">#eceff1</color>
 </resources>

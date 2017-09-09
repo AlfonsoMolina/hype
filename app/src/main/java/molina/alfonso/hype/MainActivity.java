@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private FeedReaderDbHelper mDbHelper;
 
     private HiloDescargarEstrenos hilo;
+    private Navegador navegador;
 
     private Menu menu;
     /*
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // Hook y setup del Toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        //getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Creamos el helper de la BBDD
         mDbHelper = new FeedReaderDbHelper(getApplicationContext());
@@ -91,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref.registerOnSharedPreferenceChangeListener(this);
+
+        navegador = new Navegador(this);
 
     }
 
@@ -157,32 +160,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * Métodos custom
      */
 
-
-    //Muestra las películas guardadas
-    public void mostrarHype(View view) {
-        Log.d(TAG, "Mostrando películas guardadas");
-
-        if(listaAdapter.toogleHype()){
-            findViewById(R.id.navegacion).setVisibility(View.GONE);
-            //Si no hay ninguna guardada, se muestra un mensaje
-            if (listaAdapter.getCount()== 0){
-                findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
-                ((TextView) findViewById(R.id.nopelis)).setText("\n\nNinguna película guardada.\nPor ahora.");
-            }
-
-
-        } else if (listaAdapter.getCount()!=0) {
-            findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
-            findViewById(R.id.nopelis).setVisibility(View.GONE);
-        }
-
-        listaAdapter.setExpandido(-1);
-        listaAdapter.notifyDataSetChanged();
-        ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
-
-
-    }
-
     public void pasarPaginaAtras(View view) {
         int pag = listaAdapter.getPagina();
         Log.d(TAG, "Retrocediendo a la página " + pag);
@@ -247,6 +224,59 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    public void onClickHype(View view){
+
+        Log.d(TAG, "Mostrando películas hypeadas");
+
+        listaAdapter.mostrarHype();
+        navegador.seleccionaHype();
+        navegador.mostrarPaginador(false);
+
+        //Si no hay ninguna guardada, se muestra un mensaje
+        if (listaAdapter.getCount()== 0){
+            navegador.mostrarNoPelis(true);
+        } else {
+            navegador.mostrarNoPelis(false);
+        }
+
+        listaAdapter.setExpandido(-1);
+        listaAdapter.notifyDataSetChanged();
+        ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+
+    }
+
+    public void onClickCartelera(View view){
+
+        //TODO: SUSTITUIR CON LA CARGA DE LA CARTELERA!
+        onClickEstrenos(view);
+        navegador.seleccionaCartelera();
+
+    }
+
+    public void onClickEstrenos(View view){
+
+        Log.d(TAG, "Mostrando películas de estreno");
+
+        listaAdapter.mostrarEstrenos();
+        navegador.seleccionaEstrenos();
+        navegador.mostrarPaginador(false);
+
+        if (listaAdapter.getCount()== 0){
+            navegador.mostrarPaginador(false);
+        } else if (listaAdapter.getUltPagina() > 1){
+            navegador.mostrarPaginador(true);
+            navegador.mostrarNoPelis(false);
+        } else {
+            navegador.mostrarPaginador(false);
+            navegador.mostrarNoPelis(false);
+        }
+
+        listaAdapter.setExpandido(-1);
+        listaAdapter.notifyDataSetChanged();
+        ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
 
     }
 

@@ -26,87 +26,119 @@
         android:elevation="4dp"
         android:backgroundTint="?attr/colorPrimary"
         >
+            <!--
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_menu_black_24dp"
+                android:tint="@color/colorAppText"
+                android:backgroundTint="?attr/colorPrimary"
+                />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/hype"
-            android:id="@+id/toolbar_title"
-            android:onClick="mostrarHype"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="20sp"
-            />
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hype"
+                android:id="@+id/toolbar_title"
+                android:onClick="mostrarHype"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="20sp"
+                />
+-->
     </android.support.v7.widget.Toolbar>
-
-
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:visibility="invisible"
+        android:visibility="visible"
         android:id="@+id/navegacion"
+        android:background="@color/colorPrimary"
         android:layout_below="@+id/my_toolbar"
-        android:layout_alignParentStart="true">
-        <ImageButton
-            android:id="@+id/previousPageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:text="@string/previous_button"
-            android:contentDescription="@string/previous_button"
-            android:onClick="pasarPaginaAtras"
-            android:src="@drawable/ic_navigate_before_black_24dp"
-            android:visibility="invisible"
-            android:tint="@color/colorAppText"
-            android:backgroundTint="@color/colorWindowBackground"
-            />
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:elevation="4dp"
+        android:layout_alignParentStart="true"
+        >
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:orientation="horizontal">
-            <!--<TextView
+            android:layout_alignParentStart="true">
+            <ImageButton
+                android:id="@+id/hype"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-regular"
-                android:textSize="34sp"
-                android:text="@string/actual_page_header" />-->
+                android:onClick="onClickHype"
+                android:src="@drawable/ic_favorite_black_24dp"
+                android:tint="@color/colorNonSelectedButton"
+                android:backgroundTint="?attr/colorPrimary" />
+            <ImageButton
+                android:id="@+id/cartelera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_theaters_black_24dp"
+                android:tint="@color/colorSelectedButton"
+                android:onClick="onClickCartelera"
+                android:backgroundTint="?attr/colorPrimary" />
+            <ImageButton
+                android:id="@+id/estrenos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_today_black_24dp"
+                android:tint="@color/colorNonSelectedButton"
+                android:onClick="onClickEstrenos"
+                android:backgroundTint="?attr/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/paginador"
+            android:layout_alignParentEnd="true">
+            <ImageButton
+                android:id="@+id/previousPageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/previous_button"
+                android:contentDescription="@string/previous_button"
+                android:onClick="pasarPaginaAtras"
+                android:src="@drawable/ic_navigate_before_black_24dp"
+                android:visibility="invisible"
+                android:tint="@color/colorAppText"
+                android:backgroundTint="?attr/colorPrimary"
+                />
+
             <TextView
                 android:id="@+id/actualPageText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-regular"
-                android:textSize="34sp"
+                android:textSize="28sp"
+                android:textColor="@color/colorAccent"
                 android:text="@string/actual_page_number" />
 
+            <ImageButton
+                android:id="@+id/nextPageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/next_button"
+                android:contentDescription="@string/next_button"
+                android:src="@drawable/ic_navigate_next_black_24dp"
+                android:onClick="pasarPaginaAdelante"
+                android:tint="@color/colorAppText"
+                android:backgroundTint="?attr/colorPrimary"
+                />
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/nextPageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:text="@string/next_button"
-            android:contentDescription="@string/next_button"
-            android:src="@drawable/ic_navigate_next_black_24dp"
-            android:onClick="pasarPaginaAdelante"
-            android:tint="@color/colorAppText"
-            android:backgroundTint="@color/colorWindowBackground"
-            />
 
-        <View
+        <!--<View
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:id="@+id/separador1"
             android:backgroundTint="@color/colorAppText"
             android:layout_alignParentBottom="true"
             android:background="@color/colorAppText"
-            />
+            />-->
 
     </RelativeLayout>
 
@@ -203,6 +235,8 @@
             android:layout_weight="1"
             android:background="#bebebe"/>
     </LinearLayout>
+
+
 
     <FrameLayout
         android:orientation="vertical"
