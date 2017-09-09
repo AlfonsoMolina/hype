@@ -278,7 +278,6 @@ public class ListaModificadaAdapter extends ArrayAdapter{
             Pelicula p = lista.get(getPosicionReal(expandido));
             FichaFragment fichaFragment = FichaFragment.newInstance(p.getTitulo(), p.getEnlace());
 
-
             fragmentManager.beginTransaction().replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();
         }
     };
