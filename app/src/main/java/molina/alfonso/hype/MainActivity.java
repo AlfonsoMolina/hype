@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private ListaModificadaAdapter mListaModificadaAdapter;
     private FeedReaderDbHelper mFeedReaderDbHelper;
     private HiloDescargas mHiloDescargas;
-    private Navegador mNavegador;
+    private Interfaz mInterfaz;
     private Menu mMenu;
 
     /*
@@ -61,14 +61,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // Creamos el helper de la BBDD
         mFeedReaderDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
-        // Hook de la lista
+        // Hook de la mListaModificadaAdapter
         ListView listView = (ListView) findViewById(R.id.lista);
 
-        //Se le manda a la lista esta actividad, para poder modificar la interfaz,
+        //Se le manda a la mListaModificadaAdapter esta actividad, para poder modificar la interfaz,
         //el layout de la row y la bbdd
         mListaModificadaAdapter = new ListaModificadaAdapter(this, R.layout.fila, mFeedReaderDbHelper);
 
-        // Setup de la lista
+        // Setup de la mListaModificadaAdapter
         listView.setAdapter(mListaModificadaAdapter);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         listView.setItemsCanFocus(false);
@@ -135,8 +135,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             sharedPreferencesEditor.apply();
         }
 
-        mNavegador = new Navegador(this, mListaModificadaAdapter);
-        mNavegador.seleccionaCartelera();
+        mInterfaz = new Interfaz(this, mListaModificadaAdapter);
+        mInterfaz.seleccionaBotonCartelera();
 
         mostrarCartelera(findViewById(R.id.cartelera));
     }
@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mListaModificadaAdapter.actualizarInterfaz();
             mListaModificadaAdapter.noHayPelis();
         } else if (clave.equalsIgnoreCase("pref_pais")){
-            //Cuando cambia el país se borra la lista anterior
+            //Cuando cambia el país se borra la mListaModificadaAdapter anterior
             mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
             mListaModificadaAdapter.eliminarLista();
             mListaModificadaAdapter.notifyDataSetChanged();
@@ -289,14 +289,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Log.d(TAG, "Mostrando películas hypeadas");
 
         mListaModificadaAdapter.mostrarHype();
-        mNavegador.seleccionaHype();
-        mNavegador.mostrarPaginador(false);
+        mInterfaz.seleccionaBotonHype();
+        mInterfaz.mostrarPaginador(false);
 
         //Si no hay ninguna guardada, se muestra un mensaje
         if (mListaModificadaAdapter.getCount()== 0){
-            mNavegador.mostrarNoPelis(true);
+            mInterfaz.mostrarNoHayPelis(true);
         } else {
-            mNavegador.mostrarNoPelis(false);
+            mInterfaz.mostrarNoHayPelis(false);
         }
 
         mListaModificadaAdapter.setExpandido(-1);
@@ -310,23 +310,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Log.d(TAG, "Mostrando películas de estreno");
 
         mListaModificadaAdapter.mostrarCartelera();
-        mNavegador.seleccionaCartelera();
-        mNavegador.mostrarPaginador(false);
+        mInterfaz.seleccionaBotonCartelera();
+        mInterfaz.mostrarPaginador(false);
 
         if (mListaModificadaAdapter.getCount()== 0){
-            mNavegador.mostrarPaginador(false);
-            mNavegador.mostrarNoPelis(true);
+            mInterfaz.mostrarPaginador(false);
+            mInterfaz.mostrarNoHayPelis(true);
         } else if (mListaModificadaAdapter.getUltPagina() > 1){
-            mNavegador.mostrarPaginador(true);
-            mNavegador.mostrarNoPelis(false);
+            mInterfaz.mostrarPaginador(true);
+            mInterfaz.mostrarNoHayPelis(false);
         } else {
-            mNavegador.mostrarPaginador(false);
-            mNavegador.mostrarNoPelis(false);
+            mInterfaz.mostrarPaginador(false);
+            mInterfaz.mostrarNoHayPelis(false);
         }
 
         mListaModificadaAdapter.setExpandido(-1);
         mListaModificadaAdapter.notifyDataSetChanged();
-        mNavegador.irAlPrimero();
+        mInterfaz.enfocaPrimerElemento();
 
     }
 
@@ -335,23 +335,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Log.d(TAG, "Mostrando películas de estreno");
 
         mListaModificadaAdapter.mostrarEstrenos();
-        mNavegador.seleccionaEstrenos();
-        mNavegador.mostrarPaginador(false);
+        mInterfaz.seleccionaBotonEstrenos();
+        mInterfaz.mostrarPaginador(false);
 
         if (mListaModificadaAdapter.getCount()== 0){
-            mNavegador.mostrarPaginador(false);
-            mNavegador.mostrarNoPelis(true);
+            mInterfaz.mostrarPaginador(false);
+            mInterfaz.mostrarNoHayPelis(true);
         } else if (mListaModificadaAdapter.getUltPagina() > 1){
-            mNavegador.mostrarPaginador(true);
-            mNavegador.mostrarNoPelis(false);
+            mInterfaz.mostrarPaginador(true);
+            mInterfaz.mostrarNoHayPelis(false);
         } else {
-            mNavegador.mostrarPaginador(false);
-            mNavegador.mostrarNoPelis(false);
+            mInterfaz.mostrarPaginador(false);
+            mInterfaz.mostrarNoHayPelis(false);
         }
 
         mListaModificadaAdapter.setExpandido(-1);
         mListaModificadaAdapter.notifyDataSetChanged();
-        mNavegador.irAlPrimero();
+        mInterfaz.enfocaPrimerElemento();
 
     }
 

@@ -27,7 +27,7 @@ public class SettingsFragment extends PreferenceFragment {
                 db.delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
                 db.delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, null);
 
-                //Se cambia el valor para notificar a la lista
+                //Se cambia el valor para notificar a la mListaModificadaAdapter
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
                 Boolean valor = prefs.getBoolean("pref_db",false);
                 SharedPreferences.Editor editor = prefs.edit();

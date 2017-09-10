@@ -333,7 +333,7 @@ public class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                                     values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 0);
                                 }
 
-                                //Y se insertan en la bbdd y en la lista de películas de la lista
+                                //Y se insertan en la bbdd y en la mListaModificadaAdapter de películas de la mListaModificadaAdapter
                                 db[1].insert(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, values);
                                 lista.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, h.equals("T")));
 
@@ -362,7 +362,7 @@ public class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                                     values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, false);
                                 }
 
-                                //Y se insertan en la bbdd y en la lista de películas de la lista
+                                //Y se insertan en la bbdd y en la mListaModificadaAdapter de películas de la mListaModificadaAdapter
                                 db[1].insert(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, values);
                                 lista.addEstrenos(new Pelicula(l, p_bitmap, t, s, e, f, h.equals("T")));
 
@@ -451,7 +451,7 @@ public class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
         }
     }
 
-    //Le dice a la lista que actualice las películas guardadas y esconde
+    //Le dice a la mListaModificadaAdapter que actualice las películas guardadas y esconde
     //la barra de progreso
     @Override
     protected void onPostExecute(Void v) {

@@ -17,7 +17,7 @@ import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 /**
  * Created by Usuario on 23/07/2017.
  * <p>
- * Hilo que lee la base de datos y carga la información de las películas en la lista
+ * Hilo que lee la base de datos y carga la información de las películas en la mListaModificadaAdapter
  */
 
 public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
@@ -30,7 +30,7 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
     private SQLiteDatabase dbw;
     private ListaModificadaAdapter lista;
 
-    //El constructor necesita la bbdd, la lista y la barra de progreso
+    //El constructor necesita la bbdd, la mListaModificadaAdapter y la barra de progreso
     public HiloLeerBBDD(SQLiteDatabase dbr, SQLiteDatabase dbw, ListaModificadaAdapter lista) {
         Log.d(TAG, "Inicializando el hilo encargado de leer la BBDD");
         this.dbr = dbr;
