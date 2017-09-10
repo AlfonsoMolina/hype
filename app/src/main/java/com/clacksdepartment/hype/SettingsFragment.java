@@ -1,4 +1,4 @@
-package molina.alfonso.hype;
+package com.clacksdepartment.hype;
 
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;

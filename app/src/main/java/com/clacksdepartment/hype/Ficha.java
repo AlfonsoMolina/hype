@@ -1,4 +1,4 @@
-package molina.alfonso.hype;
+package com.clacksdepartment.hype;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

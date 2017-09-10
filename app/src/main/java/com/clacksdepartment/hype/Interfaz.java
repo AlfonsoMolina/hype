@@ -1,4 +1,4 @@
-package molina.alfonso.hype;
+package com.clacksdepartment.hype;
 
 import android.support.v4.content.ContextCompat;
 import android.view.View;

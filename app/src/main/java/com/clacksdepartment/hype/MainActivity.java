@@ -1,4 +1,4 @@
-package molina.alfonso.hype;
+package com.clacksdepartment.hype;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

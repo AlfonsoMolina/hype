@@ -1,13 +1,13 @@
-package molina.alfonso.hype;
+package com.clacksdepartment.hype;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import static molina.alfonso.hype.FeedReaderContract.SQL_CREATE_ENTRIES_CARTELERA;
-import static molina.alfonso.hype.FeedReaderContract.SQL_CREATE_ENTRIES_ESTRENOS;
-import static molina.alfonso.hype.FeedReaderContract.SQL_DELETE_ENTRIES_ESTRENOS;
+import static com.clacksdepartment.hype.FeedReaderContract.SQL_CREATE_ENTRIES_CARTELERA;
+import static com.clacksdepartment.hype.FeedReaderContract.SQL_CREATE_ENTRIES_ESTRENOS;
+import static com.clacksdepartment.hype.FeedReaderContract.SQL_DELETE_ENTRIES_ESTRENOS;
 
 /**
  * Created by Usuario on 11/07/2017.

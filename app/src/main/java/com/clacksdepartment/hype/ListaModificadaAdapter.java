@@ -1,9 +1,8 @@
-package molina.alfonso.hype;
+package com.clacksdepartment.hype;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.CalendarContract;

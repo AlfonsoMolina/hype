@@ -175,7 +175,7 @@
     </LinearLayout>
 
     <FrameLayout
-        tools:context="molina.alfonso.hype.FichaFragment"
+        tools:context="com.clacksdepartment.hype.FichaFragment"
         android:id="@+id/ficha_container"
         android:elevation="10dp"
         android:clipToPadding="false"

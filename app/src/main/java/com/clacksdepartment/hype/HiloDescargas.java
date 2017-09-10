@@ -1,4 +1,4 @@
-package molina.alfonso.hype;
+package com.clacksdepartment.hype;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,7 +14,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -24,9 +23,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Calendar;
-
-import static molina.alfonso.hype.ListaModificadaAdapter.CARTELERA;
-import static molina.alfonso.hype.ListaModificadaAdapter.ESTRENOS;
 
 /**
  * Created by Clacks Department on 11/07/2017.

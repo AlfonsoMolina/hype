@@ -20,7 +20,7 @@
         android:textSize="20sp"
         />
     </android.support.v7.widget.Toolbar>
-    <fragment android:name="molina.alfonso.hype.SettingsFragment"
+    <fragment android:name="com.clacksdepartment.hype.SettingsFragment"
         android:id="@+id/fragmento"
         android:layout_weight="1"
         android:layout_width="match_parent"
