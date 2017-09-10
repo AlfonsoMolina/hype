@@ -273,7 +273,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
         return mostrarHype;
     }
 
-    View.OnClickListener abre_ficha = new View.OnClickListener(){
+    private View.OnClickListener abre_ficha = new View.OnClickListener(){
         @Override
         public void onClick(View view) {
             Log.i(TAG, "Pulsado botón de abrir fichaFragment");
@@ -383,7 +383,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
 
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
             sharingIntent.setType("text/plain");
-            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, p.getTitulo());
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Acabo de compartir \"" + p.getTitulo() + "\" contigo a través de la aplicación Hype!");
             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, p.getEnlace());
             activity.startActivity(Intent.createChooser(sharingIntent, "Compartir película: " + p.getTitulo() + "."));
 
