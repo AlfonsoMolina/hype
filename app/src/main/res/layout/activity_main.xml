@@ -51,7 +51,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.166"
-                android:onClick="onClickHype"
+                android:onClick="mostrarHype"
                 android:src="@drawable/ic_favorite_black_24dp"
                 android:tint="@color/colorNonSelectedButton"
                 android:backgroundTint="?attr/colorPrimary"
@@ -63,7 +63,7 @@
                 android:layout_weight="0.166"
                 android:src="@drawable/ic_theaters_black_24dp"
                 android:tint="@color/colorSelectedButton"
-                android:onClick="onClickCartelera"
+                android:onClick="mostrarCartelera"
                 android:backgroundTint="?attr/colorPrimary"
                 style="@style/Widget.AppCompat.Button.Borderless"/>
             <ImageButton
@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_today_black_24dp"
                 android:tint="@color/colorNonSelectedButton"
-                android:onClick="onClickEstrenos"
+                android:onClick="mostrarEstrenos"
                 android:backgroundTint="?attr/colorPrimary"
                 style="@style/Widget.AppCompat.Button.Borderless"/>
 

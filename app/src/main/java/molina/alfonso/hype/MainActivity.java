@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mNavegador = new Navegador(this, mListaModificadaAdapter);
         mNavegador.seleccionaCartelera();
 
-        onClickCartelera(findViewById(R.id.cartelera));
+        mostrarCartelera(findViewById(R.id.cartelera));
     }
 
     @Override
@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     }
 
-    public void onClickHype(View view){
+    public void mostrarHype(View view){
 
         Log.d(TAG, "Mostrando películas hypeadas");
 
@@ -305,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     }
 
-    public void onClickCartelera(View view){
+    public void mostrarCartelera(View view){
 
         Log.d(TAG, "Mostrando películas de estreno");
 
@@ -330,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     }
 
-    public void onClickEstrenos(View view){
+    public void mostrarEstrenos(View view){
 
         Log.d(TAG, "Mostrando películas de estreno");
 
