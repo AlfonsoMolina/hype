@@ -383,7 +383,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
 
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
             sharingIntent.setType("text/plain");
-            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Acabo de compartir \"" + p.getTitulo() + "\" contigo a través de la aplicación Hype!");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "He compartido \"" + p.getTitulo() + "\" a través de Hype!");
             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, p.getEnlace());
             activity.startActivity(Intent.createChooser(sharingIntent, "Compartir película: " + p.getTitulo() + "."));
 
