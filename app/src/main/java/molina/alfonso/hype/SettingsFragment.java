@@ -24,7 +24,8 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceClick(Preference preference) {
                 //Se vacía la bbdd
                 SQLiteDatabase db = (new FeedReaderDbHelper(getActivity().getApplicationContext())).getWritableDatabase();
-                db.delete(FeedReaderContract.FeedEntry.TABLE_NAME, null, null);
+                db.delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
+                db.delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, null);
 
                 //Se cambia el valor para notificar a la lista
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());

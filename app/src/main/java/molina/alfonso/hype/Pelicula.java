@@ -28,15 +28,14 @@ public class Pelicula {
      * Constructor
      */
 
-    //link, portada, titulo, sinopsis, estreno (con letras), fecha (exacto), fecha corta, hay hype?
-    Pelicula (String l, Bitmap p, String t, String s, String e, String f, String fc,Boolean h){
+    //link, portada, titulo, sinopsis, estreno (con letras), fecha (exacto), hay hype?
+    Pelicula (String l, Bitmap p, String t, String s, String e, String f, Boolean h){
         Log.v(TAG, "Objeto Pelicula construido");
         this.titulo = t;
         this.sinopsis = s;
         this.estreno_letras = e;
         this.enlace = l;
         this.estreno_fecha = f;
-        this.estreno_corto = fc;
         this.isHyped = h;
         this.portada = p;
 

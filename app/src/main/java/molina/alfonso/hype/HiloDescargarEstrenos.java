@@ -25,7 +25,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Calendar;
 
-import static android.R.attr.bitmap;
+import static molina.alfonso.hype.ListaModificadaAdapter.CARTELERA;
+import static molina.alfonso.hype.ListaModificadaAdapter.ESTRENOS;
 
 /**
  * Created by Clacks Department on 11/07/2017.
@@ -46,13 +47,9 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     //Estoy hay que pasarlo a un array o algo
     private String[] meses_es = {"enero", "febrero", "marzo", "abril", "mayo", "junio",
             "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
-    private String[] meses_corto_es = {"ene", "feb", "mar", "abr", "may", "jun",
-            "jul", "ago", "sep", "oct", "nov", "dic"};
 
     private String[] meses_en = {"january", "february", "march", "april", "may", "june",
             "july", "august", "september", "october", "november", "december"};
-    private String[] meses_corto_en = {"jan", "feb", "mar", "apr", "may", "jun",
-            "jul", "aug", "sep", "oct", "nov", "dic"};
 
     private String idioma = "es";   //Idioma de sinopsis y título. (Pendiente)
     private String pais = "es";     //Pais del que mirar los estrenos. (Pendiente)
@@ -64,14 +61,11 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
     //Elementos del layout para la barra de carga
     private LinearLayout carga_barra;
-    private TextView carga_mensaje;
 
-
-    public HiloDescargarEstrenos(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra, TextView carga_mensaje) {
+    public HiloDescargarEstrenos(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra) {
         Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
         this.lista = lista;
         this.carga_barra = carga_barra;
-        this.carga_mensaje = carga_mensaje;
         this.sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
 
     }
@@ -81,11 +75,6 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     @Override
     protected void onPreExecute (){
         Log.d(TAG, "Actualizando UI antes de ejecutar el hilo");
-        for(int i = 0; i < 9; i++)
-            carga_barra.getChildAt(i).setBackgroundColor(Color.parseColor("#455a64"));
-        carga_barra.setVisibility(View.VISIBLE);
-        //carga_mensaje.setVisibility(View.VISIBLE);
-
         //Se coge el país elegido
         pais = sharedPref.getString("pref_pais", "");
         idioma = pais;
@@ -97,234 +86,265 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     protected Void doInBackground(SQLiteDatabase... db) {
         Log.d(TAG, "Comenzando descarga de estrenos");
 
-        //db[0] para leer db[1] para escribir
-        String html = "";
-        String dir = "";
+        boolean estado = true; //Variable que utilizo para ejecutar dos veces el comando. El do primero, después cambia
+                                //y se ejecuta el while, después cambia y sale.
+                                //Primero hace Cartelera, despues Estrenos
 
-        //Se prepara esto, para después usarlo para leer la bbdd y
-        //ver si una película ya se ha guardado o es nueva
-        String[] projection = {
-                FeedReaderContract.FeedEntry.COLUMN_REF
-        };
-        String selection = FeedReaderContract.FeedEntry.COLUMN_REF + " = ?";
+        do {
 
+            pagina = 1;
+            publishProgress(0);
+            //db[0] para leer db[1] para escribir
+            String html = "";
+            String dir = "";
 
-        //Se van a descargar las 10 primeras páginas de estrenos de FILMAFFINITY
-        while (pagina <= 10 && !isCancelled()) {
-            try {
-                dir = "https://m.filmaffinity.com/" + idioma + "/rdcat.php?id=upc_th_" + pais + "&page=" + pagina;
-                html = getHTML(dir);
-            } catch (Exception ee) {
-                html = null;
-                this.cancel(true);
-            }
+            //Se prepara esto, para después usarlo para leer la bbdd y
+            //ver si una película ya se ha guardado o es nueva
 
-            if (html != null) {
-
-                //Se parte el HTML en la división entre las películas
-                String[] peliculasHTML = html.split("-item\" href=\"");
-                String l;
-                String p;
-                String t;
-                String s;
-                String e;
-                String f;
-                String fc;
-                byte[] p_byte;
-                Bitmap p_bitmap;
-                int ind;
+            String s_temp = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_REF :
+                    FeedReaderContract.FeedEntryEstrenos.COLUMN_REF;
+            String[] projection = {
+                    s_temp
+            };
+            String selection = s_temp + " = ?";
 
 
-                Cursor cursor;
-
-                ContentValues values = new ContentValues();
-
-                //Se analizan los trozos de HTML correspondientes a cada película
-                for (int i = 1; i < peliculasHTML.length && !isCancelled(); i++) {
-
-                    //Se utiliza en link para ver si ya está
-                    l = peliculasHTML[i].substring(0, peliculasHTML[i].indexOf("\""));
-
-                    String[] selectionArgs = {l};
-
-                    cursor = db[0].query(
-                            FeedReaderContract.FeedEntry.TABLE_NAME,                     // The table to query
-                            projection,                               // The columns to return
-                            selection,                                // The columns for the WHERE clause
-                            selectionArgs,                            // The values for the WHERE clause
-                            null,                                     // don't group the rows
-                            null,                                     // don't filter by row groups
-                            null                                    // The sort order
-                    );
-
-                    //Si la película no está guardada, se añade
-                    //TODO que la edite con nueva info, sin borrar si se ha guardado
-                    if (cursor.getCount() == 0) {
-
-                        //Se buscan y guardan los diferentes elementos
-                        ind = peliculasHTML[i].indexOf("src=\"");
-                        p = peliculasHTML[i].substring(ind + 5, peliculasHTML[i].indexOf("\"", ind + 5));
-
-                        try {
-                            URL url = new URL(p);
-                            p_bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                            p_bitmap = Bitmap.createScaledBitmap(p_bitmap, 50, 80, false);
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            p_bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
-                            p_byte = stream.toByteArray();
-
-                        }catch (Exception ee){
-                            p_bitmap = Bitmap.createBitmap(50, 80, Bitmap.Config.ARGB_8888);
-                            p_bitmap.eraseColor(Color.BLACK);
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            p_bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
-                            p_byte = stream.toByteArray();
-
-                            //TODO hacerlo más eficiente, directamente en stream
-                        }
-
-                        ind = peliculasHTML[i].indexOf("mc-title ft\">");
-                        t = peliculasHTML[i].substring(ind + 13, peliculasHTML[i].indexOf("   ", ind + 13));
-                        ind = peliculasHTML[i].indexOf("synop-text\">");
-
-                        //La sinopsis acaba al final del campo o antes de (FILMAFFINITY) si es larga.
-                        int ind2 = peliculasHTML[i].indexOf("</li>",ind + 12);
-                        int ind3 =  peliculasHTML[i].indexOf("(FILM",ind + 12);
-
-                        if (ind3 >0 && ind3 < ind2)
-                            ind2=ind3;
-
-                        s = peliculasHTML[i].substring(ind + 12, ind2);
-                        ind = peliculasHTML[i].indexOf("date\">");
-
-
-                        if (ind == -1) {
-                            e = "Sin confirmar";
-                            f = "09/09/2099";
-                            fc = "n";
-
-                        }else {
-                            e = peliculasHTML[i].substring(ind + 6, peliculasHTML[i].indexOf("</span>", ind + 6));
-
-                            //Ahora se mira la fecha para guardarla en el formato correcto.
-                            ind2 = e.indexOf(", ");
-                            String ee = "";
-                            String fecha_dia = "";
-                            String fecha_mes = "";
-                            String fecha_ano = "";
-
-                            if (ind2 > 0) {
-
-                                int m = 0;
-
-                                //Pasa el mes a número
-                                switch (idioma) {
-                                    case "es":
-                                    case "mx":
-                                    case "ar":
-                                    case "co":
-                                    case "cl":
-                                        ee = e.substring(e.indexOf(", ") + 2);
-                                        fecha_dia = ee.substring(0, ee.indexOf(" "));
-                                        fecha_mes = ee.substring(ee.indexOf("de ") + 3);
-
-                                        if (fecha_dia.length() == 1)
-                                            fecha_dia = '0' + fecha_dia;
-
-                                        while (!fecha_mes.equalsIgnoreCase(meses_es[m++])) ;
-                                        break;
-                                    default:
-                                        ee = e.substring(e.indexOf(", ") + 2);
-                                        fecha_mes = ee.substring(0, ee.indexOf(" "));
-                                        fecha_dia = ee.substring(ee.indexOf(" "));
-
-                                        if (fecha_dia.length() == 1)
-                                            fecha_dia = '0' + fecha_dia;
-
-                                        while (!fecha_mes.equalsIgnoreCase(meses_en[m++])) ;
-                                        break;
-                                }
-
-                                fecha_mes = "" + m;
-                                if (fecha_mes.length() == 1)
-                                    fecha_mes = '0' + fecha_mes;
-
-                                f = "" + Calendar.getInstance().get(Calendar.YEAR) + '/' + fecha_mes + '/' + fecha_dia;
-
-                            } else {
-                                fecha_dia = e.split("/")[0];
-                                fecha_mes = e.split("/")[1];
-                                fecha_ano = e.split("/")[2];
-
-                                switch (idioma) {
-                                    case "es":
-                                    case "mx":
-                                    case "ar":
-                                    case "co":
-                                    case "cl":
-                                        e = fecha_dia + " de " + meses_es[Integer.parseInt(fecha_mes) - 1];
-                                        break;
-                                    default:
-                                        e = meses_en[Integer.parseInt(fecha_mes) - 1] + " " + fecha_dia;
-                                        break;
-                                }
-
-                                if (fecha_dia.length() == 1)
-                                    fecha_dia = '0' + fecha_dia;
-
-                                if (fecha_mes.length() == 1)
-                                    fecha_mes = '0' + fecha_mes;
-
-                                f = "" + fecha_ano + '/' + fecha_mes + '/' + fecha_dia;
-
-                            }
-
-                            switch (idioma) {
-                                case "es":
-                                case "mx":
-                                case "ar":
-                                case "co":
-                                case "cl":
-                                    fc = fecha_dia + " " + meses_corto_es[Integer.parseInt(fecha_mes) - 1];
-                                    break;
-                                default:
-                                    fc = fecha_dia + " " + meses_corto_en[Integer.parseInt(fecha_mes) - 1];
-                                    break;
-                            }
-                        }
-                        // Me cargo sangrías y cosas raras
-                        s = s.trim();
-
-                        //Se añaden los valores que hemos cogido
-                        values.put(FeedReaderContract.FeedEntry.COLUMN_REF, l);
-                        values.put(FeedReaderContract.FeedEntry.COLUMN_TITULO, t);
-                        values.put(FeedReaderContract.FeedEntry.COLUMN_PORTADA, p_byte);
-                        values.put(FeedReaderContract.FeedEntry.COLUMN_SINOPSIS, s);
-                        values.put(FeedReaderContract.FeedEntry.COLUMN_HYPE, false);
-                        values.put(FeedReaderContract.FeedEntry.COLUMN_CORTO, fc);
-                        values.put(FeedReaderContract.FeedEntry.COLUMN_ESTRENO, e);
-                        values.put(FeedReaderContract.FeedEntry.COLUMN_FECHA, f);
-
-                        //Y se insertan en la bbdd y en la lista de películas de la lista
-                        db[1].insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
-                        lista.add(new Pelicula(l, p_bitmap, t, s, e, f, fc, false));
-                        values.clear();
-
-                        Log.d(TAG, "Encontrada película: " + t + ".");
-                    }
-                    cursor.close();
+            //Se van a descargar las 10 primeras páginas de estrenos de FILMAFFINITY
+            while (pagina <= 10 && !isCancelled()) {
+                try {
+                    String modo = estado ? "new" : "upc";
+                    dir = "https://m.filmaffinity.com/" + idioma + "/rdcat.php?id=" + modo + "_th_" + pais + "&page=" + pagina;
+                    html = getHTML(dir);
+                } catch (Exception ee) {
+                    Log.d(TAG, "Error en la descarga de HTML.");
+                    html = null;
+                    this.cancel(true);
                 }
 
+                if (html != null) {
+
+                    //Se parte el HTML en la división entre las películas
+                    String[] peliculasHTML = html.split("-item\" href=\"");
+                    String l;
+                    String p;
+                    String t;
+                    String s;
+                    String e;
+                    String f;
+                    byte[] p_byte;
+                    Bitmap p_bitmap;
+                    int ind;
+
+
+                    Cursor cursor;
+
+                    ContentValues values = new ContentValues();
+
+                    //Se analizan los trozos de HTML correspondientes a cada película
+                    for (int i = 1; i < peliculasHTML.length && !isCancelled(); i++) {
+
+                        //Se utiliza en link para ver si ya está
+                        l = peliculasHTML[i].substring(0, peliculasHTML[i].indexOf("\""));
+                        String[] selectionArgs = {l};
+
+                        if (estado) {
+
+                            cursor = db[0].query(
+                                    FeedReaderContract.FeedEntryCartelera.TABLE_NAME,                     // The table to query
+                                    projection,                               // The columns to return
+                                    selection,                                // The columns for the WHERE clause
+                                    selectionArgs,                            // The values for the WHERE clause
+                                    null,                                     // don't group the rows
+                                    null,                                     // don't filter by row groups
+                                    null                                    // The sort order
+                            );
+                        } else { // if (estado == ESTRENOS)
+                            cursor = db[0].query(
+                                    FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
+                                    projection,                               // The columns to return
+                                    selection,                                // The columns for the WHERE clause
+                                    selectionArgs,                            // The values for the WHERE clause
+                                    null,                                     // don't group the rows
+                                    null,                                     // don't filter by row groups
+                                    null                                    // The sort order
+                            );
+                        }
+
+                        //Si la película no está guardada, se añade
+                        //TODO que la edite con nueva info, sin borrar si se ha guardado
+                        if (cursor.getCount() == 0) {
+                            //Se buscan y guardan los diferentes elementos
+                            ind = peliculasHTML[i].indexOf("src=\"");
+                            p = peliculasHTML[i].substring(ind + 5, peliculasHTML[i].indexOf("\"", ind + 5));
+
+                            try {
+                                URL url = new URL(p);
+                                p_bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                p_bitmap = Bitmap.createScaledBitmap(p_bitmap, 50, 80, false);
+                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                p_bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+                                p_byte = stream.toByteArray();
+
+                            } catch (Exception ee) {
+                                p_bitmap = Bitmap.createBitmap(50, 80, Bitmap.Config.ARGB_8888);
+                                p_bitmap.eraseColor(Color.BLACK);
+                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                p_bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+                                p_byte = stream.toByteArray();
+
+                                //TODO hacerlo más eficiente, directamente en stream
+                            }
+
+                            ind = peliculasHTML[i].indexOf("mc-title ft\">");
+                            t = peliculasHTML[i].substring(ind + 13, peliculasHTML[i].indexOf("   ", ind + 13));
+                            ind = peliculasHTML[i].indexOf("synop-text\">");
+
+                            //La sinopsis acaba al final del campo o antes de (FILMAFFINITY) si es larga.
+                            int ind2 = peliculasHTML[i].indexOf("</li>", ind + 12);
+                            int ind3 = peliculasHTML[i].indexOf("(FILM", ind + 12);
+
+                            if (ind3 > 0 && ind3 < ind2)
+                                ind2 = ind3;
+
+                            s = peliculasHTML[i].substring(ind + 12, ind2);
+                            ind = peliculasHTML[i].indexOf("date\">");
+
+
+                            if (ind == -1) {
+                                e = "Sin confirmar";
+                                f = "09/09/2099";
+
+                            } else {
+                                e = peliculasHTML[i].substring(ind + 6, peliculasHTML[i].indexOf("</span>", ind + 6));
+
+                                //Ahora se mira la fecha para guardarla en el formato correcto.
+                                ind2 = e.indexOf(", ");
+                                String ee = "";
+                                String fecha_dia = "";
+                                String fecha_mes = "";
+                                String fecha_ano = "";
+
+                                if (ind2 > 0) {
+
+                                    int m = 0;
+
+                                    //Pasa el mes a número
+                                    switch (idioma) {
+                                        case "es":
+                                        case "mx":
+                                        case "ar":
+                                        case "co":
+                                        case "cl":
+                                            ee = e.substring(e.indexOf(", ") + 2);
+                                            fecha_dia = ee.substring(0, ee.indexOf(" "));
+                                            fecha_mes = ee.substring(ee.indexOf("de ") + 3);
+
+                                            if (fecha_dia.length() == 1)
+                                                fecha_dia = '0' + fecha_dia;
+
+                                            while (!fecha_mes.equalsIgnoreCase(meses_es[m++])) ;
+                                            break;
+                                        default:
+                                            ee = e.substring(e.indexOf(", ") + 2);
+                                            fecha_mes = ee.substring(0, ee.indexOf(" "));
+                                            fecha_dia = ee.substring(ee.indexOf(" "));
+
+                                            if (fecha_dia.length() == 1)
+                                                fecha_dia = '0' + fecha_dia;
+
+                                            while (!fecha_mes.equalsIgnoreCase(meses_en[m++])) ;
+                                            break;
+                                    }
+
+                                    fecha_mes = "" + m;
+                                    if (fecha_mes.length() == 1)
+                                        fecha_mes = '0' + fecha_mes;
+
+                                    f = "" + Calendar.getInstance().get(Calendar.YEAR) + '/' + fecha_mes + '/' + fecha_dia;
+
+                                } else {
+                                    fecha_dia = e.split("/")[0];
+                                    fecha_mes = e.split("/")[1];
+                                    fecha_ano = e.split("/")[2];
+
+                                    switch (idioma) {
+                                        case "es":
+                                        case "mx":
+                                        case "ar":
+                                        case "co":
+                                        case "cl":
+                                            e = fecha_dia + " de " + meses_es[Integer.parseInt(fecha_mes) - 1];
+                                            break;
+                                        default:
+                                            e = meses_en[Integer.parseInt(fecha_mes) - 1] + " " + fecha_dia;
+                                            break;
+                                    }
+
+                                    if (fecha_dia.length() == 1)
+                                        fecha_dia = '0' + fecha_dia;
+
+                                    if (fecha_mes.length() == 1)
+                                        fecha_mes = '0' + fecha_mes;
+
+                                    f = "" + fecha_ano + '/' + fecha_mes + '/' + fecha_dia;
+
+                                }
+
+                            }
+                            // Me cargo sangrías y cosas raras
+                            s = s.trim();
+
+                            if (estado) {
+
+                                //Se añaden los valores que hemos cogido
+                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_REF, l);
+                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO, t);
+                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA, p_byte);
+                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS, s);
+                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, false);
+                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO, e);
+                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA, f);
+                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 0);
+
+                                //Y se insertan en la bbdd y en la lista de películas de la lista
+                                db[1].insert(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, values);
+                                lista.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, false));
+
+
+                            } else {
+                                //Se añaden los valores que hemos cogido
+                                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF, l);
+                                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO, t);
+                                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA, p_byte);
+                                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS, s);
+                                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, false);
+                                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO, e);
+                                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA, f);
+
+                                //Y se insertan en la bbdd y en la lista de películas de la lista
+                                db[1].insert(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, values);
+                                lista.addEstrenos(new Pelicula(l, p_bitmap, t, s, e, f, false));
+
+                            }
+                            values.clear();
+
+                            Log.d(TAG, "Encontrada película: " + t + ".");
+                        }
+                        cursor.close();
+                    }
+
+                }
+
+                //Después de leer cada página, se actualiza la interfaz con lo que llevamos
+                //(Menos en la última, porque sería esto más el onPostExecution justo después,
+                //y no queda bien)
+                if (pagina < 10)
+                    publishProgress(pagina);
+
+                pagina++;
             }
-
-            //Después de leer cada página, se actualiza la interfaz con lo que llevamos
-            //(Menos en la última, porque sería esto más el onPostExecution justo después,
-            //y no queda bien)
-            if (pagina<10)
-                publishProgress(pagina);
-
-            pagina++;
-        }
+            estado = !estado;
+        }while(!estado);
         return null;
     }
 
@@ -356,10 +376,16 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     @Override
     protected void onProgressUpdate(Integer... i) {
         Log.d(TAG, "Descarga al " + ((i[0]+1)*10) + "%");
-        carga_barra.getChildAt(i[0]-1).setBackgroundColor(Color.parseColor("#37474f"));
-        lista.setMaxPaginas();
-        lista.notifyDataSetChanged();
-        lista.actualizarInterfaz();
+        if (i[0] == 0){
+            for(int j = 0; j < 9; j++)
+                carga_barra.getChildAt(j).setBackgroundColor(Color.parseColor("#455a64"));
+            carga_barra.setVisibility(View.VISIBLE);
+        } else {
+            carga_barra.getChildAt(i[0] - 1).setBackgroundColor(Color.parseColor("#37474f"));
+            lista.setMaxPaginas();
+            lista.notifyDataSetChanged();
+            lista.actualizarInterfaz();
+        }
     }
 
     //Le dice a la lista que actualice las películas guardadas y esconde
@@ -371,7 +397,6 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
         lista.setMaxPaginas();
         lista.actualizarInterfaz();
         lista.noHayPelis(); //Y esto de chanchullo para quitar el X
-        carga_mensaje.setVisibility(View.GONE);
         carga_barra.setVisibility(View.GONE);
     }
 
@@ -382,7 +407,6 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
         lista.setMaxPaginas();
         lista.actualizarInterfaz();
         lista.noHayPelis(); //Y esto de chanchullo para quitar el X
-        carga_mensaje.setVisibility(View.GONE);
         carga_barra.setVisibility(View.GONE);
     }
 

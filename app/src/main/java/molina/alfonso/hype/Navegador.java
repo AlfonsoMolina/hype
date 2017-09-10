@@ -12,9 +12,11 @@ import android.widget.TextView;
 public class Navegador {
 
     MainActivity mainActivity;
+    ListaModificadaAdapter lista;
 
-    Navegador(MainActivity mainActivity){
+    Navegador(MainActivity mainActivity, ListaModificadaAdapter lista){
         this.mainActivity = mainActivity;
+        this.lista = lista;
     }
 
     public void seleccionaHype(){
@@ -38,6 +40,19 @@ public class Navegador {
     public void mostrarPaginador(Boolean mostrar){
         if (mostrar){
             mainActivity.findViewById(R.id.paginador).setVisibility(View.VISIBLE);
+            int pagina = lista.getPagina();
+            String txt = "" + (pagina+1);
+            ((TextView) mainActivity.findViewById(R.id.paginaActual)).setText(txt);
+
+            mainActivity.findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
+            mainActivity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
+
+            if (pagina == 0)
+                mainActivity.findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
+
+            if (pagina+1 == lista.getUltPagina())
+                mainActivity.findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
+
         }else{
             mainActivity.findViewById(R.id.paginador).setVisibility(View.INVISIBLE);
         }

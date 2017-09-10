@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -56,10 +57,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // Fijamos el layout a usar
         setContentView(R.layout.activity_main);
 
-        // Relajamos políticas de Threads
-        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        //StrictMode.setThreadPolicy(policy);
-
         // Hook y setup del Toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -67,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         // Creamos el helper de la BBDD
         mDbHelper = new FeedReaderDbHelper(getApplicationContext());
-
 
         // Hook de la lista
         ListView lista = (ListView) findViewById(R.id.lista);
@@ -93,8 +89,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref.registerOnSharedPreferenceChangeListener(this);
 
-        navegador = new Navegador(this);
 
+        //Si es el primer uso se iniliaciza (parte 1)
+        if (sharedPref.getInt("iniciado",0)==0){
+
+            HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(this, listaAdapter,
+                    ((LinearLayout) findViewById(R.id.carga_barra)));
+
+            hilo.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt("iniciado", 1);
+            editor.apply();
+        }
+
+        navegador = new Navegador(this, listaAdapter);
+        navegador.seleccionaCartelera();
+
+        onClickCartelera(findViewById(R.id.cartelera));
     }
 
     @Override
@@ -112,6 +124,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 drawable.setColorFilter(getResources().getColor(R.color.colorAppText), PorterDuff.Mode.SRC_ATOP);
             }
         }
+
+        //Y si es la primera ejecución y ahora mismo se están descargando cosas:
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
+        if (sharedPref.getInt("iniciado",0)<2) {
+            menu.findItem(R.id.actualizar).setEnabled(false);
+            menu.findItem(R.id.actualizar).setVisible(false);
+            menu.findItem(R.id.cancelar).setEnabled(true);
+            menu.findItem(R.id.cancelar).setVisible(true);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt("iniciado", 2);
+            editor.apply();
+        }
+
 
         return true;
     }
@@ -132,8 +158,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //Actualiza las películas guardadas..
             case R.id.actualizar:
                 hilo = new HiloDescargarEstrenos(this, listaAdapter,
-                        ((LinearLayout) findViewById(R.id.carga_barra)),
-                        ((TextView) findViewById(R.id.carga_mensaje)));
+                        ((LinearLayout) findViewById(R.id.carga_barra)));
                 // Lanzamos el Thread que descargará la información.
                 hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
                 item.setEnabled(false);
@@ -143,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
 
             case R.id.cancelar:
+
                 hilo.cancel(true);
                 item.setEnabled(false);
                 item.setVisible(false);
@@ -166,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
         if (pag > 0) {
             listaAdapter.pasarPagina(pag - 1);
-            ((TextView) findViewById(R.id.actualPageText)).setText(String.valueOf(pag));
+            ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pag));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
             //porque se ha cogido del adaptador. Así que, se queda igual.
@@ -185,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
         if (pag < listaAdapter.getUltPagina()) {
             listaAdapter.pasarPagina(pag + 1);
-            ((TextView) findViewById(R.id.actualPageText)).setText(String.valueOf(pag+2));
+            ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pag+2));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
             //porque se ha cogido del adaptador.
@@ -206,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             listaAdapter.noHayPelis();
         } else if (key.equalsIgnoreCase("pref_pais")){
             //Cuando cambia el país se borra la lista anterior
-            mDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntry.TABLE_NAME, null, null);
+            mDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
             listaAdapter.eliminarLista();
             listaAdapter.notifyDataSetChanged();
             listaAdapter.actualizarInterfaz();
@@ -250,9 +276,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public void onClickCartelera(View view){
 
-        //TODO: SUSTITUIR CON LA CARGA DE LA CARTELERA!
-        onClickEstrenos(view);
+        Log.d(TAG, "Mostrando películas de estreno");
+
+        listaAdapter.mostrarCartelera();
         navegador.seleccionaCartelera();
+        navegador.mostrarPaginador(false);
+
+        if (listaAdapter.getCount()== 0){
+            navegador.mostrarPaginador(false);
+            navegador.mostrarNoPelis(true);
+        } else if (listaAdapter.getUltPagina() > 1){
+            navegador.mostrarPaginador(true);
+            navegador.mostrarNoPelis(false);
+        } else {
+            navegador.mostrarPaginador(false);
+            navegador.mostrarNoPelis(false);
+        }
+
+        listaAdapter.setExpandido(-1);
+        listaAdapter.notifyDataSetChanged();
+        ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+
 
     }
 
@@ -266,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         if (listaAdapter.getCount()== 0){
             navegador.mostrarPaginador(false);
+            navegador.mostrarNoPelis(true);
         } else if (listaAdapter.getUltPagina() > 1){
             navegador.mostrarPaginador(true);
             navegador.mostrarNoPelis(false);
