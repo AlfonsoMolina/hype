@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mListaModificadaAdapter.setExpandido(position);
+                mListaModificadaAdapter.setItemExpandido(position);
                 mListaModificadaAdapter.notifyDataSetChanged();
             }
         });
@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.mostrarNoHayPelis(false);
         }
 
-        mListaModificadaAdapter.setExpandido(-1);
+        mListaModificadaAdapter.setItemExpandido(-1);
         mListaModificadaAdapter.notifyDataSetChanged();
         ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
 
@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.mostrarNoHayPelis(false);
         }
 
-        mListaModificadaAdapter.setExpandido(-1);
+        mListaModificadaAdapter.setItemExpandido(-1);
         mListaModificadaAdapter.notifyDataSetChanged();
         mInterfaz.enfocaPrimerElemento();
 
@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.mostrarNoHayPelis(false);
         }
 
-        mListaModificadaAdapter.setExpandido(-1);
+        mListaModificadaAdapter.setItemExpandido(-1);
         mListaModificadaAdapter.notifyDataSetChanged();
         mInterfaz.enfocaPrimerElemento();
 
