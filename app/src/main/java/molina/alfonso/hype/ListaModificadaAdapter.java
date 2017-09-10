@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatImageButton;
-import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,13 +88,13 @@ public class ListaModificadaAdapter extends ArrayAdapter{
         if(estado == HYPE){
             int i = 0;
             while(i < listaCartelera.size()) {
-                if (listaCartelera.get(i).getisHyped())
+                if (listaCartelera.get(i).getHype())
                     count++;
                 i++;
             }
             i = 0;
             while(i < listaEstrenos.size()) {
-                if (listaEstrenos.get(i).getisHyped())
+                if (listaEstrenos.get(i).getHype())
                     count++;
                 i++;
             }
@@ -123,7 +122,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
             int i = 0;
 
             while (i < listaCartelera.size()) {
-                if (listaCartelera.get(i).getisHyped()) {
+                if (listaCartelera.get(i).getHype()) {
                     if (p == 0) {
                         posicion = i;
                     }
@@ -134,7 +133,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
 
             int j = 0;
             while (j < listaEstrenos.size()) {
-                if (listaEstrenos.get(j).getisHyped()) {
+                if (listaEstrenos.get(j).getHype()) {
                     if (p == 0) {
                         posicion = i;
                     }
@@ -204,10 +203,10 @@ public class ListaModificadaAdapter extends ArrayAdapter{
             p = (estado == CARTELERA ? listaCartelera : listaEstrenos).get(getPosicionReal(position));
         }
         ((TextView) fila.findViewById(R.id.titulo)).setText(p.getTitulo());
-        ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstreno());
+        ((TextView) fila.findViewById(R.id.estreno)).setText(p.getEstrenoLetras());
         ((ImageView) fila.findViewById(R.id.portada)).setImageBitmap(p.getPortada());
 
-        if (p.getisHyped()) {
+        if (p.getHype()) {
             fila.findViewById(R.id.hype_msg).setVisibility(View.VISIBLE);
         } else
             fila.findViewById(R.id.hype_msg).setVisibility(View.GONE);
@@ -222,7 +221,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
             fila.findViewById(R.id.av_ficha).setOnClickListener(abre_ficha);
             fila.findViewById(R.id.av_compartir).setOnClickListener(compartir);
 
-            if (p.getisHyped()){
+            if (p.getHype()){
                 ((AppCompatImageButton) fila.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
             }else{
                 ((AppCompatImageButton) fila.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_border_black_24dp);
@@ -351,7 +350,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
                 p = (estado == CARTELERA ? listaCartelera : listaEstrenos).get(getPosicionReal(position));
             }
             Calendar beginTime = Calendar.getInstance();
-            String [] f = p.getFecha_estreno().split("/");
+            String [] f = p.getEstrenoFecha().split("/");
             int[] fecha = {Integer.parseInt(f[0]), Integer.parseInt(f[1]),Integer.parseInt(f[2])};
             beginTime.set(fecha[0], fecha[1]-1, fecha[2], 0, 0);
             // Primero comprobar si puedo editar el evento.
@@ -395,9 +394,9 @@ public class ListaModificadaAdapter extends ArrayAdapter{
             ContentValues values = new ContentValues();
             String h;
 
-            p.setisHyped(!p.getisHyped());
+            p.setHype(!p.getHype());
 
-            if (p.getisHyped()) {
+            if (p.getHype()) {
                 h = "T";
                 ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_black_24dp);
             } else {
