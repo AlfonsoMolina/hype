@@ -34,8 +34,6 @@ public class ListaModificadaAdapter extends ArrayAdapter{
      * Declaración de variables
      */
 
-    // TODO: AÑADIR BOTÓN DE COMPARTIR
-
     private static final String TAG = "ListaModificadaAdapter";
 
     public static final int HYPE = 0;
