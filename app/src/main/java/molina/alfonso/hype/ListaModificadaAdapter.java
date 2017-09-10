@@ -471,8 +471,16 @@ public class ListaModificadaAdapter extends ArrayAdapter{
         @Override
         public void onClick(View view) {
             int position = expandido;
-            Pelicula p = lista.get(getPosicionReal(position));
-
+            Pelicula p;
+            if(estado == HYPE){
+                int preal = getPosicionReal(position);
+                if (preal >= listaCartelera.size())
+                    p = listaEstrenos.get(preal-listaCartelera.size());
+                else
+                    p = listaCartelera.get(preal);
+            }else {
+                p = (estado == CARTELERA ? listaCartelera : listaEstrenos).get(getPosicionReal(position));
+            }
             Log.d(TAG, "Pulsado botón \"Share\" en película " + p.getTitulo());
 
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
