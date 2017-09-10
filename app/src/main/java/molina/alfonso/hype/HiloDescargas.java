@@ -36,7 +36,7 @@ import static molina.alfonso.hype.ListaModificadaAdapter.ESTRENOS;
 
 // TODO: Actualizar también el resto de pelis
 
-public class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
+class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
     /*
      * Declaración de variables
@@ -63,7 +63,7 @@ public class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
     //Elementos del layout para la barra de carga
     private LinearLayout carga_barra;
 
-    public HiloDescargas(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra, boolean act) {
+    HiloDescargas(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra, boolean act) {
         Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
         this.lista = lista;
         this.carga_barra = carga_barra;
@@ -101,8 +101,8 @@ public class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
             pagina = 1;
             publishProgress(0);
             //db[0] para leer db[1] para escribir
-            String html = "";
-            String dir = "";
+            String html;
+            String dir;
 
             //Se prepara esto, para después usarlo para leer la bbdd y
             //ver si una película ya se ha guardado o es nueva
@@ -397,13 +397,13 @@ public class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 ContentValues values2 = new ContentValues();
                 values2.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 0);
 
-                String[] selectionArgs3 = { "1" };
+                /*String[] selectionArgs3 = { "1" };
 
                 int count = db[1].update(
                         FeedReaderContract.FeedEntryCartelera.TABLE_NAME,
                         values2,
                         selection2,
-                        selectionArgs3);
+                        selectionArgs3);*/
 
             }
             estado = !estado;

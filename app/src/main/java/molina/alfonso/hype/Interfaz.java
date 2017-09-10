@@ -10,35 +10,35 @@ import android.widget.TextView;
  * Created by vicente on 9/9/17.
  */
 
-public class Interfaz {
+class Interfaz {
 
-    MainActivity mMainActivity;
-    ListaModificadaAdapter mListaModificadaAdapter;
+    private MainActivity mMainActivity;
+    private ListaModificadaAdapter mListaModificadaAdapter;
 
     Interfaz(MainActivity mainActivity, ListaModificadaAdapter listaModificadaAdapter){
         this.mMainActivity = mainActivity;
         this.mListaModificadaAdapter = listaModificadaAdapter;
     }
 
-    public void seleccionaBotonHype(){
+    void seleccionaBotonHype(){
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.hype), true);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.cartelera), false);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.estrenos), false);
     }
 
-    public void seleccionaBotonCartelera(){
+    void seleccionaBotonCartelera(){
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.hype), false);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.cartelera), true);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.estrenos), false);
     }
 
-    public void seleccionaBotonEstrenos(){
+    void seleccionaBotonEstrenos(){
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.hype), false);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.cartelera), false);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.estrenos), true);
     }
 
-    public void mostrarPaginador(Boolean mostrar){
+    void mostrarPaginador(Boolean mostrar){
         if (mostrar){
             mMainActivity.findViewById(R.id.paginador).setVisibility(View.VISIBLE);
             int pagina = mListaModificadaAdapter.getPagina();
@@ -59,7 +59,7 @@ public class Interfaz {
         }
     }
 
-    public void mostrarNoHayPelis(Boolean mostrar){
+    void mostrarNoHayPelis(Boolean mostrar){
         if (mostrar){
             ((TextView) mMainActivity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
             mMainActivity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
@@ -76,7 +76,7 @@ public class Interfaz {
         }
     }
 
-    public void enfocaPrimerElemento(){
+    void enfocaPrimerElemento(){
         ((ListView) mMainActivity.findViewById(R.id.lista)).smoothScrollToPosition(0);
     }
 
