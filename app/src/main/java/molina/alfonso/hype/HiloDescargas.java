@@ -36,7 +36,7 @@ import static molina.alfonso.hype.ListaModificadaAdapter.ESTRENOS;
 
 // TODO: Actualizar también el resto de pelis
 
-public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void> {
+public class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
     /*
      * Declaración de variables
@@ -63,7 +63,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     //Elementos del layout para la barra de carga
     private LinearLayout carga_barra;
 
-    public HiloDescargarEstrenos(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra, boolean act) {
+    public HiloDescargas(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra, boolean act) {
         Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
         this.lista = lista;
         this.carga_barra = carga_barra;

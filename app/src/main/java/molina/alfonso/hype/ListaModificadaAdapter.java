@@ -330,7 +330,6 @@ public class ListaModificadaAdapter extends ArrayAdapter{
                 p = (estado == CARTELERA ? listaCartelera : listaEstrenos).get(getPosicionReal(expandido));
             }            FichaFragment fichaFragment = FichaFragment.newInstance(p.getTitulo(), p.getEnlace());
 
-            //activity.findViewById(R.id.ficha_container).setVisibility(View.VISIBLE);
             fragmentManager.beginTransaction().replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();
         }
     };
@@ -535,7 +534,6 @@ public class ListaModificadaAdapter extends ArrayAdapter{
         estado = HYPE;
     }
 
-    // TODO: Hacer que muestre la cartelera de verdad
     public void mostrarCartelera(){
         expandido = -1;
         estado = CARTELERA;

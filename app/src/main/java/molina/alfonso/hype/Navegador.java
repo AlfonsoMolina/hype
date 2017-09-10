@@ -3,6 +3,7 @@ package molina.alfonso.hype;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 /**
@@ -60,7 +61,7 @@ public class Navegador {
 
     public void mostrarNoPelis(Boolean mostrar){
         if (mostrar){
-            ((TextView) mainActivity.findViewById(R.id.nopelis)).setText("\n\nNinguna película guardada.\nPor ahora.");
+            ((TextView) mainActivity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
             mainActivity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
         }else{
             mainActivity.findViewById(R.id.nopelis).setVisibility(View.GONE);
@@ -73,6 +74,10 @@ public class Navegador {
         }else{
             imageView.setColorFilter(ContextCompat.getColor(mainActivity,R.color.colorNonSelectedButton));
         }
+    }
+
+    public void irAlPrimero(){
+        ((ListView) mainActivity.findViewById(R.id.lista)).smoothScrollToPosition(0);
     }
 
 }

@@ -29,22 +29,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     // TODO: Refinar icono de Hype
     // TODO: Crear icono para la aplicación
-    // TODO: Añadir "sección" cartelera (descargar la info e ya)
-    // TODO: Facilitar acceso a sección Hype (y señalizarlo)
     // TODO: Mejorar (y completar) traducción "countrie"
 
-    // Etiqueta para logs
     private static final String TAG = "MainActivity";
 
-    // Adaptador de la lista
-    private ListaModificadaAdapter listaAdapter;
-    // Helper para manipular la BBDD
-    private FeedReaderDbHelper mDbHelper;
+    private ListaModificadaAdapter mListaModificadaAdapter;
+    private FeedReaderDbHelper mFeedReaderDbHelper;
+    private HiloDescargas mHiloDescargas;
+    private Navegador mNavegador;
+    private Menu mMenu;
 
-    private HiloDescargarEstrenos hilo;
-    private Navegador navegador;
-
-    private Menu menu;
     /*
      * Métodos override
      */
@@ -60,89 +54,89 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
 
         // Hook y setup del Toolbar
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
         //getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Creamos el helper de la BBDD
-        mDbHelper = new FeedReaderDbHelper(getApplicationContext());
+        mFeedReaderDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
         // Hook de la lista
-        ListView lista = (ListView) findViewById(R.id.lista);
+        ListView listView = (ListView) findViewById(R.id.lista);
 
         //Se le manda a la lista esta actividad, para poder modificar la interfaz,
         //el layout de la row y la bbdd
-        listaAdapter = new ListaModificadaAdapter(this, R.layout.fila, mDbHelper);
+        mListaModificadaAdapter = new ListaModificadaAdapter(this, R.layout.fila, mFeedReaderDbHelper);
 
         // Setup de la lista
-        lista.setAdapter(listaAdapter);
-        lista.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        lista.setItemsCanFocus(false);
+        listView.setAdapter(mListaModificadaAdapter);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        listView.setItemsCanFocus(false);
 
         //Al pulsar en una fila se expande y muestra más información.
-        lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                listaAdapter.setExpandido(position);
-                listaAdapter.notifyDataSetChanged();
+                mListaModificadaAdapter.setExpandido(position);
+                mListaModificadaAdapter.notifyDataSetChanged();
             }
         });
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPref.registerOnSharedPreferenceChangeListener(this);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         //Se actualiza una vez cada dos días
         //Cojo la fecha actual:
-        String year = "" + Calendar.getInstance().get(Calendar.YEAR);
-        int month_i = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        int day_i = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        String ano = "" + Calendar.getInstance().get(Calendar.YEAR);
+        int mesTemp = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        int diaTemp = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 
-        String month;
-        String day;
+        String mes;
+        String dia;
 
-        if (month_i < 10)
-            month = "0" + month_i;
+        if (mesTemp < 10)
+            mes = "0" + mesTemp;
         else
-            month = "" + month_i;
+            mes = "" + mesTemp;
 
-        if (day_i < 10)
-            day = "0" + day_i;
+        if (diaTemp < 10)
+            dia = "0" + diaTemp;
         else
-            day = "" + day_i;
+            dia = "" + diaTemp;
 
-        String fecha_hoy = year + '/' + month + '/' + day;
+        String fechaHoy = ano + '/' + mes + '/' + dia;
 
         //Y la guardada:
-        String fecha_guardada = sharedPref.getString("fecha","01/01/1990");
-        if (fecha_hoy.compareTo(fecha_guardada) > 0) {
+        String fechaGuardada = sharedPreferences.getString("fecha","01/01/1990");
+        if (fechaHoy.compareTo(fechaGuardada) > 0) {
             //Se hace una actualización suave
-            HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(this, listaAdapter,
+            mHiloDescargas = new HiloDescargas(this, mListaModificadaAdapter,
                     ((LinearLayout) findViewById(R.id.carga_barra)),false);
 
-            hilo.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+            mHiloDescargas.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
 
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt("iniciado", 1);
-            editor.putString("fecha",fecha_hoy);
-            editor.apply();
+            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+            sharedPreferencesEditor.putInt("iniciado", 1);
+            sharedPreferencesEditor.putString("fecha",fechaHoy);
+            sharedPreferencesEditor.apply();
         }
 
 
             //Si es el primer uso se iniliaciza (parte 1)
-        if (sharedPref.getInt("iniciado",0)==0){
+        if (sharedPreferences.getInt("iniciado",0)==0){
 
-            HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(this, listaAdapter,
+            mHiloDescargas = new HiloDescargas(this, mListaModificadaAdapter,
                     ((LinearLayout) findViewById(R.id.carga_barra)),false);
 
-            hilo.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+            mHiloDescargas.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
 
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt("iniciado", 1);
-            editor.apply();
+            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+            sharedPreferencesEditor.putInt("iniciado", 1);
+            sharedPreferencesEditor.apply();
         }
 
-        navegador = new Navegador(this, listaAdapter);
-        navegador.seleccionaCartelera();
+        mNavegador = new Navegador(this, mListaModificadaAdapter);
+        mNavegador.seleccionaCartelera();
 
         onClickCartelera(findViewById(R.id.cartelera));
     }
@@ -150,13 +144,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "Menú de opciones creado");
-        // Expande el menu, añade las opciones
-        this.menu = menu;
+        // Expande el mMenu, añade las opciones
+        this.mMenu = menu;
         getMenuInflater().inflate(R.menu.menu, menu);
 
         // Para dar color a los botones de la ActionBar
-        for(int i = 0; i < menu.size(); i++){
-            Drawable drawable = menu.getItem(i).getIcon();
+        for(int i = 0; i < mMenu.size(); i++){
+            Drawable drawable = mMenu.getItem(i).getIcon();
             if(drawable != null) {
                 drawable.mutate();
                 drawable.setColorFilter(getResources().getColor(R.color.colorAppText), PorterDuff.Mode.SRC_ATOP);
@@ -164,28 +158,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
 
         //Y si es la primera ejecución y ahora mismo se están descargando cosas:
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPref.registerOnSharedPreferenceChangeListener(this);
-        if (sharedPref.getInt("iniciado",0)<2) {
-            menu.findItem(R.id.actualizar).setEnabled(false);
-            menu.findItem(R.id.actualizar).setVisible(false);
-            menu.findItem(R.id.cancelar).setEnabled(true);
-            menu.findItem(R.id.cancelar).setVisible(true);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt("iniciado", 2);
-            editor.apply();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        if (sharedPreferences.getInt("iniciado",0)<2) {
+            mMenu.findItem(R.id.actualizar).setEnabled(false);
+            mMenu.findItem(R.id.actualizar).setVisible(false);
+            mMenu.findItem(R.id.cancelar).setEnabled(true);
+            mMenu.findItem(R.id.cancelar).setVisible(true);
+            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+            sharedPreferencesEditor.putInt("iniciado", 2);
+            sharedPreferencesEditor.apply();
         }
-
 
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d(TAG, "Opción seleccionada " + item.toString());
+    public boolean onOptionsItemSelected(MenuItem selectedItem) {
+        Log.d(TAG, "Opción seleccionada " + selectedItem.toString());
 
-        // Interpretamos lo seleccionado en el menu
-        switch (item.getItemId()) {
+        // Interpretamos lo seleccionado en el mMenu
+        switch (selectedItem.getItemId()) {
 
             //Mostrar las opciones (pendiente)
             case R.id.action_settings:
@@ -195,27 +188,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             //Actualiza las películas guardadas..
             case R.id.actualizar:
-                hilo = new HiloDescargarEstrenos(this, listaAdapter,
+                mHiloDescargas = new HiloDescargas(this, mListaModificadaAdapter,
                         ((LinearLayout) findViewById(R.id.carga_barra)),true);
                 // Lanzamos el Thread que descargará la información.
-                hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
-                item.setEnabled(false);
-                item.setVisible(false);
-                menu.findItem(R.id.cancelar).setEnabled(true);
-                menu.findItem(R.id.cancelar).setVisible(true);
+                mHiloDescargas.execute(mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
+                selectedItem.setEnabled(false);
+                selectedItem.setVisible(false);
+                mMenu.findItem(R.id.cancelar).setEnabled(true);
+                mMenu.findItem(R.id.cancelar).setVisible(true);
                 return true;
 
             case R.id.cancelar:
 
-                hilo.cancel(true);
-                item.setEnabled(false);
-                item.setVisible(false);
-                menu.findItem(R.id.actualizar).setEnabled(true);
-                menu.findItem(R.id.actualizar).setVisible(true);
+                mHiloDescargas.cancel(true);
+                selectedItem.setEnabled(false);
+                selectedItem.setVisible(false);
+                mMenu.findItem(R.id.actualizar).setEnabled(true);
+                mMenu.findItem(R.id.actualizar).setVisible(true);
                 return true;
 
             default:
-                return super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(selectedItem);
 
         }
     }
@@ -224,67 +217,67 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * Métodos custom
      */
 
-    public void pasarPaginaAtras(View view) {
-        int pag = listaAdapter.getPagina();
-        Log.d(TAG, "Retrocediendo a la página " + pag);
+    public void retrocederPagina(View view) {
+        int pagina = mListaModificadaAdapter.getPagina();
+        Log.d(TAG, "Retrocediendo a la página " + pagina);
         findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
-        if (pag > 0) {
-            listaAdapter.pasarPagina(pag - 1);
-            ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pag));
+        if (pagina > 0) {
+            mListaModificadaAdapter.pasarPagina(pagina - 1);
+            ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
             //porque se ha cogido del adaptador. Así que, se queda igual.
             ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
-            if (pag == 1) {
+            if (pagina == 1) {
                 findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
             }
         }
 
-        listaAdapter.notifyDataSetChanged();
+        mListaModificadaAdapter.notifyDataSetChanged();
     }
 
-    public void pasarPaginaAdelante(View view) {
-        int pag = listaAdapter.getPagina();
-        Log.d(TAG, "Avanzando a la página " + (pag+2));
+    public void avanzarPagina(View view) {
+        int pagina = mListaModificadaAdapter.getPagina();
+        Log.d(TAG, "Avanzando a la página " + (pagina+2));
         findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
-        if (pag < listaAdapter.getUltPagina()) {
-            listaAdapter.pasarPagina(pag + 1);
-            ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pag+2));
+        if (pagina < mListaModificadaAdapter.getUltPagina()) {
+            mListaModificadaAdapter.pasarPagina(pagina + 1);
+            ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina+2));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
             //porque se ha cogido del adaptador.
             ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
-            if (pag+2 == listaAdapter.getUltPagina()) {
+            if (pagina+2 == mListaModificadaAdapter.getUltPagina()) {
                 findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
             }
         }
 
-        listaAdapter.notifyDataSetChanged();
+        mListaModificadaAdapter.notifyDataSetChanged();
     }
 
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equalsIgnoreCase("pref_db")){
-            listaAdapter.eliminarLista();
-            listaAdapter.notifyDataSetChanged();
-            listaAdapter.actualizarInterfaz();
-            listaAdapter.noHayPelis();
-        } else if (key.equalsIgnoreCase("pref_pais")){
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String clave) {
+        if(clave.equalsIgnoreCase("pref_db")){
+            mListaModificadaAdapter.eliminarLista();
+            mListaModificadaAdapter.notifyDataSetChanged();
+            mListaModificadaAdapter.actualizarInterfaz();
+            mListaModificadaAdapter.noHayPelis();
+        } else if (clave.equalsIgnoreCase("pref_pais")){
             //Cuando cambia el país se borra la lista anterior
-            mDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
-            listaAdapter.eliminarLista();
-            listaAdapter.notifyDataSetChanged();
-            listaAdapter.actualizarInterfaz();
-            listaAdapter.noHayPelis();
+            mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
+            mListaModificadaAdapter.eliminarLista();
+            mListaModificadaAdapter.notifyDataSetChanged();
+            mListaModificadaAdapter.actualizarInterfaz();
+            mListaModificadaAdapter.noHayPelis();
         }
     }
 
     protected void onDestroy() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPref.unregisterOnSharedPreferenceChangeListener(this);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
     }
 
-    public Menu getMenu(){ return menu;}
+    public Menu getMenu(){ return mMenu;}
 
     @Override
     public void onFragmentInteraction(Uri uri) {
@@ -295,19 +288,19 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas hypeadas");
 
-        listaAdapter.mostrarHype();
-        navegador.seleccionaHype();
-        navegador.mostrarPaginador(false);
+        mListaModificadaAdapter.mostrarHype();
+        mNavegador.seleccionaHype();
+        mNavegador.mostrarPaginador(false);
 
         //Si no hay ninguna guardada, se muestra un mensaje
-        if (listaAdapter.getCount()== 0){
-            navegador.mostrarNoPelis(true);
+        if (mListaModificadaAdapter.getCount()== 0){
+            mNavegador.mostrarNoPelis(true);
         } else {
-            navegador.mostrarNoPelis(false);
+            mNavegador.mostrarNoPelis(false);
         }
 
-        listaAdapter.setExpandido(-1);
-        listaAdapter.notifyDataSetChanged();
+        mListaModificadaAdapter.setExpandido(-1);
+        mListaModificadaAdapter.notifyDataSetChanged();
         ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
 
     }
@@ -316,25 +309,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas de estreno");
 
-        listaAdapter.mostrarCartelera();
-        navegador.seleccionaCartelera();
-        navegador.mostrarPaginador(false);
+        mListaModificadaAdapter.mostrarCartelera();
+        mNavegador.seleccionaCartelera();
+        mNavegador.mostrarPaginador(false);
 
-        if (listaAdapter.getCount()== 0){
-            navegador.mostrarPaginador(false);
-            navegador.mostrarNoPelis(true);
-        } else if (listaAdapter.getUltPagina() > 1){
-            navegador.mostrarPaginador(true);
-            navegador.mostrarNoPelis(false);
+        if (mListaModificadaAdapter.getCount()== 0){
+            mNavegador.mostrarPaginador(false);
+            mNavegador.mostrarNoPelis(true);
+        } else if (mListaModificadaAdapter.getUltPagina() > 1){
+            mNavegador.mostrarPaginador(true);
+            mNavegador.mostrarNoPelis(false);
         } else {
-            navegador.mostrarPaginador(false);
-            navegador.mostrarNoPelis(false);
+            mNavegador.mostrarPaginador(false);
+            mNavegador.mostrarNoPelis(false);
         }
 
-        listaAdapter.setExpandido(-1);
-        listaAdapter.notifyDataSetChanged();
-        ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
-
+        mListaModificadaAdapter.setExpandido(-1);
+        mListaModificadaAdapter.notifyDataSetChanged();
+        mNavegador.irAlPrimero();
 
     }
 
@@ -342,24 +334,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas de estreno");
 
-        listaAdapter.mostrarEstrenos();
-        navegador.seleccionaEstrenos();
-        navegador.mostrarPaginador(false);
+        mListaModificadaAdapter.mostrarEstrenos();
+        mNavegador.seleccionaEstrenos();
+        mNavegador.mostrarPaginador(false);
 
-        if (listaAdapter.getCount()== 0){
-            navegador.mostrarPaginador(false);
-            navegador.mostrarNoPelis(true);
-        } else if (listaAdapter.getUltPagina() > 1){
-            navegador.mostrarPaginador(true);
-            navegador.mostrarNoPelis(false);
+        if (mListaModificadaAdapter.getCount()== 0){
+            mNavegador.mostrarPaginador(false);
+            mNavegador.mostrarNoPelis(true);
+        } else if (mListaModificadaAdapter.getUltPagina() > 1){
+            mNavegador.mostrarPaginador(true);
+            mNavegador.mostrarNoPelis(false);
         } else {
-            navegador.mostrarPaginador(false);
-            navegador.mostrarNoPelis(false);
+            mNavegador.mostrarPaginador(false);
+            mNavegador.mostrarNoPelis(false);
         }
 
-        listaAdapter.setExpandido(-1);
-        listaAdapter.notifyDataSetChanged();
-        ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+        mListaModificadaAdapter.setExpandido(-1);
+        mListaModificadaAdapter.notifyDataSetChanged();
+        mNavegador.irAlPrimero();
 
     }
 
