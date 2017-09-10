@@ -68,7 +68,7 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 null,                                     // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
-                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA + " ASC"                                    // The sort order
+                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA + " DESC"                                    // The sort order
         );
 
         //Datos de las películas:
@@ -79,14 +79,13 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
         //Y empezamos a mirar las tuplas una a una
         while (cursor.moveToNext()) {
-            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA));
-            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO)); //Esto para el log solo
-
-            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF));
-            p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA));
-            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS));
-            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO));
-            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE));
+            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA));
+            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO)); //Esto para el log solo
+            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_REF));
+            p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA));
+            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS));
+            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO));
+            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE));
 
             p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
 
@@ -159,7 +158,7 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
             if (fecha_hoy.compareTo(f) >= 0) {
                 String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
-                String[] selectionArgs = {t};
+                String[] selectionArgs = {l};
                 dbr.delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, selection, selectionArgs);
 
                 values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF, l);

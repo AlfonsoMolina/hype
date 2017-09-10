@@ -376,13 +376,18 @@ public class ListaModificadaAdapter extends ArrayAdapter{
         public void onClick(View v) {
 
             int position = expandido;
+            int bbdd = estado;
+
             Pelicula p;
             if(estado == HYPE){
                 int preal = getPosicionReal(position);
-                if (preal >= listaCartelera.size())
-                    p = listaEstrenos.get(preal-listaCartelera.size());
-                else
+                if (preal >= listaCartelera.size()) {
+                    p = listaEstrenos.get(preal - listaCartelera.size());
+                    bbdd = ESTRENOS;
+                }else {
                     p = listaCartelera.get(preal);
+                    bbdd = CARTELERA;
+                }
             }else {
                 p = (estado == CARTELERA ? listaCartelera : listaEstrenos).get(getPosicionReal(position));
             }            Log.d(TAG, "Pulsado botón \"Hype\" en película " + p.getTitulo());
@@ -401,16 +406,30 @@ public class ListaModificadaAdapter extends ArrayAdapter{
                 ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
             }
 
-            values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, h);
+            if(bbdd == CARTELERA){
+                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, h);
 
-            String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
-            String[] selectionArgs = {p.getEnlace()};
+                String selection = FeedReaderContract.FeedEntryCartelera.COLUMN_REF + " LIKE ?";
+                String[] selectionArgs = {p.getEnlace()};
 
-            int count = dbw.update(
-                    FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,
-                    values,
-                    selection,
-                    selectionArgs);
+                int count = dbw.update(
+                        FeedReaderContract.FeedEntryCartelera.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+
+            }else {
+                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, h);
+
+                String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF+ " LIKE ?";
+                String[] selectionArgs = {p.getEnlace()};
+
+                int count = dbw.update(
+                        FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+            }
 
             notifyDataSetChanged();
         }
@@ -474,6 +493,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
 
     public void eliminarLista() {
         listaEstrenos.clear();
+        listaCartelera.clear();
     }
 
     public int getEstado(){

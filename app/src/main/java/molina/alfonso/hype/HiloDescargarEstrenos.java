@@ -55,6 +55,7 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     private String pais = "es";     //Pais del que mirar los estrenos. (Pendiente)
     private int pagina = 1;         //Número de páginas de las 10 que se van a descargar.
     private SharedPreferences sharedPref;
+    private boolean actFuerte;      //Si es True, se borra la bbdd y se cargan de nuevo.
 
     //Lista que guardará las películas
     private ListaModificadaAdapter lista;
@@ -62,12 +63,12 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
     //Elementos del layout para la barra de carga
     private LinearLayout carga_barra;
 
-    public HiloDescargarEstrenos(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra) {
+    public HiloDescargarEstrenos(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra, boolean act) {
         Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
         this.lista = lista;
         this.carga_barra = carga_barra;
         this.sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-
+        this.actFuerte = act;
     }
 
 
@@ -80,6 +81,11 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
         idioma = pais;
         if (pais.equalsIgnoreCase("uk") || pais.equalsIgnoreCase("us") || pais.equalsIgnoreCase("fr"))
             idioma = "en";
+
+        if(actFuerte) {
+            lista.eliminarLista();
+            lista.noHayPelis();
+        }
     }
 
     @Override
@@ -103,8 +109,12 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
 
             String s_temp = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_REF :
                     FeedReaderContract.FeedEntryEstrenos.COLUMN_REF;
+            String s_temp2 = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE :
+                    FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE;
+            String s_temp3 = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE :
+                    FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO;
             String[] projection = {
-                    s_temp
+                    s_temp, s_temp2, s_temp3
             };
             String selection = s_temp + " = ?";
 
@@ -170,9 +180,8 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                             );
                         }
 
-                        //Si la película no está guardada, se añade
-                        //TODO que la edite con nueva info, sin borrar si se ha guardado
-                        if (cursor.getCount() == 0) {
+                        //Si la película no está guardada (o si es una actualización fuerte), se añade
+                        if (cursor.getCount() == 0 || actFuerte) {
                             //Se buscan y guardan los diferentes elementos
                             ind = peliculasHTML[i].indexOf("src=\"");
                             p = peliculasHTML[i].substring(ind + 5, peliculasHTML[i].indexOf("\"", ind + 5));
@@ -301,14 +310,32 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                                 values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO, t);
                                 values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA, p_byte);
                                 values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS, s);
-                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, false);
                                 values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO, e);
                                 values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA, f);
-                                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 0);
+
+                                String h = "F";
+                                //Si es una act fuerte, primero se borra
+                                if (actFuerte && cursor.getCount()>0){
+                                    cursor.moveToFirst();
+                                    values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 1);
+                                    h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE));
+                                    values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, h);
+
+                                    String selection2 = FeedReaderContract.FeedEntryCartelera.COLUMN_REF + " LIKE ?";
+                                    String[] selectionArgs2 = {l};
+                                    db[0].delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, selection2, selectionArgs2);
+
+                                }else if (actFuerte){
+                                    values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, false);
+                                    values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 1);
+                                } else {
+                                    values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, false);
+                                    values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 0);
+                                }
 
                                 //Y se insertan en la bbdd y en la lista de películas de la lista
                                 db[1].insert(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, values);
-                                lista.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, false));
+                                lista.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, h.equals("T")));
 
 
                             } else {
@@ -321,9 +348,23 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                                 values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO, e);
                                 values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA, f);
 
+                                String h = "F";
+                                if (actFuerte && cursor.getCount()>0){
+                                    cursor.moveToNext();
+                                    h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE));
+                                    values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, h);
+
+                                    String selection2 = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
+                                    String[] selectionArgs2 = {l};
+                                    db[0].delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, selection2, selectionArgs2);
+
+                                }else{
+                                    values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, false);
+                                }
+
                                 //Y se insertan en la bbdd y en la lista de películas de la lista
                                 db[1].insert(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, values);
-                                lista.addEstrenos(new Pelicula(l, p_bitmap, t, s, e, f, false));
+                                lista.addEstrenos(new Pelicula(l, p_bitmap, t, s, e, f, h.equals("T")));
 
                             }
                             values.clear();
@@ -342,6 +383,28 @@ public class HiloDescargarEstrenos extends AsyncTask<SQLiteDatabase,Integer,Void
                     publishProgress(pagina);
 
                 pagina++;
+            }
+            //Para la actualización fuerte de la cartelera hay que borrar a las antiguas. Para eso:
+            //He marcado con SIGUE a las que he encontrado
+            //Ahora borro las no marcadas
+            //Cambio los valores SIGUE por 0
+            if(actFuerte && estado){
+                String selection2 = FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE + " LIKE ?";
+                String[] selectionArgs2 = {"0"};
+                db[0].delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, selection2, selectionArgs2);
+
+                //Y esto pone un 0 donde antes había un 1
+                ContentValues values2 = new ContentValues();
+                values2.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 0);
+
+                String[] selectionArgs3 = { "1" };
+
+                int count = db[1].update(
+                        FeedReaderContract.FeedEntryCartelera.TABLE_NAME,
+                        values2,
+                        selection2,
+                        selectionArgs3);
+
             }
             estado = !estado;
         }while(!estado);

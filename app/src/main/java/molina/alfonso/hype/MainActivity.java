@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, FichaFragment.OnFragmentInteractionListener{
 
     /*
@@ -89,12 +91,48 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref.registerOnSharedPreferenceChangeListener(this);
 
+        //Se actualiza una vez cada dos días
+        //Cojo la fecha actual:
+        String year = "" + Calendar.getInstance().get(Calendar.YEAR);
+        int month_i = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        int day_i = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 
-        //Si es el primer uso se iniliaciza (parte 1)
+        String month;
+        String day;
+
+        if (month_i < 10)
+            month = "0" + month_i;
+        else
+            month = "" + month_i;
+
+        if (day_i < 10)
+            day = "0" + day_i;
+        else
+            day = "" + day_i;
+
+        String fecha_hoy = year + '/' + month + '/' + day;
+
+        //Y la guardada:
+        String fecha_guardada = sharedPref.getString("fecha","01/01/1990");
+        if (fecha_hoy.compareTo(fecha_guardada) > 0) {
+            //Se hace una actualización suave
+            HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(this, listaAdapter,
+                    ((LinearLayout) findViewById(R.id.carga_barra)),false);
+
+            hilo.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
+
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt("iniciado", 1);
+            editor.putString("fecha",fecha_hoy);
+            editor.apply();
+        }
+
+
+            //Si es el primer uso se iniliaciza (parte 1)
         if (sharedPref.getInt("iniciado",0)==0){
 
             HiloDescargarEstrenos hilo = new HiloDescargarEstrenos(this, listaAdapter,
-                    ((LinearLayout) findViewById(R.id.carga_barra)));
+                    ((LinearLayout) findViewById(R.id.carga_barra)),false);
 
             hilo.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
 
@@ -158,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //Actualiza las películas guardadas..
             case R.id.actualizar:
                 hilo = new HiloDescargarEstrenos(this, listaAdapter,
-                        ((LinearLayout) findViewById(R.id.carga_barra)));
+                        ((LinearLayout) findViewById(R.id.carga_barra)),true);
                 // Lanzamos el Thread que descargará la información.
                 hilo.execute(mDbHelper.getReadableDatabase(), mDbHelper.getWritableDatabase());
                 item.setEnabled(false);
