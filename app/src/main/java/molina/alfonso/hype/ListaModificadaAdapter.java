@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatImageButton;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,8 +32,6 @@ public class ListaModificadaAdapter extends ArrayAdapter{
     /*
      * Declaración de variables
      */
-
-    // TODO: AÑADIR BOTÓN DE COMPARTIR
 
     private static final String TAG = "ListaModificadaAdapter";
 
@@ -221,6 +220,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
             fila.findViewById(R.id.av_hype).setOnClickListener(get_hype);
             fila.findViewById(R.id.av_enlace).setOnClickListener(get_info);
             fila.findViewById(R.id.av_ficha).setOnClickListener(abre_ficha);
+            fila.findViewById(R.id.av_compartir).setOnClickListener(compartir);
 
             if (p.getisHyped()){
                 ((AppCompatImageButton) fila.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
@@ -315,7 +315,7 @@ public class ListaModificadaAdapter extends ArrayAdapter{
     }
 
 
-    View.OnClickListener abre_ficha = new View.OnClickListener(){
+    private View.OnClickListener abre_ficha = new View.OnClickListener(){
         @Override
         public void onClick(View view) {
             Log.i(TAG, "Pulsado botón de abrir fichaFragment");
@@ -463,6 +463,23 @@ public class ListaModificadaAdapter extends ArrayAdapter{
             // Lanzamos el intent
             getContext().startActivity(i);
             // profit!
+
+        }
+    };
+
+    private View.OnClickListener compartir = new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+            int position = expandido;
+            Pelicula p = lista.get(getPosicionReal(position));
+
+            Log.d(TAG, "Pulsado botón \"Share\" en película " + p.getTitulo());
+
+            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "He compartido \"" + p.getTitulo() + "\" a través de Hype!");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, p.getEnlace());
+            activity.startActivity(Intent.createChooser(sharingIntent, "Compartir película: " + p.getTitulo() + "."));
 
         }
     };
