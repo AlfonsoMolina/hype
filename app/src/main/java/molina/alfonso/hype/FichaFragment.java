@@ -32,6 +32,7 @@ public class FichaFragment extends Fragment {
     private String link;
 
     private Ficha ficha;
+    private ViewGroup contenedor;
 
     private OnFragmentInteractionListener mListener;
 
@@ -71,12 +72,15 @@ public class FichaFragment extends Fragment {
         // Inflate the layout for this fragment
         Log.i(TAG, "FichaFragment abierta");
 
+        contenedor = container;
+        contenedor.setVisibility(View.VISIBLE);
         return inflater.inflate(R.layout.fragment_ficha, container, false);
     }
 
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
 
         // Fijamos el título, ya conocido, para ir rellenando algo la ficha...
         ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
@@ -109,6 +113,7 @@ public class FichaFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        contenedor.setVisibility(View.GONE);
     }
 
     /**
