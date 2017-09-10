@@ -138,6 +138,19 @@
 
                 />
 
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/av_compartir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:src="@drawable/ic_share_black_24dp"
+                android:tint="@color/colorAppText"
+                android:backgroundTint="@color/colorWindowBackground"
+
+                />
         </LinearLayout>
 
     </LinearLayout>
