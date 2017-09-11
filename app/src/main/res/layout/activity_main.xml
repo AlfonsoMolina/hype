@@ -162,7 +162,7 @@
             android:dividerHeight="0.1dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:layoutAnimation="@anim/animacion_primera_apertura"
+            android:layoutAnimation="@anim/rellenar_lista"
             />
 
         <TextView

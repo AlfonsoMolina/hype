@@ -36,9 +36,9 @@ class ListaModificadaAdapter extends ArrayAdapter{
 
     private static final String TAG = "ListaModificadaAdapter";
 
-    private static final int HYPE = 0;
-    private static final int CARTELERA = 1;
-    private static final int ESTRENOS = 2;
+    public static final int HYPE = 0;
+    public static final int CARTELERA = 1;
+    public static final int ESTRENOS = 2;
 
     private ArrayList<Pelicula> mListaEstrenos = new ArrayList<>();  //Los elementos de la mListaEstrenos
     private ArrayList<Pelicula> mListaCartelera = new ArrayList<>();  //Los elementos de la mListaEstrenos
@@ -528,20 +528,34 @@ class ListaModificadaAdapter extends ArrayAdapter{
         return estado;
     }
 
-    void mostrarEstrenos(){
-        itemExpandido = -1;
-        estado = ESTRENOS;
-
+    boolean mostrarEstrenos(){
+        boolean haCambiado = false;
+        if (estado != ESTRENOS){
+            itemExpandido = -1;
+            estado = ESTRENOS;
+            haCambiado = true;
+        }
+        return haCambiado;
     }
 
-    void mostrarHype(){
-        itemExpandido = -1;
-        estado = HYPE;
+    boolean mostrarHype(){
+        boolean haCambiado = false;
+        if (estado != HYPE){
+            itemExpandido = -1;
+            estado = HYPE;
+            haCambiado = true;
+        }
+        return haCambiado;
     }
 
-    void mostrarCartelera(){
-        itemExpandido = -1;
-        estado = CARTELERA;
+    boolean mostrarCartelera(){
+        boolean haCambiado = false;
+        if (estado != CARTELERA){
+            itemExpandido = -1;
+            estado = CARTELERA;
+            haCambiado = true;
+        }
+        return haCambiado;
     }
 
     int getUltPagina() {

@@ -288,20 +288,28 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas hypeadas");
 
-        mListaModificadaAdapter.mostrarHype();
-        mInterfaz.seleccionaBotonHype();
-        mInterfaz.mostrarPaginador(false);
+        if (mListaModificadaAdapter.getEstado() != ListaModificadaAdapter.HYPE){
+            mInterfaz.animaListado();
+            mListaModificadaAdapter.mostrarHype();
+            mInterfaz.seleccionaBotonHype();
+            mInterfaz.mostrarPaginador(false);
 
-        //Si no hay ninguna guardada, se muestra un mensaje
-        if (mListaModificadaAdapter.getCount()== 0){
-            mInterfaz.mostrarNoHayPelis(true);
-        } else {
-            mInterfaz.mostrarNoHayPelis(false);
+            //Si no hay ninguna guardada, se muestra un mensaje
+            if (mListaModificadaAdapter.getCount()== 0){
+                mInterfaz.mostrarNoHayPelis(true);
+            } else {
+                mInterfaz.mostrarNoHayPelis(false);
+            }
+
+            mListaModificadaAdapter.setItemExpandido(-1);
+            mListaModificadaAdapter.notifyDataSetChanged();
+            mInterfaz.enfocaPrimerElementoBrusco();
+            ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+        }else{
+            mInterfaz.enfocaPrimerElementoSuave();
         }
 
-        mListaModificadaAdapter.setItemExpandido(-1);
-        mListaModificadaAdapter.notifyDataSetChanged();
-        ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+
 
     }
 
@@ -309,49 +317,61 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas de estreno");
 
-        mListaModificadaAdapter.mostrarCartelera();
-        mInterfaz.seleccionaBotonCartelera();
-        mInterfaz.mostrarPaginador(false);
+        if (mListaModificadaAdapter.getEstado() != ListaModificadaAdapter.CARTELERA) {
+            mInterfaz.animaListado();
+            mListaModificadaAdapter.mostrarCartelera();
+            mInterfaz.seleccionaBotonCartelera();
+            mInterfaz.mostrarPaginador(false);
 
-        if (mListaModificadaAdapter.getCount()== 0){
-            mInterfaz.mostrarPaginador(false);
-            mInterfaz.mostrarNoHayPelis(true);
-        } else if (mListaModificadaAdapter.getUltPagina() > 1){
-            mInterfaz.mostrarPaginador(true);
-            mInterfaz.mostrarNoHayPelis(false);
-        } else {
-            mInterfaz.mostrarPaginador(false);
-            mInterfaz.mostrarNoHayPelis(false);
+            if (mListaModificadaAdapter.getCount()== 0){
+                mInterfaz.mostrarPaginador(false);
+                mInterfaz.mostrarNoHayPelis(true);
+            } else if (mListaModificadaAdapter.getUltPagina() > 1){
+                mInterfaz.mostrarPaginador(true);
+                mInterfaz.mostrarNoHayPelis(false);
+            } else {
+                mInterfaz.mostrarPaginador(false);
+                mInterfaz.mostrarNoHayPelis(false);
+            }
+
+            mListaModificadaAdapter.setItemExpandido(-1);
+            mListaModificadaAdapter.notifyDataSetChanged();
+            mInterfaz.enfocaPrimerElementoBrusco();
+        }else{
+            mInterfaz.enfocaPrimerElementoSuave();
         }
-
-        mListaModificadaAdapter.setItemExpandido(-1);
-        mListaModificadaAdapter.notifyDataSetChanged();
-        mInterfaz.enfocaPrimerElemento();
-
     }
 
     public void mostrarEstrenos(View view){
 
         Log.d(TAG, "Mostrando películas de estreno");
 
-        mListaModificadaAdapter.mostrarEstrenos();
-        mInterfaz.seleccionaBotonEstrenos();
-        mInterfaz.mostrarPaginador(false);
+        if (mListaModificadaAdapter.getEstado() != ListaModificadaAdapter.ESTRENOS) {
 
-        if (mListaModificadaAdapter.getCount()== 0){
+            mInterfaz.animaListado();
+            mListaModificadaAdapter.mostrarEstrenos();
+
+            mInterfaz.seleccionaBotonEstrenos();
             mInterfaz.mostrarPaginador(false);
-            mInterfaz.mostrarNoHayPelis(true);
-        } else if (mListaModificadaAdapter.getUltPagina() > 1){
-            mInterfaz.mostrarPaginador(true);
-            mInterfaz.mostrarNoHayPelis(false);
-        } else {
-            mInterfaz.mostrarPaginador(false);
-            mInterfaz.mostrarNoHayPelis(false);
+
+            if (mListaModificadaAdapter.getCount()== 0){
+                mInterfaz.mostrarPaginador(false);
+                mInterfaz.mostrarNoHayPelis(true);
+            } else if (mListaModificadaAdapter.getUltPagina() > 1){
+                mInterfaz.mostrarPaginador(true);
+                mInterfaz.mostrarNoHayPelis(false);
+            } else {
+                mInterfaz.mostrarPaginador(false);
+                mInterfaz.mostrarNoHayPelis(false);
+            }
+
+            mListaModificadaAdapter.setItemExpandido(-1);
+            mListaModificadaAdapter.notifyDataSetChanged();
+            mInterfaz.enfocaPrimerElementoBrusco();
+
+        }else{
+            mInterfaz.enfocaPrimerElementoSuave();
         }
-
-        mListaModificadaAdapter.setItemExpandido(-1);
-        mListaModificadaAdapter.notifyDataSetChanged();
-        mInterfaz.enfocaPrimerElemento();
 
     }
 

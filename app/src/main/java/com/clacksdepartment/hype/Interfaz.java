@@ -2,13 +2,11 @@ package com.clacksdepartment.hype;
 
 import android.support.v4.content.ContextCompat;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-/**
- * Created by vicente on 9/9/17.
- */
 
 class Interfaz {
 
@@ -76,8 +74,18 @@ class Interfaz {
         }
     }
 
-    void enfocaPrimerElemento(){
+    void enfocaPrimerElementoSuave(){
         ((ListView) mMainActivity.findViewById(R.id.lista)).smoothScrollToPosition(0);
+    }
+
+    void enfocaPrimerElementoBrusco(){
+        ((ListView) mMainActivity.findViewById(R.id.lista)).setSelection(0);
+        mMainActivity.findViewById(R.id.lista).requestFocus();
+    }
+
+    void animaListado(){
+        LayoutAnimationController layoutAnimationController = AnimationUtils.loadLayoutAnimation(mMainActivity,R.anim.rellenar_lista);
+        ((ListView) mMainActivity.findViewById(R.id.lista)).setLayoutAnimation(layoutAnimationController);
     }
 
 }
