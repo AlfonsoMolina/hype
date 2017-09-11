@@ -22,7 +22,7 @@ import java.util.Calendar;
 
 /**
  * Adaptador creado para las diferentes listas. Tiene un comportamiento diferente
- * según la naturaleza de la mListaEstrenos.
+ * según la naturaleza de la lista.
  *
  * @author Alfonso Molina
  */
@@ -34,9 +34,9 @@ class ListaModificadaAdapter extends ArrayAdapter{
 
     private static final String TAG = "ListaModificadaAdapter";
 
-    static final int HYPE = 0;
-    static final int CARTELERA = 1;
-    static final int ESTRENOS = 2;
+    private static final int HYPE = 0;
+    private static final int CARTELERA = 1;
+    private static final int ESTRENOS = 2;
 
     private ArrayList<Pelicula> mListaEstrenos = new ArrayList<>();  //Los elementos de la mListaEstrenos
     private ArrayList<Pelicula> mListaCartelera = new ArrayList<>();  //Los elementos de la mListaEstrenos
@@ -218,11 +218,11 @@ class ListaModificadaAdapter extends ArrayAdapter{
             filaView.findViewById(R.id.avanzado).setVisibility(View.VISIBLE);
             ((TextView) filaView.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis());
 
-            filaView.findViewById(R.id.av_fecha).setOnClickListener(enviar_Calendario);
-            filaView.findViewById(R.id.av_hype).setOnClickListener(get_hype);
-            filaView.findViewById(R.id.av_enlace).setOnClickListener(get_info);
-            filaView.findViewById(R.id.av_ficha).setOnClickListener(abre_ficha);
-            filaView.findViewById(R.id.av_compartir).setOnClickListener(compartir);
+            filaView.findViewById(R.id.av_fecha).setOnClickListener(abrirCalendario);
+            filaView.findViewById(R.id.av_hype).setOnClickListener(marcarHype);
+            filaView.findViewById(R.id.av_enlace).setOnClickListener(abrirWeb);
+            filaView.findViewById(R.id.av_ficha).setOnClickListener(abrirFicha);
+            filaView.findViewById(R.id.av_compartir).setOnClickListener(abrirMenuCompartir);
 
             if (pelicula.getHype()){
                 ((AppCompatImageButton) filaView.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
@@ -301,7 +301,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
     }
 
 
-    private View.OnClickListener abre_ficha = new View.OnClickListener(){
+    private View.OnClickListener abrirFicha = new View.OnClickListener(){
         @Override
         public void onClick(View view) {
             Log.i(TAG, "Pulsado botón de abrir fichaFragment");
@@ -321,7 +321,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
     };
 
     //Envía la película al calendario en forma de evento
-    private View.OnClickListener enviar_Calendario = new View.OnClickListener() {
+    private View.OnClickListener abrirCalendario = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             int posicionRelativa = itemExpandido;
@@ -356,7 +356,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
     };
 
     //Guarda la película
-    private View.OnClickListener get_hype = new View.OnClickListener() {
+    private View.OnClickListener marcarHype = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
@@ -426,7 +426,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
     /*
      * Método llamado al pedir más info en una peli seleccionada.
      */
-    private View.OnClickListener get_info = new View.OnClickListener(){
+    private View.OnClickListener abrirWeb = new View.OnClickListener(){
 
         @Override
         public void onClick(View view) {
@@ -455,7 +455,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
         }
     };
 
-    private View.OnClickListener compartir = new View.OnClickListener(){
+    private View.OnClickListener abrirMenuCompartir = new View.OnClickListener(){
         @Override
         public void onClick(View view) {
             int position = itemExpandido;
@@ -479,7 +479,6 @@ class ListaModificadaAdapter extends ArrayAdapter{
 
         }
     };
-
 
     void pasarPagina(int i){
         if (estado == CARTELERA)
