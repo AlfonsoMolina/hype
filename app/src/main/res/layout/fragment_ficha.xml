@@ -10,6 +10,7 @@
     android:focusableInTouchMode="true"
     android:layout_margin="20dp"
     android:elevation="10dp"
+    android:layoutAnimation="@anim/fadein"
     >
 
         <LinearLayout

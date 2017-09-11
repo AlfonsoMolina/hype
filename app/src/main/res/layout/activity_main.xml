@@ -157,10 +157,11 @@
             android:id="@+id/lista"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@color/colorAppText"
-            android:dividerHeight="1dp"
+            android:divider="@color/colorAccent"
+            android:dividerHeight="0.1dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:layoutAnimation="@anim/animacion_primera_apertura"
             />
 
         <TextView
@@ -183,6 +184,7 @@
         android:layout_height="match_parent"
         android:clickable="true"
         android:visibility="gone"
+        android:animateLayoutChanges="true"
         >
     </FrameLayout>
 

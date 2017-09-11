@@ -60,6 +60,8 @@ class ListaModificadaAdapter extends ArrayAdapter{
 
     private FragmentManager mFragmentManager;
 
+    private ViewGroup viewGroup;
+
     /**
      * Constructor.
      * @param resourceID recurso con el layout de cada fila.
@@ -95,12 +97,14 @@ class ListaModificadaAdapter extends ArrayAdapter{
         switch (estado){
             case HYPE:
                 // Cuenta de peliculas hype en cartelera
-                for (int i = 0; (i < mListaCartelera.size()) && (mListaCartelera.get(i).getHype()); i++){
-                    cuenta++;
+                for (int i = 0; i < mListaCartelera.size(); i++){
+                    if (mListaCartelera.get(i).getHype())
+                        cuenta++;
                 }
                 // Cuenta de peliculas hype en estrenos
-                for (int i = 0; (i < mListaEstrenos.size()) && (mListaEstrenos.get(i).getHype()); i++){
-                    cuenta++;
+                for (int i = 0; i < mListaEstrenos.size(); i++){
+                    if (mListaEstrenos.get(i).getHype())
+                        cuenta++;
                 }
                 break;
             default:
@@ -521,6 +525,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
     void mostrarEstrenos(){
         itemExpandido = -1;
         estado = ESTRENOS;
+
     }
 
     void mostrarHype(){
