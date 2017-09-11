@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/logo_prov_byn"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:contentDescription="@string/logo_dscr"
         android:alpha="0.5"/>
 
@@ -40,6 +40,7 @@
         android:padding="0dp"
         android:elevation="4dp"
         android:layout_alignParentStart="true"
+
         >
         <LinearLayout
             android:layout_width="match_parent"
@@ -176,15 +177,12 @@
     </LinearLayout>
 
     <FrameLayout
-        tools:context="com.clacksdepartment.hype.FichaFragment"
         android:id="@+id/ficha_container"
         android:elevation="10dp"
-        android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
         android:visibility="gone"
-        android:animateLayoutChanges="true"
         >
     </FrameLayout>
 

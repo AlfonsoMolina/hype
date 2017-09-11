@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -324,9 +325,16 @@ class ListaModificadaAdapter extends ArrayAdapter{
                     pelicula = mListaCartelera.get(posicionAbsoluta);
             }else {
                 pelicula = (estado == CARTELERA ? mListaCartelera : mListaEstrenos).get(getPosicionAbsoluta(itemExpandido));
-            }            FichaFragment fichaFragment = FichaFragment.newInstance(pelicula.getTitulo(), pelicula.getEnlace());
+            }
+            FichaFragment fichaFragment = FichaFragment.newInstance(pelicula.getTitulo(), pelicula.getEnlace());
 
-            mFragmentManager.beginTransaction().replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();
+
+            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+
+            fragmentTransaction.setCustomAnimations(R.anim.abrir_ficha,R.anim.cerrar_ficha,R.anim.abrir_ficha,R.anim.cerrar_ficha);
+
+            fragmentTransaction.replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();
+
         }
     };
 

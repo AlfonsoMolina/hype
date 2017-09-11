@@ -74,6 +74,7 @@ public class FichaFragment extends Fragment {
 
         contenedor = container;
         contenedor.setVisibility(View.VISIBLE);
+
         return inflater.inflate(R.layout.fragment_ficha, container, false);
     }
 
@@ -113,6 +114,12 @@ public class FichaFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         contenedor.setVisibility(View.GONE);
     }
 
