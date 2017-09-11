@@ -61,8 +61,6 @@ class ListaModificadaAdapter extends ArrayAdapter{
 
     private FragmentManager mFragmentManager;
 
-    private ViewGroup viewGroup;
-
     /**
      * Constructor.
      * @param resourceID recurso con el layout de cada fila.
