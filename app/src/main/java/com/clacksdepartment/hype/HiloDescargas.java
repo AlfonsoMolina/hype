@@ -393,13 +393,13 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 ContentValues values2 = new ContentValues();
                 values2.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 0);
 
-                /*String[] selectionArgs3 = { "1" };
+                String[] selectionArgs3 = { "1" };
 
                 int count = db[1].update(
                         FeedReaderContract.FeedEntryCartelera.TABLE_NAME,
                         values2,
                         selection2,
-                        selectionArgs3);*/
+                        selectionArgs3);
 
             }
             estado = !estado;
