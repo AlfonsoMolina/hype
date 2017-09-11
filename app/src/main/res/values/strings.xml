@@ -10,7 +10,7 @@
     <string name="no_pelis">\n\nThere aren\'t any movie yet :(</string>
     <string name="cargando">Loading…</string>
     <string name="leyendo">Database is been read.\nWait a second…</string>
-    <string name="pref_pais">Countrie</string>
+    <string name="pref_pais">Country</string>
     <string name="pref_pais_def">uk</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ficha_titulo_default">Title</string>
@@ -25,4 +25,7 @@
     <string name="mas_info">+ info</string>
     <string name="enlace">link</string>
     <string name="logo_dscr">Logo</string>
+    <string name="texto_seccion_hype">Hyped!</string>
+    <string name="texto_seccion_cartelera">In theaters</string>
+    <string name="texto_seccion_estrenos">Coming soon</string>
 </resources>

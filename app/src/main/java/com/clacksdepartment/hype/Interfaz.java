@@ -1,6 +1,7 @@
 package com.clacksdepartment.hype;
 
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatImageButton;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
@@ -22,18 +23,22 @@ class Interfaz {
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.hype), true);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.cartelera), false);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.estrenos), false);
+        ((TextView) mMainActivity.findViewById(R.id.seccion)).setText(R.string.texto_seccion_hype);
+
     }
 
     void seleccionaBotonCartelera(){
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.hype), false);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.cartelera), true);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.estrenos), false);
+        ((TextView) mMainActivity.findViewById(R.id.seccion)).setText(R.string.texto_seccion_cartelera);
     }
 
     void seleccionaBotonEstrenos(){
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.hype), false);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.cartelera), false);
         coloreaBoton((ImageView) mMainActivity.findViewById(R.id.estrenos), true);
+        ((TextView) mMainActivity.findViewById(R.id.seccion)).setText(R.string.texto_seccion_estrenos);
     }
 
     void mostrarPaginador(Boolean mostrar){
