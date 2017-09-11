@@ -3,6 +3,7 @@ package com.clacksdepartment.hype;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.CalendarContract;
@@ -53,6 +54,8 @@ class ListaModificadaAdapter extends ArrayAdapter{
 
     private int itemExpandido = -1;                             //Posición del elemento itemExpandido
 
+    private FeedReaderDbHelper mFeedReaderDbHelper;
+
     private int estado = CARTELERA;
 
     private FragmentManager mFragmentManager;
@@ -71,6 +74,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
         ultimaPagEstrenos = 1;
         ultimaPagCartelera = 1;
         mFragmentManager = mainActivity.getSupportFragmentManager();
+        this.mFeedReaderDbHelper = feedReaderDbHelper;
         HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(feedReaderDbHelper.getReadableDatabase(), feedReaderDbHelper.getWritableDatabase(),this);
         hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         mInterfaz = new Interfaz(mainActivity, this);
@@ -273,15 +277,17 @@ class ListaModificadaAdapter extends ArrayAdapter{
     //Cuando haya una página nueva, mostrará el botón para pasar la página.
 
     void actualizarInterfaz(){
-        if (getCount()== 0){
-            mInterfaz.mostrarPaginador(false);
-            mInterfaz.mostrarNoHayPelis(true);
-        } else if (getUltPagina() > 1){
-            mInterfaz.mostrarPaginador(true);
-            mInterfaz.mostrarNoHayPelis(false);
-        } else {
-            mInterfaz.mostrarPaginador(false);
-            mInterfaz.mostrarNoHayPelis(false);
+        if (estado != HYPE) {
+            if (getCount() == 0) {
+                mInterfaz.mostrarPaginador(false);
+                mInterfaz.mostrarNoHayPelis(true);
+            } else if (getUltPagina() > 1) {
+                mInterfaz.mostrarPaginador(true);
+                mInterfaz.mostrarNoHayPelis(false);
+            } else {
+                mInterfaz.mostrarPaginador(false);
+                mInterfaz.mostrarNoHayPelis(false);
+            }
         }
     }
 
@@ -377,7 +383,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
                 pelicula = (estado == CARTELERA ? mListaCartelera : mListaEstrenos).get(getPosicionAbsoluta(posicionRelativa));
             }            Log.d(TAG, "Pulsado botón \"Hype\" en película " + pelicula.getTitulo());
 
-            //SQLiteDatabase dbw = mFeedReaderDbHelper.getWritableDatabase();
+            SQLiteDatabase dbw = mFeedReaderDbHelper.getWritableDatabase();
             ContentValues contentValues = new ContentValues();
             String isHyped;
 
@@ -394,7 +400,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
             if(BBDD == CARTELERA){
                 contentValues.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, isHyped);
 
-                /*
+
                 String selection = FeedReaderContract.FeedEntryCartelera.COLUMN_REF + " LIKE ?";
                 String[] selectionArgs = {pelicula.getEnlace()};
 
@@ -403,11 +409,11 @@ class ListaModificadaAdapter extends ArrayAdapter{
                         contentValues,
                         selection,
                         selectionArgs);
-                */
+
             }else {
                 contentValues.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, isHyped);
 
-                /*
+
                 String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF+ " LIKE ?";
                 String[] selectionArgs = {pelicula.getEnlace()};
 
@@ -416,7 +422,7 @@ class ListaModificadaAdapter extends ArrayAdapter{
                         contentValues,
                         selection,
                         selectionArgs);
-                */
+
             }
 
             notifyDataSetChanged();
