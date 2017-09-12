@@ -534,6 +534,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }else{
             notifyDataSetChanged();
             itemExpandido = -1;
+            if (getItemCount() == 0){
+                actualizarInterfaz();
+            }
         }
     }
 
