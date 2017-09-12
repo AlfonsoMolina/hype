@@ -28,16 +28,23 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
     private SQLiteDatabase dbr;
     private SQLiteDatabase dbw;
-    private ListaModificadaAdapter lista;
+    //private ListaModificadaAdapter lista;
+    private listaNueva lista;
 
     //El constructor necesita la bbdd, la mListaModificadaAdapter y la barra de progreso
-    public HiloLeerBBDD(SQLiteDatabase dbr, SQLiteDatabase dbw, ListaModificadaAdapter lista) {
+    /*public HiloLeerBBDD(SQLiteDatabase dbr, SQLiteDatabase dbw, ListaModificadaAdapter lista) {
+        Log.d(TAG, "Inicializando el hilo encargado de leer la BBDD");
+        this.dbr = dbr;
+        this.dbw = dbw;
+        this.lista = lista;
+    }*/
+    //El constructor necesita la bbdd, la mListaModificadaAdapter y la barra de progreso
+    public HiloLeerBBDD(SQLiteDatabase dbr, SQLiteDatabase dbw, listaNueva lista) {
         Log.d(TAG, "Inicializando el hilo encargado de leer la BBDD");
         this.dbr = dbr;
         this.dbw = dbw;
         this.lista = lista;
     }
-
     @Override
     protected Void doInBackground(Void... v) {
         Log.d(TAG, "Comenzando lectura de la BBDD");
@@ -190,10 +197,10 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
         Log.d(TAG, "Lectura finalizada, actualizando interfaz");
         lista.setMaxPaginas();
         lista.notifyDataSetChanged();
-        lista.actualizarInterfaz();
+    //    lista.actualizarInterfaz();
 
         //Se comprueba si no hay películas (primera ejecución), para mostrar un emnsaje.
-        lista.noHayPelis();
+   //     lista.noHayPelis();
     }
 
 }

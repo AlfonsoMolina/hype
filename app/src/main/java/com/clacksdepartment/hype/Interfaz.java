@@ -2,6 +2,7 @@ package com.clacksdepartment.hype;
 
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatImageButton;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
@@ -12,9 +13,15 @@ import android.widget.TextView;
 class Interfaz {
 
     private MainActivity mMainActivity;
-    private ListaModificadaAdapter mListaModificadaAdapter;
+//    private ListaModificadaAdapter mListaModificadaAdapter;
+    private listaNueva mListaModificadaAdapter;
 
-    Interfaz(MainActivity mainActivity, ListaModificadaAdapter listaModificadaAdapter){
+  /*  Interfaz(MainActivity mainActivity, ListaModificadaAdapter listaModificadaAdapter){
+        this.mMainActivity = mainActivity;
+        this.mListaModificadaAdapter = listaModificadaAdapter;
+    }*/
+
+    Interfaz(MainActivity mainActivity, listaNueva listaModificadaAdapter){
         this.mMainActivity = mainActivity;
         this.mListaModificadaAdapter = listaModificadaAdapter;
     }
@@ -80,17 +87,17 @@ class Interfaz {
     }
 
     void enfocaPrimerElementoSuave(){
-        ((ListView) mMainActivity.findViewById(R.id.lista)).smoothScrollToPosition(0);
+        ((RecyclerView) mMainActivity.findViewById(R.id.lista)).smoothScrollToPosition(0);
     }
 
     void enfocaPrimerElementoBrusco(){
-        ((ListView) mMainActivity.findViewById(R.id.lista)).setSelection(0);
+        //((RecyclerView) mMainActivity.findViewById(R.id.lista)).setSelection(0);
         mMainActivity.findViewById(R.id.lista).requestFocus();
     }
 
     void animaListado(){
         LayoutAnimationController layoutAnimationController = AnimationUtils.loadLayoutAnimation(mMainActivity,R.anim.rellenar_lista);
-        ((ListView) mMainActivity.findViewById(R.id.lista)).setLayoutAnimation(layoutAnimationController);
+        ((RecyclerView) mMainActivity.findViewById(R.id.lista)).setLayoutAnimation(layoutAnimationController);
     }
 
 }

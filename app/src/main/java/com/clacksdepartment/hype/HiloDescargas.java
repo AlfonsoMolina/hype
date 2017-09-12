@@ -54,12 +54,12 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
     private boolean actFuerte;      //Si es True, se borra la bbdd y se cargan de nuevo.
 
     //Lista que guardará las películas
-    private ListaModificadaAdapter lista;
+    private listaNueva lista;
 
     //Elementos del layout para la barra de carga
     private LinearLayout carga_barra;
 
-    HiloDescargas(Context context, ListaModificadaAdapter lista, LinearLayout carga_barra, boolean act) {
+    HiloDescargas(Context context, listaNueva lista, LinearLayout carga_barra, boolean act) {
         Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
         this.lista = lista;
         this.carga_barra = carga_barra;

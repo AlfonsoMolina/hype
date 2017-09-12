@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:padding="5dip"
     android:id="@+id/contenedor"
-    android:theme="@style/AppTheme">
+    android:theme="@style/AppTheme"
+    android:onClick="mostrarAvanzado">
 
     <LinearLayout
         android:id="@+id/basico"
@@ -96,6 +97,7 @@
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:gravity="center"
+                android:onClick="enviarCalendario"
                 />
 
             <android.support.v7.widget.AppCompatImageButton
@@ -109,6 +111,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
+                android:onClick="abrirFicha"
                 />
 
             <android.support.v7.widget.AppCompatImageButton
@@ -122,6 +125,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
+                android:onClick="marcarHype"
                 />
 
             <android.support.v7.widget.AppCompatImageButton
@@ -135,7 +139,7 @@
                 android:src="@drawable/ic_link_black_24dp"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
-
+                android:onClick="abrirWeb"
                 />
 
             <android.support.v7.widget.AppCompatImageButton
@@ -149,7 +153,7 @@
                 android:src="@drawable/ic_share_black_24dp"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
-
+                android:onClick="abrirMenuCompartir"
                 />
         </LinearLayout>
 

@@ -9,12 +9,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,11 +34,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private static final String TAG = "MainActivity";
 
-    private ListaModificadaAdapter mListaModificadaAdapter;
+   // private ListaModificadaAdapter mListaModificadaAdapter;
     private FeedReaderDbHelper mFeedReaderDbHelper;
     private HiloDescargas mHiloDescargas;
     private Interfaz mInterfaz;
     private Menu mMenu;
+
+
+    private RecyclerView mRecyclerView;
+    private listaNueva mListaModificadaAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     /*
      * Métodos override
@@ -61,54 +67,29 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // Creamos el helper de la BBDD
         mFeedReaderDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
-        // Hook de la mListaModificadaAdapter
-        ListView listView = (ListView) findViewById(R.id.lista);
 
-        //Se le manda a la mListaModificadaAdapter esta actividad, para poder modificar la interfaz,
-        //el layout de la row y la bbdd
-        mListaModificadaAdapter = new ListaModificadaAdapter(this, R.layout.fila, mFeedReaderDbHelper);
+        mRecyclerView = (RecyclerView) findViewById(R.id.lista);
 
-        // Setup de la mListaModificadaAdapter
-        listView.setAdapter(mListaModificadaAdapter);
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        listView.setItemsCanFocus(false);
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
 
-        //Al pulsar en una fila se expande y muestra más información.
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mListaModificadaAdapter.setItemExpandido(position);
-                mListaModificadaAdapter.notifyDataSetChanged();
-            }
-        });
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        // specify an adapter (see also next example)
+        mListaModificadaAdapter = new listaNueva(this, R.layout.fila, mFeedReaderDbHelper);
+        mRecyclerView.setAdapter(mListaModificadaAdapter);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        //Se actualiza una vez cada dos días
-        //Cojo la fecha actual:
-        String ano = "" + Calendar.getInstance().get(Calendar.YEAR);
-        int mesTemp = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        int diaTemp = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-
-        String mes;
-        String dia;
-
-        if (mesTemp < 10)
-            mes = "0" + mesTemp;
-        else
-            mes = "" + mesTemp;
-
-        if (diaTemp < 10)
-            dia = "0" + diaTemp;
-        else
-            dia = "" + diaTemp;
-
-        String fechaHoy = ano + '/' + mes + '/' + dia;
-
-        //Y la guardada:
-        String fechaGuardada = sharedPreferences.getString("fecha","01/01/1990");
-        if (fechaHoy.compareTo(fechaGuardada) > 0) {
+        //Se actualiza una vez al día
+        int diaHoy = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+        //int semanaHoy = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
+        int diaGuardado = sharedPreferences.getInt("dia",0);
+        if (diaHoy > diaGuardado) {
             //Se hace una actualización suave
             mHiloDescargas = new HiloDescargas(this, mListaModificadaAdapter,
                     ((LinearLayout) findViewById(R.id.carga_barra)),false);
@@ -117,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
             sharedPreferencesEditor.putInt("iniciado", 1);
-            sharedPreferencesEditor.putString("fecha",fechaHoy);
+            sharedPreferencesEditor.putInt("fecha",diaHoy);
             sharedPreferencesEditor.apply();
         }
 
@@ -295,16 +276,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.mostrarPaginador(false);
 
             //Si no hay ninguna guardada, se muestra un mensaje
-            if (mListaModificadaAdapter.getCount()== 0){
+         /*   if (mListaModificadaAdapter.getCount()== 0){
                 mInterfaz.mostrarNoHayPelis(true);
             } else {
                 mInterfaz.mostrarNoHayPelis(false);
-            }
+            }*/
 
-            mListaModificadaAdapter.setItemExpandido(-1);
+            mListaModificadaAdapter.noHayPelis();
+
+            //mListaModificadaAdapter.setItemExpandido(-1);
             mListaModificadaAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
-            ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+            ((RecyclerView) findViewById(R.id.lista)).smoothScrollToPosition(0);
         }else{
             mInterfaz.enfocaPrimerElementoSuave();
         }
@@ -322,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mListaModificadaAdapter.mostrarCartelera();
             mInterfaz.seleccionaBotonCartelera();
             mInterfaz.mostrarPaginador(false);
-
+/*
             if (mListaModificadaAdapter.getCount()== 0){
                 mInterfaz.mostrarPaginador(false);
                 mInterfaz.mostrarNoHayPelis(true);
@@ -332,9 +315,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             } else {
                 mInterfaz.mostrarPaginador(false);
                 mInterfaz.mostrarNoHayPelis(false);
-            }
+            }*/
 
-            mListaModificadaAdapter.setItemExpandido(-1);
+            mListaModificadaAdapter.actualizarInterfaz();
+
+            //mListaModificadaAdapter.setItemExpandido(-1);
             mListaModificadaAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
         }else{
@@ -354,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.seleccionaBotonEstrenos();
             mInterfaz.mostrarPaginador(false);
 
-            if (mListaModificadaAdapter.getCount()== 0){
+           /* if (mListaModificadaAdapter.getCount()== 0){
                 mInterfaz.mostrarPaginador(false);
                 mInterfaz.mostrarNoHayPelis(true);
             } else if (mListaModificadaAdapter.getUltPagina() > 1){
@@ -363,16 +348,40 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             } else {
                 mInterfaz.mostrarPaginador(false);
                 mInterfaz.mostrarNoHayPelis(false);
-            }
+            }*/
 
-            mListaModificadaAdapter.setItemExpandido(-1);
+           mListaModificadaAdapter.actualizarInterfaz();
+
+            //mListaModificadaAdapter.setItemExpandido(-1);
             mListaModificadaAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
 
         }else{
             mInterfaz.enfocaPrimerElementoSuave();
         }
-
     }
 
+
+    public void mostrarAvanzado(View view){
+        mListaModificadaAdapter.setItemExpandido(view);
+    }
+    public void marcarHype(View view){
+        mListaModificadaAdapter.marcarHype(view);
+     }
+
+    public void enviarCalendario(View view) {
+        startActivity(mListaModificadaAdapter.abrirCalendario());
+    }
+
+    public void abrirFicha(View view) {
+        mListaModificadaAdapter.abrirFicha();
+    }
+
+    public void abrirWeb(View view) {
+        startActivity(mListaModificadaAdapter.abrirWeb());
+    }
+
+    public void abrirMenuCompartir(View view) {
+        mListaModificadaAdapter.abrirMenuCompartir();
+    }
 }

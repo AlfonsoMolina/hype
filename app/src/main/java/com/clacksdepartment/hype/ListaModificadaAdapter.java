@@ -76,9 +76,9 @@ class ListaModificadaAdapter extends ArrayAdapter{
         ultimaPagCartelera = 1;
         mFragmentManager = mainActivity.getSupportFragmentManager();
         this.mFeedReaderDbHelper = feedReaderDbHelper;
-        HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(feedReaderDbHelper.getReadableDatabase(), feedReaderDbHelper.getWritableDatabase(),this);
-        hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        mInterfaz = new Interfaz(mainActivity, this);
+   //     HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(feedReaderDbHelper.getReadableDatabase(), feedReaderDbHelper.getWritableDatabase(),this);
+    //    hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+     //   mInterfaz = new Interfaz(mainActivity, this);
     }
 
     /**
