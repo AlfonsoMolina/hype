@@ -529,8 +529,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         //}
 
-        //notifyItemChanged(itemExpandido);
-        notifyDataSetChanged();
+        if (estado != HYPE) {
+            notifyItemChanged(itemExpandido);
+        }else{
+            notifyDataSetChanged();
+            itemExpandido = -1;
+        }
     }
 
     /*
