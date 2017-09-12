@@ -3,6 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:padding="5dip"
     android:id="@+id/contenedor"
     android:onClick="mostrarAvanzado">
@@ -85,7 +86,7 @@
             android:descendantFocusability="blocksDescendants"
             >
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/av_fecha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -99,7 +100,7 @@
                 android:onClick="enviarCalendario"
                 />
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/av_ficha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -113,7 +114,7 @@
                 android:onClick="abrirFicha"
                 />
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/av_hype"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -141,7 +142,7 @@
                 android:onClick="abrirWeb"
                 />
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/av_compartir"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
