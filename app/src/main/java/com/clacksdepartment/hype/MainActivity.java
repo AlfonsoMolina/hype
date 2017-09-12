@@ -101,20 +101,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             sharedPreferencesEditor.apply();
         }
 
-
-            //Si es el primer uso se iniliaciza (parte 1)
-        if (sharedPreferences.getInt("iniciado",0)==0){
-
-            mHiloDescargas = new HiloDescargas(this, mListaModificadaAdapter,
-                    ((LinearLayout) findViewById(R.id.carga_barra)),false);
-
-            mHiloDescargas.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
-
-            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-            sharedPreferencesEditor.putInt("iniciado", 1);
-            sharedPreferencesEditor.apply();
-        }
-
         mInterfaz = new Interfaz(this, mListaModificadaAdapter);
         mInterfaz.seleccionaBotonCartelera();
 
@@ -176,6 +162,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 selectedItem.setVisible(false);
                 mMenu.findItem(R.id.cancelar).setEnabled(true);
                 mMenu.findItem(R.id.cancelar).setVisible(true);
+
+                mListaModificadaAdapter.reiniciarPagina();
+                mInterfaz.mostrarPaginador(false);
                 return true;
 
             case R.id.cancelar:

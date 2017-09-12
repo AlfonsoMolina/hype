@@ -10,7 +10,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/logo_prov_byn"
+        android:src="@drawable/popcorn_byn_peque"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:contentDescription="@string/logo_dscr"
@@ -171,15 +171,6 @@
             android:layoutAnimation="@anim/rellenar_lista"
             />
 
-        <TextView
-            android:id="@+id/carga_mensaje"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/cargando"
-            android:textAlignment="center"
-            android:visibility="gone"
-            />
-
     </LinearLayout>
 
     <FrameLayout
@@ -204,6 +195,11 @@
             android:orientation="horizontal"
             android:baselineAligned="false">
 
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorWindowBackground"/>
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

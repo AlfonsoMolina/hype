@@ -258,6 +258,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         itemExpandido = -1;
     }
 
+    void reiniciarPagina(){
+        paginaCartelera = 0;
+        paginaEstrenos = 0;
+    }
+
     int getPagina(){
         if (estado == CARTELERA)
             return paginaCartelera;
@@ -267,10 +272,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             return 0;
     }
 
-    void setMaxPaginas() {
-        this.ultimaPagEstrenos = mListaEstrenos.size() / numPeliculasPorPagina;
-        this.ultimaPagCartelera = mListaCartelera.size() / numPeliculasPorPagina;
-    }
 
     void addCartelera(Pelicula p){
         int ultPagina = mListaCartelera.size() -1;
@@ -294,7 +295,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             mListaEstrenos.get(ultPagina+1).add(p);
         }
         if (estado == ESTRENOS && paginaEstrenos == (mListaEstrenos.size()-1)){
-            notifyItemInserted(mListaEstrenos.get(mListaCartelera.size()-1).size()-1);
+            notifyItemInserted(mListaEstrenos.get(mListaEstrenos.size()-1).size()-1);
         }
     }
 
@@ -327,6 +328,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
+    void mostrarNoPelis(boolean b){
+        mInterfaz.mostrarNoHayPelis(false);
+    }
     void actualizarInterfaz(){
         if (estado != HYPE) {
             if (getItemCount() == 0 ) {

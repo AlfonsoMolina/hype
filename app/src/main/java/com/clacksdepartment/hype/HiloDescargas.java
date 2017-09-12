@@ -129,6 +129,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
                 if (html != null) {
 
+
                     //Se parte el HTML en la división entre las películas
                     String[] peliculasHTML = html.split("-item\" href=\"");
                     String l;
@@ -334,6 +335,10 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
                                 //Y se insertan en la bbdd y en la mListaModificadaAdapter de películas de la mListaModificadaAdapter
                                 db[1].insert(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, values);
+                                //Si es la primera página que se hace, se hace esto para quitar el noPelis.
+                                //Es lo único que se me ha ocurrido.
+                                if(pagina == 1)
+                                    publishProgress(-2);
                                 lista.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, h.equals("T")));
 
 
@@ -363,6 +368,10 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
                                 //Y se insertan en la bbdd y en la mListaModificadaAdapter de películas de la mListaModificadaAdapter
                                 db[1].insert(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, values);
+                                //Si es la primera página que se hace, se hace esto para quitar el noPelis.
+                                //Es lo único que se me ha ocurrido.
+                                if(pagina == 1)
+                                    publishProgress(-2);
                                 lista.addEstrenos(new Pelicula(l, p_bitmap, t, s, e, f, h.equals("T")));
 
                             }
@@ -438,13 +447,16 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
     @Override
     protected void onProgressUpdate(Integer... i) {
         Log.d(TAG, "Descarga al " + ((i[0]+1)*10) + "%");
-        if (i[0] == 0){
+        if (i[0] == -2)
+            lista.mostrarNoPelis(false);
+        else if (i[0] == 0){
             for(int j = 0; j < 9; j++)
                 carga_barra.getChildAt(j).setBackgroundColor(Color.parseColor("#455a64"));
             carga_barra.setVisibility(View.VISIBLE);
+            carga_barra.getChildAt(0).setBackgroundColor(Color.parseColor("#37474f"));
+            lista.actualizarInterfaz();
         } else {
-            carga_barra.getChildAt(i[0] - 1).setBackgroundColor(Color.parseColor("#37474f"));
-            lista.setMaxPaginas();
+            carga_barra.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#37474f"));
             //lista.notifyDataSetChanged();
             lista.actualizarInterfaz();
         }
@@ -457,7 +469,6 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
         Log.d(TAG, "Descarga finalizada, actualizando interfaz");
         //lista.notifyDataSetChanged();
 
-        lista.setMaxPaginas();
         lista.actualizarInterfaz();
         lista.noHayPelis(); //Y esto de chanchullo para quitar el X
         carga_barra.setVisibility(View.GONE);
@@ -467,7 +478,6 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
     protected void onCancelled(Void v){
         Log.d(TAG, "Descarga cancelada, actualizando interfaz");
         //lista.notifyDataSetChanged();
-        lista.setMaxPaginas();
         lista.actualizarInterfaz();
         lista.noHayPelis(); //Y esto de chanchullo para quitar el X
         carga_barra.setVisibility(View.GONE);

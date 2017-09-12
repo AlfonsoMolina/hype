@@ -195,7 +195,6 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
     @Override
     protected void onPostExecute(Void v) {
         Log.d(TAG, "Lectura finalizada, actualizando interfaz");
-        lista.setMaxPaginas();
         //lista.notifyDataSetChanged();
         lista.actualizarInterfaz();
 
