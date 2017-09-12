@@ -5,8 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:theme="@style/AppTheme">
+    android:layout_height="match_parent">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -15,7 +14,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:contentDescription="@string/logo_dscr"
-        android:alpha="0.5"/>
+        android:alpha="0.2"/>
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
@@ -167,8 +166,6 @@
             android:id="@+id/lista"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@color/colorAccent"
-            android:dividerHeight="0.1dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:layoutAnimation="@anim/rellenar_lista"

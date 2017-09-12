@@ -296,8 +296,11 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                                 }
 
                             }
+
                             // Me cargo sangrías y cosas raras
                             s = s.trim();
+                            t = t.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " ").replace("<br />", "\n");
+                            s = s.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " ").replace("<br />", "\n");
 
                             if (estado) {
 

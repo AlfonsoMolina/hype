@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
             //porque se ha cogido del adaptador. Así que, se queda igual.
-            mInterfaz.enfocaPrimerElementoSuave();
+            mInterfaz.enfocaPrimerElementoBrusco();
             if (pagina == 1) {
                 findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
             }
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
             //porque se ha cogido del adaptador.
-            mInterfaz.enfocaPrimerElementoSuave();
+            mInterfaz.enfocaPrimerElementoBrusco();
             if (pagina+2 == mListaModificadaAdapter.getUltPagina()) {
                 findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
             }
