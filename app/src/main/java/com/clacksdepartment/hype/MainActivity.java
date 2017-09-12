@@ -17,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
 
     private RecyclerView mRecyclerView;
-    private listaNueva mListaModificadaAdapter;
+    private RecyclerViewAdapter mListaModificadaAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     /*
@@ -79,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mListaModificadaAdapter = new listaNueva(this, R.layout.fila, mFeedReaderDbHelper);
+        mListaModificadaAdapter = new RecyclerViewAdapter(this, R.layout.fila, mFeedReaderDbHelper);
         mRecyclerView.setAdapter(mListaModificadaAdapter);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -276,11 +275,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.mostrarPaginador(false);
 
             //Si no hay ninguna guardada, se muestra un mensaje
-         /*   if (mListaModificadaAdapter.getCount()== 0){
-                mInterfaz.mostrarNoHayPelis(true);
-            } else {
-                mInterfaz.mostrarNoHayPelis(false);
-            }*/
+
+            mListaModificadaAdapter.actualizarInterfaz();
 
             mListaModificadaAdapter.noHayPelis();
 
@@ -305,18 +301,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mListaModificadaAdapter.mostrarCartelera();
             mInterfaz.seleccionaBotonCartelera();
             mInterfaz.mostrarPaginador(false);
-/*
-            if (mListaModificadaAdapter.getItemCount()== 0){
-                mInterfaz.mostrarPaginador(false);
-                mInterfaz.mostrarNoHayPelis(true);
-            } else if (mListaModificadaAdapter.getUltPagina() > 1){
-                mInterfaz.mostrarPaginador(true);
-                mInterfaz.mostrarNoHayPelis(false);
-            } else {
-                mInterfaz.mostrarPaginador(false);
-                mInterfaz.mostrarNoHayPelis(false);
-            }
-*/
+
             mListaModificadaAdapter.actualizarInterfaz();
 
             //mListaModificadaAdapter.setItemExpandido(-1);
@@ -338,19 +323,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             mInterfaz.seleccionaBotonEstrenos();
             mInterfaz.mostrarPaginador(false);
-            /*
-            if (mListaModificadaAdapter.getItemCount()== 0){
-                mInterfaz.mostrarPaginador(false);
-                mInterfaz.mostrarNoHayPelis(true);
-            } else if (mListaModificadaAdapter.getUltPagina() > 1){
-                mInterfaz.mostrarPaginador(true);
-                mInterfaz.mostrarNoHayPelis(false);
-            } else {
-                mInterfaz.mostrarPaginador(false);
-                mInterfaz.mostrarNoHayPelis(false);
-            }
-            */
-           mListaModificadaAdapter.actualizarInterfaz();
+
+            mListaModificadaAdapter.actualizarInterfaz();
 
             //mListaModificadaAdapter.setItemExpandido(-1);
             mListaModificadaAdapter.notifyDataSetChanged();

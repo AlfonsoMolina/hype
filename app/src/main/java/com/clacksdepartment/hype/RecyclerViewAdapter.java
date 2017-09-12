@@ -1,6 +1,5 @@
 package com.clacksdepartment.hype;
 
-import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,23 +14,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Calendar;
-
-import static java.security.AccessController.getContext;
 
 /**
  * Created by Usuario on 12/09/2017.
  */
 
-public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "listaNueva";
 
@@ -78,7 +72,7 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
 
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public listaNueva (MainActivity mainActivity, int resourceID, FeedReaderDbHelper feedReaderDbHelper) {
+    public RecyclerViewAdapter(MainActivity mainActivity, int resourceID, FeedReaderDbHelper feedReaderDbHelper) {
         mListaCartelera = new ArrayList<>();
         mListaEstrenos = new ArrayList<>();
         Log.d(TAG, "Construyendo el adaptador de la mListaEstrenos");
@@ -95,8 +89,8 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
 
     // Create new views (invoked by the layout manager)
     @Override
-    public listaNueva.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
+    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                             int viewType) {
         // create a new view
         RelativeLayout v = (RelativeLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fila, parent, false);
@@ -334,7 +328,7 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
 
     void actualizarInterfaz(){
         if (estado != HYPE) {
-            if ((estado == CARTELERA? mListaCartelera.size():mListaEstrenos.size()) == 0 ) {
+            if (getItemCount() == 0 ) {
                 mInterfaz.mostrarPaginador(false);
                 mInterfaz.mostrarNoHayPelis(true);
             } else if (getUltPagina() > 1) {
@@ -342,6 +336,13 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
                 mInterfaz.mostrarNoHayPelis(false);
             } else {
                 mInterfaz.mostrarPaginador(false);
+                mInterfaz.mostrarNoHayPelis(false);
+            }
+        }else{
+            mInterfaz.mostrarPaginador(false);
+            if (getItemCount() == 0) {
+                mInterfaz.mostrarNoHayPelis(true);
+            } else {
                 mInterfaz.mostrarNoHayPelis(false);
             }
         }
@@ -481,8 +482,6 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
     //Guarda la película
     public void marcarHype (View v) {
 
-        int BBDD = estado;
-
         Pelicula pelicula = getPelicula(itemExpandido);
 
         Log.d(TAG, "Pulsado botón \"Hype\" en película " + pelicula.getTitulo());
@@ -501,32 +500,34 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
             ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
 
-        if (BBDD == CARTELERA) {
+        //if (estado == CARTELERA) {
+
+        // Primero intentamos en la bbdd de cartelera...
             contentValues.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, isHyped);
 
             String selection = FeedReaderContract.FeedEntryCartelera.COLUMN_REF + " LIKE ?";
             String[] selectionArgs = {pelicula.getEnlace()};
 
-            int count = dbw.update(
+            dbw.update(
                     FeedReaderContract.FeedEntryCartelera.TABLE_NAME,
                     contentValues,
                     selection,
                     selectionArgs);
 
-        } else {
+        //} else {
+        // luego en la bbdd de hype
             contentValues.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, isHyped);
 
+            selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
+            //String[] selectionArgs = {pelicula.getEnlace()};
 
-            String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
-            String[] selectionArgs = {pelicula.getEnlace()};
-
-            int count = dbw.update(
+            dbw.update(
                     FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,
                     contentValues,
                     selection,
                     selectionArgs);
 
-        }
+        //}
 
         //notifyItemChanged(itemExpandido);
         notifyDataSetChanged();

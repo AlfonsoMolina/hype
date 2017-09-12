@@ -12,16 +12,16 @@ class Interfaz {
 
     private MainActivity mMainActivity;
 //    private ListaModificadaAdapter mListaNueva;
-    private listaNueva mListaNueva;
+    private RecyclerViewAdapter mRecyclerViewAdapter;
 
   /*  Interfaz(MainActivity mainActivity, ListaModificadaAdapter listaModificadaAdapter){
         this.mMainActivity = mainActivity;
         this.mListaNueva = listaModificadaAdapter;
     }*/
 
-    Interfaz(MainActivity mainActivity, listaNueva listaNueva){
+    Interfaz(MainActivity mainActivity, RecyclerViewAdapter RecyclerViewAdapter){
         this.mMainActivity = mainActivity;
-        this.mListaNueva = listaNueva;
+        this.mRecyclerViewAdapter = RecyclerViewAdapter;
     }
 
     void seleccionaBotonHype(){
@@ -49,7 +49,7 @@ class Interfaz {
     void mostrarPaginador(Boolean mostrar){
         if (mostrar){
             mMainActivity.findViewById(R.id.paginador).setVisibility(View.VISIBLE);
-            int pagina = mListaNueva.getPagina();
+            int pagina = mRecyclerViewAdapter.getPagina();
             String txt = "" + (pagina+1);
             ((TextView) mMainActivity.findViewById(R.id.paginaActual)).setText(txt);
 
@@ -59,7 +59,7 @@ class Interfaz {
             if (pagina == 0)
                 mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
 
-            if (pagina+1 == mListaNueva.getUltPagina())
+            if (pagina+1 == mRecyclerViewAdapter.getUltPagina())
                 mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
 
         }else{
