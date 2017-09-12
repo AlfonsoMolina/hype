@@ -196,8 +196,8 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
     protected void onPostExecute(Void v) {
         Log.d(TAG, "Lectura finalizada, actualizando interfaz");
         lista.setMaxPaginas();
-        lista.notifyDataSetChanged();
-    //    lista.actualizarInterfaz();
+        //lista.notifyDataSetChanged();
+        lista.actualizarInterfaz();
 
         //Se comprueba si no hay películas (primera ejecución), para mostrar un emnsaje.
    //     lista.noHayPelis();

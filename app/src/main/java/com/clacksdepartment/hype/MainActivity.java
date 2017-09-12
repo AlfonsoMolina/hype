@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
             sharedPreferencesEditor.putInt("iniciado", 1);
-            sharedPreferencesEditor.putInt("fecha",diaHoy);
+            sharedPreferencesEditor.putInt("dia",diaHoy);
             sharedPreferencesEditor.apply();
         }
 
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
             //porque se ha cogido del adaptador. Así que, se queda igual.
-            ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+            mInterfaz.enfocaPrimerElementoSuave();
             if (pagina == 1) {
                 findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
             }
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
             //porque se ha cogido del adaptador.
-            ((ListView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+            mInterfaz.enfocaPrimerElementoSuave();
             if (pagina+2 == mListaModificadaAdapter.getUltPagina()) {
                 findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
             }
@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.seleccionaBotonCartelera();
             mInterfaz.mostrarPaginador(false);
 /*
-            if (mListaModificadaAdapter.getCount()== 0){
+            if (mListaModificadaAdapter.getItemCount()== 0){
                 mInterfaz.mostrarPaginador(false);
                 mInterfaz.mostrarNoHayPelis(true);
             } else if (mListaModificadaAdapter.getUltPagina() > 1){
@@ -315,8 +315,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             } else {
                 mInterfaz.mostrarPaginador(false);
                 mInterfaz.mostrarNoHayPelis(false);
-            }*/
-
+            }
+*/
             mListaModificadaAdapter.actualizarInterfaz();
 
             //mListaModificadaAdapter.setItemExpandido(-1);
@@ -338,8 +338,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             mInterfaz.seleccionaBotonEstrenos();
             mInterfaz.mostrarPaginador(false);
-
-           /* if (mListaModificadaAdapter.getCount()== 0){
+            /*
+            if (mListaModificadaAdapter.getItemCount()== 0){
                 mInterfaz.mostrarPaginador(false);
                 mInterfaz.mostrarNoHayPelis(true);
             } else if (mListaModificadaAdapter.getUltPagina() > 1){
@@ -348,8 +348,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             } else {
                 mInterfaz.mostrarPaginador(false);
                 mInterfaz.mostrarNoHayPelis(false);
-            }*/
-
+            }
+            */
            mListaModificadaAdapter.actualizarInterfaz();
 
             //mListaModificadaAdapter.setItemExpandido(-1);

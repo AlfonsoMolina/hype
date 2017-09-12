@@ -33,7 +33,7 @@ import static java.security.AccessController.getContext;
 
 public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
 
-    private static final String TAG = "ListaModificadaAdapter";
+    private static final String TAG = "listaNueva";
 
     public static final int HYPE = 0;
     public static final int CARTELERA = 1;
@@ -195,9 +195,7 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
                     }
                 }
             }
-
             return count;
-
         }
 
         else if (estado == CARTELERA) {
@@ -250,9 +248,9 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
 
     int getUltPagina() {
         if (estado==CARTELERA)
-            return ultimaPagCartelera;
+            return mListaCartelera.size();
         else if (estado==ESTRENOS)
-            return ultimaPagEstrenos;
+            return mListaEstrenos.size();
         else
             return 0;
     }
@@ -287,7 +285,10 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
             mListaCartelera.add(new ArrayList<Pelicula>());
             mListaCartelera.get(ultPagina+1).add(p);
         }
-
+        // Si estamos en la sección y la página donde se han añadido los datos:
+        if (estado == CARTELERA && paginaCartelera == (mListaCartelera.size()-1)){
+            notifyItemInserted(mListaCartelera.get(mListaCartelera.size()-1).size()-1);
+        }
     }
     void addEstrenos(Pelicula p){
         int ultPagina = mListaEstrenos.size() -1;
@@ -297,12 +298,16 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
             mListaEstrenos.add(new ArrayList<Pelicula>());
             mListaEstrenos.get(ultPagina+1).add(p);
         }
+        if (estado == ESTRENOS && paginaEstrenos == (mListaEstrenos.size()-1)){
+            notifyItemInserted(mListaEstrenos.get(mListaCartelera.size()-1).size()-1);
+        }
     }
 
     //Estos dos pueden ser más eficientes
     void addCartelera(ArrayList<Pelicula> peliculas){
         for (int i = 0; i < peliculas.size();i++) {
             addCartelera(peliculas.get(i));
+
         }
     }
     void addEstrenos(ArrayList<Pelicula> peliculas){
@@ -310,10 +315,6 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
             addEstrenos(peliculas.get(i));
         }
     }
-
-
-
-
 
     //Si la mListaEstrenos está vacía, muestra el mensaje de que no hay películas.
     //TODO modificar.
@@ -527,7 +528,7 @@ public class listaNueva extends RecyclerView.Adapter<listaNueva.ViewHolder> {
 
         }
 
-       //notifyItemChanged(itemExpandido);
+        //notifyItemChanged(itemExpandido);
         notifyDataSetChanged();
     }
 

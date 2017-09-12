@@ -442,7 +442,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
         } else {
             carga_barra.getChildAt(i[0] - 1).setBackgroundColor(Color.parseColor("#37474f"));
             lista.setMaxPaginas();
-            lista.notifyDataSetChanged();
+            //lista.notifyDataSetChanged();
             lista.actualizarInterfaz();
         }
     }
@@ -452,7 +452,8 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
     @Override
     protected void onPostExecute(Void v) {
         Log.d(TAG, "Descarga finalizada, actualizando interfaz");
-        lista.notifyDataSetChanged();
+        //lista.notifyDataSetChanged();
+
         lista.setMaxPaginas();
         lista.actualizarInterfaz();
         lista.noHayPelis(); //Y esto de chanchullo para quitar el X
@@ -462,7 +463,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
     @Override
     protected void onCancelled(Void v){
         Log.d(TAG, "Descarga cancelada, actualizando interfaz");
-        lista.notifyDataSetChanged();
+        //lista.notifyDataSetChanged();
         lista.setMaxPaginas();
         lista.actualizarInterfaz();
         lista.noHayPelis(); //Y esto de chanchullo para quitar el X

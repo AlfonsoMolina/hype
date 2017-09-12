@@ -1,29 +1,27 @@
 package com.clacksdepartment.hype;
 
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 class Interfaz {
 
     private MainActivity mMainActivity;
-//    private ListaModificadaAdapter mListaModificadaAdapter;
-    private listaNueva mListaModificadaAdapter;
+//    private ListaModificadaAdapter mListaNueva;
+    private listaNueva mListaNueva;
 
   /*  Interfaz(MainActivity mainActivity, ListaModificadaAdapter listaModificadaAdapter){
         this.mMainActivity = mainActivity;
-        this.mListaModificadaAdapter = listaModificadaAdapter;
+        this.mListaNueva = listaModificadaAdapter;
     }*/
 
-    Interfaz(MainActivity mainActivity, listaNueva listaModificadaAdapter){
+    Interfaz(MainActivity mainActivity, listaNueva listaNueva){
         this.mMainActivity = mainActivity;
-        this.mListaModificadaAdapter = listaModificadaAdapter;
+        this.mListaNueva = listaNueva;
     }
 
     void seleccionaBotonHype(){
@@ -51,7 +49,7 @@ class Interfaz {
     void mostrarPaginador(Boolean mostrar){
         if (mostrar){
             mMainActivity.findViewById(R.id.paginador).setVisibility(View.VISIBLE);
-            int pagina = mListaModificadaAdapter.getPagina();
+            int pagina = mListaNueva.getPagina();
             String txt = "" + (pagina+1);
             ((TextView) mMainActivity.findViewById(R.id.paginaActual)).setText(txt);
 
@@ -61,7 +59,7 @@ class Interfaz {
             if (pagina == 0)
                 mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
 
-            if (pagina+1 == mListaModificadaAdapter.getUltPagina())
+            if (pagina+1 == mListaNueva.getUltPagina())
                 mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
 
         }else{
@@ -91,7 +89,7 @@ class Interfaz {
     }
 
     void enfocaPrimerElementoBrusco(){
-        //((RecyclerView) mMainActivity.findViewById(R.id.lista)).setSelection(0);
+        ((RecyclerView) mMainActivity.findViewById(R.id.lista)).scrollToPosition(0);
         mMainActivity.findViewById(R.id.lista).requestFocus();
     }
 
