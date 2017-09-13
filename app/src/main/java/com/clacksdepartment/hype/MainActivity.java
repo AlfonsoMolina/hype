@@ -1,5 +1,6 @@
 package com.clacksdepartment.hype;
 
+import android.animation.LayoutTransition;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -261,15 +263,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.animaListado();
             mListaModificadaAdapter.mostrarHype();
             mInterfaz.seleccionaBotonHype();
-            mInterfaz.mostrarPaginador(false);
-
-            //Si no hay ninguna guardada, se muestra un mensaje
-
-            mListaModificadaAdapter.actualizarInterfaz();
-
-            mListaModificadaAdapter.noHayPelis();
-
-            //mListaModificadaAdapter.setItemExpandido(-1);
             mListaModificadaAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
             ((RecyclerView) findViewById(R.id.lista)).smoothScrollToPosition(0);
@@ -289,11 +282,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.animaListado();
             mListaModificadaAdapter.mostrarCartelera();
             mInterfaz.seleccionaBotonCartelera();
-            mInterfaz.mostrarPaginador(false);
-
-            mListaModificadaAdapter.actualizarInterfaz();
-
-            //mListaModificadaAdapter.setItemExpandido(-1);
             mListaModificadaAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
         }else{
@@ -309,13 +297,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             mInterfaz.animaListado();
             mListaModificadaAdapter.mostrarEstrenos();
-
             mInterfaz.seleccionaBotonEstrenos();
-            mInterfaz.mostrarPaginador(false);
-
-            mListaModificadaAdapter.actualizarInterfaz();
-
-            //mListaModificadaAdapter.setItemExpandido(-1);
             mListaModificadaAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
 

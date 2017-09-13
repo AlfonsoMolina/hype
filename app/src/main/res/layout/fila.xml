@@ -6,7 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:padding="5dip"
     android:id="@+id/contenedor"
-    android:onClick="mostrarAvanzado">
+    android:onClick="mostrarAvanzado"
+    android:animateLayoutChanges="true">
 
     <LinearLayout
         android:id="@+id/basico"

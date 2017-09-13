@@ -86,58 +86,61 @@
                 android:backgroundTint="?attr/colorPrimary"
                 style="@style/Widget.AppCompat.Button.Borderless"/>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:id="@+id/paginador">
-                <ImageButton
-                    android:id="@+id/previousPageButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:text="@string/previous_button"
-                    android:contentDescription="@string/previous_button"
-                    android:onClick="retrocederPagina"
-                    android:src="@drawable/ic_navigate_before_black_24dp"
-                    android:visibility="invisible"
-                    android:tint="@color/colorAppText"
-                    android:backgroundTint="?attr/colorPrimary"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    />
+            <!--
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:id="@+id/paginador">
+                            <ImageButton
+                                android:id="@+id/previousPageButton"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.2"
+                                android:text="@string/previous_button"
+                                android:contentDescription="@string/previous_button"
+                                android:onClick="retrocederPagina"
+                                android:src="@drawable/ic_navigate_before_black_24dp"
+                                android:visibility="invisible"
+                                android:tint="@color/colorAppText"
+                                android:backgroundTint="?attr/colorPrimary"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                />
 
-                <TextView
-                    android:id="@+id/paginaActual"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textAlignment="gravity"
-                    android:fontFamily="sans-serif-regular"
-                    android:textSize="24sp"
-                    android:textColor="@color/colorAppText"
-                    android:text="@string/actual_page_number"
-                    />
+                            <TextView
+                                android:id="@+id/paginaActual"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textAlignment="gravity"
+                                android:layout_gravity="center"
+                                android:fontFamily="sans-serif-regular"
+                                android:textSize="18sp"
+                                android:textColor="#FFFFFF"
+                                android:text="@string/actual_page_number"
+                                android:background="@drawable/circle_shape"
+                                android:backgroundTint="@color/colorWindowBackground"
+                                />
 
-                <ImageButton
-                    android:id="@+id/nextPageButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:text="@string/next_button"
-                    android:contentDescription="@string/next_button"
-                    android:src="@drawable/ic_navigate_next_black_24dp"
-                    android:onClick="avanzarPagina"
-                    android:tint="@color/colorAppText"
-                    android:backgroundTint="?attr/colorPrimary"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    />
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.05" />
-            </LinearLayout>
-
+                            <ImageButton
+                                android:id="@+id/nextPageButton"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.2"
+                                android:text="@string/next_button"
+                                android:contentDescription="@string/next_button"
+                                android:src="@drawable/ic_navigate_next_black_24dp"
+                                android:onClick="avanzarPagina"
+                                android:tint="@color/colorAppText"
+                                android:backgroundTint="?attr/colorPrimary"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                />
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="0.05" />
+                        </LinearLayout>
+            -->
         </LinearLayout>
     </RelativeLayout>
 
@@ -166,8 +169,12 @@
             android:id="@+id/lista"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingTop="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:paddingBottom="60dp"
+            android:clipToPadding="false"
+            android:backgroundTint="@color/colorPrimary"
             android:layoutAnimation="@anim/rellenar_lista"
             />
 
@@ -193,7 +200,8 @@
             android:layout_width="match_parent"
             android:layout_height="5dp"
             android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:animateLayoutChanges="true">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -247,5 +255,63 @@
                 android:background="@color/colorWindowBackground"/>
         </LinearLayout>
     </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/pie"
+        android:id="@+id/paginador"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp"
+        android:paddingBottom="10dp"
+        android:elevation="4dp"
+        android:animateLayoutChanges="true">
+
+            <ImageButton
+                android:id="@+id/previousPageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="@string/previous_button"
+                android:contentDescription="@string/previous_button"
+                android:onClick="retrocederPagina"
+                android:src="@drawable/ic_navigate_before_black_24dp"
+                android:tint="#000000"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="?attr/colorAccent"
+                />
+
+
+        <TextView
+            android:id="@+id/paginaActual"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:textAlignment="gravity"
+            android:layout_gravity="bottom|center_horizontal"
+            android:fontFamily="sans-serif-regular"
+            android:textSize="14sp"
+            android:textColor="@color/colorAppText"
+            android:text="@string/actual_page_number"
+            android:visibility="gone"
+            android:background="@drawable/circle_shape"
+            android:backgroundTint="@color/colorPrimary"
+            />
+
+
+        <ImageButton
+                android:id="@+id/nextPageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="@string/next_button"
+                android:contentDescription="@string/next_button"
+                android:src="@drawable/ic_navigate_next_black_24dp"
+                android:onClick="avanzarPagina"
+                android:tint="#000000"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="?attr/colorAccent"
+                />
+    </FrameLayout>
 
 </RelativeLayout>

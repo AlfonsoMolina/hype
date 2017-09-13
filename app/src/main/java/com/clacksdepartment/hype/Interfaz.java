@@ -48,22 +48,28 @@ class Interfaz {
 
     void mostrarPaginador(Boolean mostrar){
         if (mostrar){
+
+            // Quiero mostrar el paginador
             mMainActivity.findViewById(R.id.paginador).setVisibility(View.VISIBLE);
+
+            // Actualizo el número de la página
             int pagina = mRecyclerViewAdapter.getPagina();
             String txt = "" + (pagina+1);
             ((TextView) mMainActivity.findViewById(R.id.paginaActual)).setText(txt);
 
-            mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
-            mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
-
-            if (pagina == 0)
-                mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
-
-            if (pagina+1 == mRecyclerViewAdapter.getUltPagina())
-                mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
+            // Evaluamos la página en la que estamos, casos: prim. pagina, ultima pagina, cualquier pagina en medio
+            if (pagina == 0){
+                mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.GONE);
+            }else if (pagina+1 == mRecyclerViewAdapter.getUltPagina()){
+                mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.GONE);
+            }else{
+                mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
+                mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
+            }
 
         }else{
-            mMainActivity.findViewById(R.id.paginador).setVisibility(View.INVISIBLE);
+            // Quiero ocultar el navegador
+            mMainActivity.findViewById(R.id.paginador).setVisibility(View.GONE);
         }
     }
 
@@ -98,4 +104,27 @@ class Interfaz {
         ((RecyclerView) mMainActivity.findViewById(R.id.lista)).setLayoutAnimation(layoutAnimationController);
     }
 
+    void actualizar(){
+
+        if (mRecyclerViewAdapter.getEstado() != RecyclerViewAdapter.HYPE) {
+            if (mRecyclerViewAdapter.getItemCount() == 0 ) {
+                mostrarPaginador(false);
+                mostrarNoHayPelis(true);
+            } else if (mRecyclerViewAdapter.getUltPagina() > 1) {
+                mostrarPaginador(true);
+                mostrarNoHayPelis(false);
+            } else {
+                mostrarPaginador(false);
+                mostrarNoHayPelis(false);
+            }
+        }else{
+            mostrarPaginador(false);
+            if (mRecyclerViewAdapter.getItemCount() == 0) {
+                mostrarNoHayPelis(true);
+            } else {
+                mostrarNoHayPelis(false);
+            }
+        }
+
+    }
 }

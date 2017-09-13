@@ -1,5 +1,6 @@
 package com.clacksdepartment.hype;
 
+import android.animation.LayoutTransition;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,6 +88,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(feedReaderDbHelper.getReadableDatabase(), feedReaderDbHelper.getWritableDatabase(),this);
         hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         mInterfaz = new Interfaz(mainActivity, this);
+
+        RecyclerView.ItemAnimator animator = ((RecyclerView) mMainActivity.findViewById(R.id.lista)).getItemAnimator();
+
+        if (animator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+        }
+
     }
 
     // Create new views (invoked by the layout manager)
@@ -341,28 +350,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     void mostrarNoPelis(boolean b){
         mInterfaz.mostrarNoHayPelis(false);
     }
-    void actualizarInterfaz(){
-        if (estado != HYPE) {
-            if (getItemCount() == 0 ) {
-                mInterfaz.mostrarPaginador(false);
-                mInterfaz.mostrarNoHayPelis(true);
-            } else if (getUltPagina() > 1) {
-                mInterfaz.mostrarPaginador(true);
-                mInterfaz.mostrarNoHayPelis(false);
-            } else {
-                mInterfaz.mostrarPaginador(false);
-                mInterfaz.mostrarNoHayPelis(false);
-            }
-        }else{
-            mInterfaz.mostrarPaginador(false);
-            if (getItemCount() == 0) {
-                mInterfaz.mostrarNoHayPelis(true);
-            } else {
-                mInterfaz.mostrarNoHayPelis(false);
-            }
-        }
-    }
 
+    void actualizarInterfaz(){
+        mInterfaz.actualizar();
+    }
 
     void eliminarLista() {
         mListaEstrenos.clear();
@@ -379,6 +370,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             itemExpandido = -1;
             estado = ESTRENOS;
             haCambiado = true;
+            mInterfaz.actualizar();
         }
         return haCambiado;
     }
@@ -389,6 +381,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             itemExpandido = -1;
             estado = HYPE;
             haCambiado = true;
+            mInterfaz.actualizar();
         }
         return haCambiado;
     }
@@ -399,6 +392,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             itemExpandido = -1;
             estado = CARTELERA;
             haCambiado = true;
+            mInterfaz.actualizar();
         }
         return haCambiado;
     }
@@ -449,12 +443,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             itemExpandido = -1;
             Log.d(TAG, "Contrayendo  elemento " + posicion);
         } else {
+
             itemExpandido = posicion;
             Log.d(TAG, "Expandiendo  elemento " + posicion);
         }
         if(posicionAntigua != -1)
             notifyItemChanged(posicionAntigua);
         notifyItemChanged(itemExpandido);
+        if (itemExpandido != -1) {
+            ((RecyclerView) mMainActivity.findViewById(R.id.lista)).smoothScrollToPosition(itemExpandido);
+        }
     }
 
 
@@ -550,7 +548,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             notifyDataSetChanged();
             itemExpandido = -1;
             if (getItemCount() == 0){
-                actualizarInterfaz();
+                mInterfaz.actualizar();
             }
         }
     }
