@@ -283,7 +283,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         // Si estamos en la sección y la página donde se han añadido los datos:
         if (estado == CARTELERA && paginaCartelera == (mListaCartelera.size()-1)){
-            notifyItemInserted(mListaCartelera.get(mListaCartelera.size()-1).size()-1);
+            try {
+                notifyItemInserted(mListaCartelera.get(mListaCartelera.size() - 1).size() - 1);
+            }catch(Exception e){
+                //Si estamos moviendo la view no se hace nada o peta.
+                Log.d(TAG, "Actualización de lista abortada por scroll.");
+            }
         }
     }
     void addEstrenos(Pelicula p){
@@ -295,7 +300,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             mListaEstrenos.get(ultPagina+1).add(p);
         }
         if (estado == ESTRENOS && paginaEstrenos == (mListaEstrenos.size()-1)){
-            notifyItemInserted(mListaEstrenos.get(mListaEstrenos.size()-1).size()-1);
+            try {
+                notifyItemInserted(mListaCartelera.get(mListaEstrenos.size() - 1).size() - 1);
+            }catch(Exception e){
+                //Si estamos moviendo la view no se hace nada o peta.
+                Log.d(TAG, "Actualización de lista abortada por scroll.");
+            }
         }
     }
 

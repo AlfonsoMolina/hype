@@ -450,7 +450,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
         if (i[0] == -2)
             lista.mostrarNoPelis(false);
         else if (i[0] == 0){
-            for(int j = 0; j < 9; j++)
+            for(int j = 0; j < 10; j++)
                 carga_barra.getChildAt(j).setBackgroundColor(Color.parseColor("#455a64"));
             carga_barra.setVisibility(View.VISIBLE);
             carga_barra.getChildAt(0).setBackgroundColor(Color.parseColor("#37474f"));
