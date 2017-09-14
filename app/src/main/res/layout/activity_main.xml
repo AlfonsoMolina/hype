@@ -279,6 +279,7 @@
                 android:tint="#000000"
                 android:background="@drawable/circle_shape"
                 android:backgroundTint="?attr/colorAccent"
+                android:visibility="gone"
                 />
 
 

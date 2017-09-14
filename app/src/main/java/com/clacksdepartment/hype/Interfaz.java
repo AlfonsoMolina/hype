@@ -2,6 +2,7 @@ package com.clacksdepartment.hype;
 
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
@@ -49,27 +50,35 @@ class Interfaz {
     void mostrarPaginador(Boolean mostrar){
         if (mostrar){
 
-            // Quiero mostrar el paginador
-            mMainActivity.findViewById(R.id.paginador).setVisibility(View.VISIBLE);
-
             // Actualizo el número de la página
-            int pagina = mRecyclerViewAdapter.getPagina();
-            String txt = "" + (pagina+1);
+            String txt = "" + (mRecyclerViewAdapter.getPagina()+1);
             ((TextView) mMainActivity.findViewById(R.id.paginaActual)).setText(txt);
 
             // Evaluamos la página en la que estamos, casos: prim. pagina, ultima pagina, cualquier pagina en medio
-            if (pagina == 0){
+
+            if (mRecyclerViewAdapter.getPagina() == 0){
                 mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.GONE);
-            }else if (pagina+1 == mRecyclerViewAdapter.getUltPagina()){
+                mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
+                Log.e("PRUEBA","Estamos en primera página");
+            }else if ((mRecyclerViewAdapter.getPagina()+1) == mRecyclerViewAdapter.getUltPagina()){
                 mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.GONE);
+                mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
+                Log.e("PRUEBA","Estamos en última página");
             }else{
                 mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
                 mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
+                Log.e("PRUEBA","Estamos en página intermedia");
             }
+
+            // Quiero mostrar el paginador
+            mMainActivity.findViewById(R.id.paginador).setVisibility(View.VISIBLE);
 
         }else{
             // Quiero ocultar el navegador
             mMainActivity.findViewById(R.id.paginador).setVisibility(View.GONE);
+            mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.GONE);
+            mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.GONE);
+
         }
     }
 

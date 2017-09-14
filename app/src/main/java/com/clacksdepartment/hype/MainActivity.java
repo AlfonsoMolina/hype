@@ -191,7 +191,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void retrocederPagina(View view) {
         int pagina = mListaModificadaAdapter.getPagina();
         Log.d(TAG, "Retrocediendo a la página " + pagina);
-        findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
         if (pagina > 0) {
             mListaModificadaAdapter.pasarPagina(pagina - 1);
             ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina));
@@ -199,9 +198,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
             //porque se ha cogido del adaptador. Así que, se queda igual.
             mInterfaz.enfocaPrimerElementoBrusco();
-            if (pagina == 1) {
-                findViewById(R.id.previousPageButton).setVisibility(View.INVISIBLE);
-            }
         }
 
         mListaModificadaAdapter.notifyDataSetChanged();
@@ -210,7 +206,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void avanzarPagina(View view) {
         int pagina = mListaModificadaAdapter.getPagina();
         Log.d(TAG, "Avanzando a la página " + (pagina+2));
-        findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
         if (pagina < mListaModificadaAdapter.getUltPagina()) {
             mListaModificadaAdapter.pasarPagina(pagina + 1);
             ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina+2));
@@ -218,9 +213,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
             //porque se ha cogido del adaptador.
             mInterfaz.enfocaPrimerElementoBrusco();
-            if (pagina+2 == mListaModificadaAdapter.getUltPagina()) {
-                findViewById(R.id.nextPageButton).setVisibility(View.INVISIBLE);
-            }
         }
 
         mListaModificadaAdapter.notifyDataSetChanged();

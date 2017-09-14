@@ -265,6 +265,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         else if (estado == ESTRENOS)
             paginaEstrenos = i;
         itemExpandido = -1;
+        actualizarInterfaz();
     }
 
     void reiniciarPagina(){
