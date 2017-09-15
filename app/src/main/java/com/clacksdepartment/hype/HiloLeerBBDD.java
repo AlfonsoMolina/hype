@@ -54,55 +54,6 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
         Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
 
-        //Primero se carga la cartelera
-
-        //Se lee la bbdd y se guardan los elementos en cursor
-        String[] projection = {
-                FeedReaderContract.FeedEntryCartelera._ID,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_REF,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE
-        };
-
-        Cursor cursor = dbr.query(
-                FeedReaderContract.FeedEntryCartelera.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                                     // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA + " DESC"                                    // The sort order
-        );
-
-        //Datos de las películas:
-        //link, título, sinopsis, estreno (letras, fecha e hype.
-        String l, t, s, e, f, h;
-        byte[] p_byte;
-        Bitmap p_bitmap;
-
-        //Y empezamos a mirar las tuplas una a una
-        while (cursor.moveToNext()) {
-            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA));
-            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO)); //Esto para el log solo
-            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_REF));
-            p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA));
-            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS));
-            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO));
-            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE));
-
-            p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
-
-            cartelera.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
-
-            Log.d(TAG, "Encontrada película: " + t + ".");
-
-        }
-
-        cursor.close();
 
         //Y ahora los estrenos
 
@@ -119,7 +70,7 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_CORTO
         };
 
-        cursor = dbr.query(
+        Cursor cursor = dbr.query(
                 FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
                 projection2,                               // The columns to return
                 null,                                // The columns for the WHERE clause
@@ -150,6 +101,12 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
         String fecha_hoy = year + '/' + month + '/' + day;
 
         ContentValues values = new ContentValues();
+
+        //Datos de las películas:
+        //link, título, sinopsis, estreno (letras, fecha e hype.
+        String l, t, s, e, f, h;
+        byte[] p_byte;
+        Bitmap p_bitmap;
 
         //Y empezamos a mirar las tuplas una a una
         while (cursor.moveToNext()) {
@@ -186,6 +143,53 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
             Log.d(TAG, "Encontrada película: " + t + ".");
         }
+
+        //Despues se carga la cartelera
+
+        //Se lee la bbdd y se guardan los elementos en cursor
+        String[] projection = {
+                FeedReaderContract.FeedEntryCartelera._ID,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_REF,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE
+        };
+
+        cursor = dbr.query(
+                FeedReaderContract.FeedEntryCartelera.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                                     // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA + " DESC"                                    // The sort order
+        );
+
+
+
+        //Y empezamos a mirar las tuplas una a una
+        while (cursor.moveToNext()) {
+            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA));
+            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO)); //Esto para el log solo
+            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_REF));
+            p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA));
+            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS));
+            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO));
+            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE));
+
+            p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
+
+            cartelera.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
+
+            Log.d(TAG, "Encontrada película: " + t + ".");
+
+        }
+
+        cursor.close();
+
         lista.addCartelera(cartelera);
         lista.addEstrenos(estrenos);
         return null;
