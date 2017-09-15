@@ -11,7 +11,7 @@
     <string name="actual_page_number">1</string>
     <string name="no_pelis">\n\nNo hay películas aún :(</string>
     <string name="cargando">Cargando…</string>
-    <string name="leyendo">Estamos leyendo la base de datos.\nEspere un momento…</string>
+    <string name="leyendo">\n\nEstamos leyendo la base de datos.\nEspere un momento…</string>
     <string name="pref_pais">País</string>
     <string name="pref_pais_def">es</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>

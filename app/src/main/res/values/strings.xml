@@ -9,7 +9,7 @@
     <string name="actual_page_number">1</string>
     <string name="no_pelis">\n\nThere aren\'t any movie yet :(</string>
     <string name="cargando">Loading…</string>
-    <string name="leyendo">Database is been read.\nWait a second…</string>
+    <string name="leyendo">\n\nDatabase is been read.\nWait a second…</string>
     <string name="pref_pais">Country</string>
     <string name="pref_pais_def">es</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
