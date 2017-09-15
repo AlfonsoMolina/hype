@@ -22,8 +22,7 @@
             android:layout_height="80dip"
             android:layout_marginEnd="5dip"
             android:contentDescription="@string/descripcion_portada"
-            android:padding="3dip"
-            android:src="@drawable/rihanna" />
+            android:padding="3dip" />
 
         <LinearLayout
             android:id="@+id/info_basico"
@@ -137,7 +136,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:src="@drawable/ic_link_black_24dp"
+                android:src="@drawable/ic_open_in_browser_black_24dp"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:onClick="abrirWeb"

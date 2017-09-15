@@ -38,6 +38,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private ArrayList<ArrayList<Pelicula>> mListaEstrenos;  //Los elementos de la mListaEstrenos
     private ArrayList<ArrayList<Pelicula>> mListaCartelera;  //Los elementos de la mListaEstrenos
+    private ArrayList<Pelicula> mListaBusqueda;
 
     private int resourceID;
     private MainActivity mMainActivity;                          //Actividad, para cambiar la IU
@@ -78,6 +79,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public RecyclerViewAdapter(MainActivity mainActivity, int resourceID, FeedReaderDbHelper feedReaderDbHelper) {
         mListaCartelera = new ArrayList<>();
         mListaEstrenos = new ArrayList<>();
+        mListaBusqueda = new ArrayList<>();
         Log.d(TAG, "Construyendo el adaptador de la mListaEstrenos");
         this.resourceID = resourceID;
         this.mMainActivity = mainActivity;
@@ -96,6 +98,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
     }
+
+
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -147,11 +151,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     private Pelicula getPelicula(int position) {
-        if (estado == HYPE){
-            for (int i = mListaCartelera.size()-1; i >= 0; i--){
-                for (int j = mListaCartelera.get(i).size()-1; j >= 0 ; j--){
-                    if (mListaCartelera.get(i).get(j).getHype()){
-                        if( position == 0)
+        if (estado == HYPE) {
+            for (int i = mListaCartelera.size() - 1; i >= 0; i--) {
+                for (int j = mListaCartelera.get(i).size() - 1; j >= 0; j--) {
+                    if (mListaCartelera.get(i).get(j).getHype()) {
+                        if (position == 0)
                             return mListaCartelera.get(i).get(j);
 
                         position--;
@@ -160,9 +164,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             }
 
-            for (int i = 0; i < mListaEstrenos.size(); i++){
-                for (int j = 0; j < mListaEstrenos.get(i).size(); j++){
-                    if (mListaEstrenos.get(i).get(j).getHype()){
+            for (int i = 0; i < mListaEstrenos.size(); i++) {
+                for (int j = 0; j < mListaEstrenos.get(i).size(); j++) {
+                    if (mListaEstrenos.get(i).get(j).getHype()) {
                         if (position == 0)
                             return mListaEstrenos.get(i).get(j);
                         position--;
@@ -200,9 +204,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             }
             return count;
-        }
-
-        else if (estado == CARTELERA) {
+         } else if (estado == CARTELERA) {
             if (mListaCartelera.size() > 0) {
                 return mListaCartelera.get(paginaCartelera).size();
             }else
@@ -299,6 +301,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
             }
+        } else if (estado == HYPE && p.getHype()){
+            try {
+                notifyDataSetChanged();
+            }catch(Exception e){
+                //Si estamos moviendo la view no se hace nada o peta.
+                Log.d(TAG, "Actualización de lista abortada por scroll.");
+            }
         }
     }
     void addEstrenos(Pelicula p){
@@ -312,6 +321,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         if (estado == ESTRENOS && paginaEstrenos == (mListaEstrenos.size()-1)){
             try {
                 notifyItemInserted(mListaCartelera.get(mListaEstrenos.size() - 1).size() - 1);
+            }catch(Exception e){
+                //Si estamos moviendo la view no se hace nada o peta.
+                Log.d(TAG, "Actualización de lista abortada por scroll.");
+            }
+        } else if (estado == HYPE && p.getHype()){
+            try {
+                notifyDataSetChanged();
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
@@ -335,7 +351,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     //Si la mListaEstrenos está vacía, muestra el mensaje de que no hay películas.
     //TODO modificar.
     void noHayPelis(){
-        if (((estado==CARTELERA)? mListaCartelera : mListaEstrenos).size()==0) {
+        if ((estado==CARTELERA) && mListaCartelera.size()==0) {
+            ((TextView) mMainActivity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
+            mMainActivity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
+        } else if ((estado==ESTRENOS) && mListaEstrenos.size()==0) {
             ((TextView) mMainActivity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
             mMainActivity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
         }
@@ -397,7 +416,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         return haCambiado;
     }
-
 
     void  setItemExpandido(View view){
         //Encontramos la posición del elemento.
@@ -583,5 +601,4 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         mMainActivity.startActivity(Intent.createChooser(intent, "Compartir película: " + pelicula.getTitulo() + "."));
 
     }
-
 }

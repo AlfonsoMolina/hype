@@ -59,15 +59,15 @@ class Interfaz {
             if (mRecyclerViewAdapter.getPagina() == 0){
                 mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.GONE);
                 mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
-                Log.e("PRUEBA","Estamos en primera página");
+
             }else if ((mRecyclerViewAdapter.getPagina()+1) == mRecyclerViewAdapter.getUltPagina()){
                 mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.GONE);
                 mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
-                Log.e("PRUEBA","Estamos en última página");
+
             }else{
                 mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
                 mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
-                Log.e("PRUEBA","Estamos en página intermedia");
+
             }
 
             // Quiero mostrar el paginador
@@ -135,5 +135,12 @@ class Interfaz {
             }
         }
 
+    }
+
+    void mostrarCabecera(Boolean b){
+        if (b){
+            mMainActivity.findViewById(R.id.navegacion).setVisibility(View.VISIBLE);
+        } else
+            mMainActivity.findViewById(R.id.navegacion).setVisibility(View.GONE);
     }
 }

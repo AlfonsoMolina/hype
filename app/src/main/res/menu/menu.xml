@@ -2,7 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- "Mark Favorite", should appear as action button if possible -->
+    <item
+        android:id="@+id/busqueda"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="Buscar"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        />
     <item
         android:id="@+id/actualizar"
         android:icon="@drawable/ic_refresh_black_24dp"
@@ -18,6 +24,7 @@
         android:enabled="false"
         android:visible="false"
         />
+
 
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"

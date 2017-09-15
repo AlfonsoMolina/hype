@@ -1,6 +1,8 @@
 package com.clacksdepartment.hype;
 
-import android.animation.LayoutTransition;
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
@@ -17,8 +19,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.support.v7.widget.SearchView;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -28,14 +30,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     /*
      * Declaración de variables
      */
-
-    // TODO: Refinar icono de Hype
-    // TODO: Crear icono para la aplicación
-    // TODO: Mejorar (y completar) traducción "countrie"
-
     private static final String TAG = "MainActivity";
 
-   // private ListaModificadaAdapter mListaModificadaAdapter;
+   // private ListaModificadaAdapter mRecyclerViewAdapter;
     private FeedReaderDbHelper mFeedReaderDbHelper;
     private HiloDescargas mHiloDescargas;
     private Interfaz mInterfaz;
@@ -43,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
 
     private RecyclerView mRecyclerView;
-    private RecyclerViewAdapter mListaModificadaAdapter;
+    private RecyclerViewAdapter mRecyclerViewAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     /*
@@ -65,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+
+
         // Creamos el helper de la BBDD
         mFeedReaderDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
@@ -80,8 +79,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mListaModificadaAdapter = new RecyclerViewAdapter(this, R.layout.fila, mFeedReaderDbHelper);
-        mRecyclerView.setAdapter(mListaModificadaAdapter);
+        mRecyclerViewAdapter = new RecyclerViewAdapter(this, R.layout.fila, mFeedReaderDbHelper);
+        mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -92,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         int diaGuardado = sharedPreferences.getInt("dia",0);
         if (diaHoy > diaGuardado) {
             //Se hace una actualización suave
-            mHiloDescargas = new HiloDescargas(this, mListaModificadaAdapter,
+            mHiloDescargas = new HiloDescargas(this, mRecyclerViewAdapter,
                     ((LinearLayout) findViewById(R.id.carga_barra)),false);
 
             mHiloDescargas.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
@@ -103,11 +102,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             sharedPreferencesEditor.apply();
         }
 
-        mInterfaz = new Interfaz(this, mListaModificadaAdapter);
+        mInterfaz = new Interfaz(this, mRecyclerViewAdapter);
         mInterfaz.seleccionaBotonCartelera();
 
         mostrarCartelera(findViewById(R.id.cartelera));
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -115,6 +116,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // Expande el mMenu, añade las opciones
         this.mMenu = menu;
         getMenuInflater().inflate(R.menu.menu, menu);
+
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.busqueda).getActionView();
+            searchView.setMaxWidth(Integer.MAX_VALUE);
+            // Assumes current activity is the searchable activity
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this.getApplicationContext(),SearchableActivity.class)));
+            searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
 
         // Para dar color a los botones de la ActionBar
         for(int i = 0; i < mMenu.size(); i++){
@@ -156,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             //Actualiza las películas guardadas..
             case R.id.actualizar:
-                mHiloDescargas = new HiloDescargas(this, mListaModificadaAdapter,
+                mHiloDescargas = new HiloDescargas(this, mRecyclerViewAdapter,
                         ((LinearLayout) findViewById(R.id.carga_barra)),true);
                 // Lanzamos el Thread que descargará la información.
                 mHiloDescargas.execute(mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
@@ -165,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 mMenu.findItem(R.id.cancelar).setEnabled(true);
                 mMenu.findItem(R.id.cancelar).setVisible(true);
 
-                mListaModificadaAdapter.reiniciarPagina();
+                mRecyclerViewAdapter.reiniciarPagina();
                 mInterfaz.mostrarPaginador(false);
                 return true;
 
@@ -178,6 +186,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 mMenu.findItem(R.id.actualizar).setVisible(true);
                 return true;
 
+            case R.id.busqueda:
+                SearchView searchView = (SearchView) selectedItem.getActionView();
+                searchView.setMaxWidth(Integer.MAX_VALUE);
+                searchView.setIconifiedByDefault(false);
+                return true;
             default:
                 return super.onOptionsItemSelected(selectedItem);
 
@@ -189,10 +202,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      */
 
     public void retrocederPagina(View view) {
-        int pagina = mListaModificadaAdapter.getPagina();
+        int pagina = mRecyclerViewAdapter.getPagina();
         Log.d(TAG, "Retrocediendo a la página " + pagina);
         if (pagina > 0) {
-            mListaModificadaAdapter.pasarPagina(pagina - 1);
+            mRecyclerViewAdapter.pasarPagina(pagina - 1);
             ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
@@ -200,14 +213,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.enfocaPrimerElementoBrusco();
         }
 
-        mListaModificadaAdapter.notifyDataSetChanged();
+        mRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     public void avanzarPagina(View view) {
-        int pagina = mListaModificadaAdapter.getPagina();
+        int pagina = mRecyclerViewAdapter.getPagina();
         Log.d(TAG, "Avanzando a la página " + (pagina+2));
-        if (pagina < mListaModificadaAdapter.getUltPagina()) {
-            mListaModificadaAdapter.pasarPagina(pagina + 1);
+        if (pagina < mRecyclerViewAdapter.getUltPagina()) {
+            mRecyclerViewAdapter.pasarPagina(pagina + 1);
             ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina+2));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
@@ -215,22 +228,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.enfocaPrimerElementoBrusco();
         }
 
-        mListaModificadaAdapter.notifyDataSetChanged();
+        mRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String clave) {
         if(clave.equalsIgnoreCase("pref_db")){
-            mListaModificadaAdapter.eliminarLista();
-            mListaModificadaAdapter.notifyDataSetChanged();
-            mListaModificadaAdapter.actualizarInterfaz();
-            mListaModificadaAdapter.noHayPelis();
+            mRecyclerViewAdapter.eliminarLista();
+            mRecyclerViewAdapter.notifyDataSetChanged();
+            mRecyclerViewAdapter.actualizarInterfaz();
+            mRecyclerViewAdapter.noHayPelis();
         } else if (clave.equalsIgnoreCase("pref_pais")){
-            //Cuando cambia el país se borra la mListaModificadaAdapter anterior
+            //Cuando cambia el país se borra la mRecyclerViewAdapter anterior
             mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
-            mListaModificadaAdapter.eliminarLista();
-            mListaModificadaAdapter.notifyDataSetChanged();
-            mListaModificadaAdapter.actualizarInterfaz();
-            mListaModificadaAdapter.noHayPelis();
+            mRecyclerViewAdapter.eliminarLista();
+            mRecyclerViewAdapter.notifyDataSetChanged();
+            mRecyclerViewAdapter.actualizarInterfaz();
+            mRecyclerViewAdapter.noHayPelis();
         }
     }
 
@@ -251,11 +264,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas hypeadas");
 
-        if (mListaModificadaAdapter.getEstado() != ListaModificadaAdapter.HYPE){
+        if (mRecyclerViewAdapter.getEstado() != ListaModificadaAdapter.HYPE){
             mInterfaz.animaListado();
-            mListaModificadaAdapter.mostrarHype();
+            mRecyclerViewAdapter.mostrarHype();
             mInterfaz.seleccionaBotonHype();
-            mListaModificadaAdapter.notifyDataSetChanged();
+            mRecyclerViewAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
             ((RecyclerView) findViewById(R.id.lista)).smoothScrollToPosition(0);
         }else{
@@ -270,11 +283,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas de estreno");
 
-        if (mListaModificadaAdapter.getEstado() != ListaModificadaAdapter.CARTELERA) {
+        if (mRecyclerViewAdapter.getEstado() != ListaModificadaAdapter.CARTELERA) {
             mInterfaz.animaListado();
-            mListaModificadaAdapter.mostrarCartelera();
+            mRecyclerViewAdapter.mostrarCartelera();
             mInterfaz.seleccionaBotonCartelera();
-            mListaModificadaAdapter.notifyDataSetChanged();
+            mRecyclerViewAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
         }else{
             mInterfaz.enfocaPrimerElementoSuave();
@@ -285,12 +298,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas de estreno");
 
-        if (mListaModificadaAdapter.getEstado() != ListaModificadaAdapter.ESTRENOS) {
+        if (mRecyclerViewAdapter.getEstado() != ListaModificadaAdapter.ESTRENOS) {
 
             mInterfaz.animaListado();
-            mListaModificadaAdapter.mostrarEstrenos();
+            mRecyclerViewAdapter.mostrarEstrenos();
             mInterfaz.seleccionaBotonEstrenos();
-            mListaModificadaAdapter.notifyDataSetChanged();
+            mRecyclerViewAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
 
         }else{
@@ -300,25 +313,26 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
 
     public void mostrarAvanzado(View view){
-        mListaModificadaAdapter.setItemExpandido(view);
+        mRecyclerViewAdapter.setItemExpandido(view);
     }
     public void marcarHype(View view){
-        mListaModificadaAdapter.marcarHype(view);
+        mRecyclerViewAdapter.marcarHype(view);
      }
 
     public void enviarCalendario(View view) {
-        startActivity(mListaModificadaAdapter.abrirCalendario());
+        startActivity(mRecyclerViewAdapter.abrirCalendario());
     }
 
     public void abrirFicha(View view) {
-        mListaModificadaAdapter.abrirFicha();
+        mRecyclerViewAdapter.abrirFicha();
     }
 
     public void abrirWeb(View view) {
-        startActivity(mListaModificadaAdapter.abrirWeb());
+        startActivity(mRecyclerViewAdapter.abrirWeb());
     }
 
     public void abrirMenuCompartir(View view) {
-        mListaModificadaAdapter.abrirMenuCompartir();
+        mRecyclerViewAdapter.abrirMenuCompartir();
     }
+
 }

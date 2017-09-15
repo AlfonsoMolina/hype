@@ -30,4 +30,6 @@
     <string name="texto_seccion_hype">Hype!</string>
     <string name="texto_seccion_cartelera">En cartelera</string>
     <string name="texto_seccion_estrenos">Próximos estrenos</string>
+    <string name="search_hint">Buscar por título</string>
+    <string name="no_busqueda">No hay resultados de búsqueda.</string>
 </resources>
