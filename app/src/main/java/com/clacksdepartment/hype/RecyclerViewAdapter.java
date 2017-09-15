@@ -148,8 +148,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private Pelicula getPelicula(int position) {
         if (estado == HYPE){
-            for (int i = 0; i < mListaCartelera.size(); i++){
-                for (int j = 0; j < mListaCartelera.get(i).size(); j++){
+            for (int i = mListaCartelera.size()-1; i >= 0; i--){
+                for (int j = mListaCartelera.get(i).size()-1; j >= 0 ; j--){
                     if (mListaCartelera.get(i).get(j).getHype()){
                         if( position == 0)
                             return mListaCartelera.get(i).get(j);
@@ -221,8 +221,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         if (estado == HYPE) {
             int pos = 0;
 
-            for (int i = 0; i<mListaCartelera.size();i++)
-                for (int j = 0; j<mListaCartelera.get(i).size();j++)
+            for (int i = mListaCartelera.size()-1; i>=0;i--)
+                for (int j = mListaCartelera.get(i).size()-1; j>=0;j--)
                     if(mListaCartelera.get(i).get(j).getHype()) {
                         if (posicionRelativa == 0) {
                             posicionAbsoluta = pos;
@@ -409,8 +409,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         if (estado == HYPE){
             Pelicula p;
             Boolean flag = true;
-            for (int i = 0; flag && i < mListaCartelera.size(); i++){
-                for (int j = 0; flag && j < mListaCartelera.get(i).size(); j++) {
+            for (int i =  mListaCartelera.size()-1; flag && i >=0; i--){
+                for (int j = mListaCartelera.get(i).size()-1; flag && j >=0 ; j--) {
                     p = mListaCartelera.get(i).get(j);
                     if (p.getHype()) {
                         if (p.getTitulo().equals(titulo)) {
