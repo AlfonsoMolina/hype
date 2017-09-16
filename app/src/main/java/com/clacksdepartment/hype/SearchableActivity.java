@@ -19,6 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -104,7 +106,10 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
        return true;
     }
     void doMySearch(String query){
+        LayoutAnimationController layoutAnimationController = AnimationUtils.loadLayoutAnimation(this,R.anim.rellenar_lista);
+        ((RecyclerView) findViewById(R.id.lista)).setLayoutAnimation(layoutAnimationController);
         mBusquedaAdapter.buscar(query);
+
     }
 
     @Override
