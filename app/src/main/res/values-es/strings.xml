@@ -32,4 +32,10 @@
     <string name="texto_seccion_estrenos">Próximos estrenos</string>
     <string name="search_hint">Buscar por título</string>
     <string name="no_busqueda">No hay resultados de búsqueda.</string>
+    <string name="anuncios">Habilitar anuncios</string>
+    <string name="pref_bbdd">Vaciar base de datos</string>
+    <string name="menu_buscar">Buscar</string>
+    <string name="recargar">Actualizar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="opciones">Opciones</string>
 </resources>

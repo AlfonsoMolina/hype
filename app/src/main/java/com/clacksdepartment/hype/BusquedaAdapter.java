@@ -30,7 +30,7 @@ import java.util.Calendar;
  * Created by Usuario on 15/09/2017.
  */
 
-public class BusquedaAdapter extends  RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewHolder> {
 
     private static final String TAG = "BusquedaAdapter";
 
@@ -72,19 +72,19 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<RecyclerViewAdapter.V
     }
 
     @Override
-    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+    public BusquedaAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                              int viewType) {
         // create a new view
         RelativeLayout v = (RelativeLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fila, parent, false);
         // set the view's size, margins, paddings and layout parameters
-        RecyclerViewAdapter.ViewHolder vh = new RecyclerViewAdapter.ViewHolder(v);
+        BusquedaAdapter.ViewHolder vh = new BusquedaAdapter.ViewHolder(v);
         return vh;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(RecyclerViewAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(BusquedaAdapter.ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         Pelicula pelicula = mListaBusqueda.get(position);

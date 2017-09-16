@@ -10,8 +10,14 @@
             android:entryValues="@array/pref_pais_valores"
             android:defaultValue="@string/pref_pais_def" />
 
-        <Preference android:title="Vaciar base de datos"
+        <Preference android:title="@string/pref_bbdd"
             android:key="pref_db"
             android:defaultValue="0"/>
 
+        <SwitchPreference android:title="@string/anuncios"
+            android:key="pref_adds"
+            android:defaultValue="true"
+            android:summaryOn=":D"
+            android:summaryOff=":'("
+            android:disableDependentsState="false"/>
 </PreferenceScreen>

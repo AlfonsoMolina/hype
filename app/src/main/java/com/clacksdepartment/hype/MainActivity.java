@@ -23,6 +23,8 @@ import android.widget.LinearLayout;
 import android.support.v7.widget.SearchView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.MobileAds;
+
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, FichaFragment.OnFragmentInteractionListener{
@@ -31,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * Declaración de variables
      */
     private static final String TAG = "MainActivity";
+
+    private static final String MY_ADMOB_APP_ID = "ca-app-pub-3940256099942544~3347511713";
 
    // private ListaModificadaAdapter mRecyclerViewAdapter;
     private FeedReaderDbHelper mFeedReaderDbHelper;
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Actividad principal creada");
+        MobileAds.initialize(this, MY_ADMOB_APP_ID);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
@@ -79,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mRecyclerViewAdapter = new RecyclerViewAdapter(this, R.layout.fila, mFeedReaderDbHelper);
+        mRecyclerViewAdapter = new RecyclerViewAdapter(this, mFeedReaderDbHelper);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

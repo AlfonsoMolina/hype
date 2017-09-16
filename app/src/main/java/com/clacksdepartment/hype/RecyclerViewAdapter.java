@@ -1,11 +1,12 @@
 package com.clacksdepartment.hype;
 
-import android.animation.LayoutTransition;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -20,6 +21,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,18 +40,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public static final int CARTELERA = 1;
     public static final int ESTRENOS = 2;
 
+    private static final int NUM_ITEM_ADD = 9;
+
     private ArrayList<ArrayList<Pelicula>> mListaEstrenos;  //Los elementos de la mListaEstrenos
     private ArrayList<ArrayList<Pelicula>> mListaCartelera;  //Los elementos de la mListaEstrenos
-    private ArrayList<Pelicula> mListaBusqueda;
 
-    private int resourceID;
     private MainActivity mMainActivity;                          //Actividad, para cambiar la IU
     private Interfaz mInterfaz;
 
     private int paginaEstrenos = 0;                                 //La página que se está mostrando (empezando por 0)
-    private int ultimaPagEstrenos;                                  //El número (empezando por 1) de la última página
     private int paginaCartelera = 0;
-    private int ultimaPagCartelera;
     private int numPeliculasPorPagina = 25;                     //Número de películas por página
 
     private Pelicula peliculaFocus;                             //Posición del elemento itemExpandido
@@ -56,6 +58,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private FeedReaderDbHelper mFeedReaderDbHelper;
 
     private int estado = CARTELERA;
+    private boolean flagAdds = true;
 
     private FragmentManager mFragmentManager;
 
@@ -63,7 +66,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public RelativeLayout mView;
 
@@ -76,20 +79,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public RecyclerViewAdapter(MainActivity mainActivity, int resourceID, FeedReaderDbHelper feedReaderDbHelper) {
+    public RecyclerViewAdapter(MainActivity mainActivity, FeedReaderDbHelper feedReaderDbHelper) {
         mListaCartelera = new ArrayList<>();
         mListaEstrenos = new ArrayList<>();
-        mListaBusqueda = new ArrayList<>();
         Log.d(TAG, "Construyendo el adaptador de la mListaEstrenos");
-        this.resourceID = resourceID;
         this.mMainActivity = mainActivity;
-        ultimaPagEstrenos = 1;
-        ultimaPagCartelera = 1;
         mFragmentManager = mainActivity.getSupportFragmentManager();
         this.mFeedReaderDbHelper = feedReaderDbHelper;
         HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(feedReaderDbHelper.getReadableDatabase(), feedReaderDbHelper.getWritableDatabase(),this);
         hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         mInterfaz = new Interfaz(mainActivity, this);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+
+        flagAdds = sharedPreferences.getBoolean("pref_adds",true);
+
 
         RecyclerView.ItemAnimator animator = ((RecyclerView) mMainActivity.findViewById(R.id.lista)).getItemAnimator();
 
@@ -100,14 +104,33 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
+    @Override
+    public int getItemViewType(int position) {
+        // Just as an example, return 0 or 2 depending on position
+        // Note that unlike in ListView adapters, types don't have to be contiguous
+        if (flagAdds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2))
+            return 0;
+        else
+            return 1;
+    }
 
     // Create new views (invoked by the layout manager)
     @Override
     public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                              int viewType) {
         // create a new view
-        RelativeLayout v = (RelativeLayout) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fila, parent, false);
+
+        RelativeLayout v;
+        switch (viewType){
+            case 0:
+                v = (RelativeLayout) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.fila_add, parent, false);
+                break;
+            default:
+                v = (RelativeLayout) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.fila, parent, false);
+                break;
+        }
         // set the view's size, margins, paddings and layout parameters
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -118,42 +141,55 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        Pelicula pelicula = getPelicula(position);
 
         View filaView = holder.mView;
 
-        ((TextView) filaView.findViewById(R.id.titulo)).setText(pelicula.getTitulo());
-        ((TextView) filaView.findViewById(R.id.estreno)).setText(pelicula.getEstrenoLetras());
-        ((ImageView) filaView.findViewById(R.id.portada)).setImageBitmap(pelicula.getPortada());
-
-        if (pelicula.getHype()) {
-            filaView.findViewById(R.id.hype_msg).setVisibility(View.VISIBLE);
-        } else
-            filaView.findViewById(R.id.hype_msg).setVisibility(View.GONE);
-
-        View avanzado = filaView.findViewById(R.id.avanzado);
-
-        position = getPosicionAbsoluta(position);
-        if (position == itemExpandido) {
-            avanzado.setVisibility(View.VISIBLE);
-            ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis());
+        if (flagAdds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2)) {
+            AdView mAdView = (AdView) filaView.findViewById(R.id.adView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
+        } else {
+            Pelicula pelicula = getPelicula(position);
+            ((TextView) filaView.findViewById(R.id.titulo)).setText(pelicula.getTitulo());
+            ((TextView) filaView.findViewById(R.id.estreno)).setText(pelicula.getEstrenoLetras());
+            ((ImageView) filaView.findViewById(R.id.portada)).setImageBitmap(pelicula.getPortada());
 
             if (pelicula.getHype()) {
-                ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
-            } else {
-                ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                filaView.findViewById(R.id.hype_msg).setVisibility(View.VISIBLE);
+            } else
+                filaView.findViewById(R.id.hype_msg).setVisibility(View.GONE);
 
-            }
+            View avanzado = filaView.findViewById(R.id.avanzado);
+
+            //position = getPosicionAbsoluta(position);
+
+            if (position == itemExpandido) {
+                avanzado.setVisibility(View.VISIBLE);
+                ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis());
+
+                if (pelicula.getHype()) {
+                    ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
+                } else {
+                    ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_border_black_24dp);
+
+                }
 
 
+            } else
+                avanzado.setVisibility(View.GONE);
 
-        } else
-            avanzado.setVisibility(View.GONE);
-
-        Log.v(TAG, "Añadiendo película " + pelicula.getTitulo() + " a la vista número " + position);
+            Log.v(TAG, "Añadiendo película " + pelicula.getTitulo() + " a la vista número " + position);
+        }
     }
 
     private Pelicula getPelicula(int position) {
+
+        if (flagAdds && position > NUM_ITEM_ADD){
+            position--;
+            if (position >= NUM_ITEM_ADD*2)
+                position--;
+        }
+
         if (estado == HYPE) {
             for (int i = mListaCartelera.size() - 1; i >= 0; i--) {
                 for (int j = mListaCartelera.get(i).size() - 1; j >= 0; j--) {
@@ -189,6 +225,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
+        int cuenta = 0;
         if (estado == HYPE){
             int count = 0;
             for (int i = 0; i < mListaCartelera.size(); i++){
@@ -206,53 +243,26 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     }
                 }
             }
-            return count;
+            cuenta = count;
          } else if (estado == CARTELERA) {
             if (mListaCartelera.size() > 0) {
-                return mListaCartelera.get(paginaCartelera).size();
+                cuenta = mListaCartelera.get(paginaCartelera).size();
             }else
-                return 0;
+                cuenta = 0;
         } else {
             if (mListaEstrenos.size() > 0) {
-                return mListaEstrenos.get(paginaEstrenos).size();
+                cuenta = mListaEstrenos.get(paginaEstrenos).size();
             }else
-                return 0;
+                cuenta = 0;
         }
-    }
 
+        if (flagAdds && cuenta > NUM_ITEM_ADD) {
+            cuenta++;
+            if (cuenta > NUM_ITEM_ADD*2)
+                cuenta++;
+        }
 
-    private int getPosicionAbsoluta(int posicionRelativa) {
-        int posicionAbsoluta = 0;
-        if (estado == HYPE) {
-            int pos = 0;
-
-            for (int i = mListaCartelera.size()-1; i>=0;i--)
-                for (int j = mListaCartelera.get(i).size()-1; j>=0;j--)
-                    if(mListaCartelera.get(i).get(j).getHype()) {
-                        if (posicionRelativa == 0) {
-                            posicionAbsoluta = pos;
-                            break;
-                        }
-                        posicionRelativa--;
-                        pos++;
-                    }
-
-            for (int i = 0; i<mListaEstrenos.size();i++)
-                for (int j = 0; j<mListaEstrenos.get(i).size();j++)
-                    if(mListaEstrenos.get(i).get(j).getHype()) {
-                        if (posicionRelativa == 0) {
-                            posicionAbsoluta = pos;
-                            break;
-                        }
-                        posicionRelativa--;
-                        pos++;
-                    }
-
-        } else
-            posicionAbsoluta = posicionRelativa ;
-
-        return posicionAbsoluta;
-
+        return cuenta;
     }
 
     int getUltPagina() {
@@ -458,14 +468,20 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             }
         }
 
+        if (flagAdds && posicion >= NUM_ITEM_ADD){
+            posicion++;
+            if (posicion >= NUM_ITEM_ADD*2)
+                posicion++;
+        }
+
         if (itemExpandido == posicion){
             itemExpandido = -1;
             Log.d(TAG, "Contrayendo  elemento " + posicion);
         } else {
-
             itemExpandido = posicion;
             Log.d(TAG, "Expandiendo  elemento " + posicion);
         }
+
         if(posicionAntigua != -1)
             notifyItemChanged(posicionAntigua);
         notifyItemChanged(itemExpandido);

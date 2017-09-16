@@ -5,21 +5,21 @@
     <item
         android:id="@+id/busqueda"
         android:icon="@drawable/ic_search_black_24dp"
-        android:title="Buscar"
+        android:title="@string/menu_buscar"
         app:showAsAction="ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView"
         />
     <item
         android:id="@+id/actualizar"
         android:icon="@drawable/ic_refresh_black_24dp"
-        android:title="Recargar"
+        android:title="@string/recargar"
         app:showAsAction="ifRoom"
         />
 
     <item
         android:id="@+id/cancelar"
         android:icon="@drawable/ic_cancel_black_24dp"
-        android:title="Cancelar"
+        android:title="@string/cancelar"
         app:showAsAction="ifRoom"
         android:enabled="false"
         android:visible="false"
@@ -28,7 +28,7 @@
 
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"
-        android:title="Opciones"
+        android:title="@string/opciones"
         app:showAsAction="never"/>
 
 </menu>
