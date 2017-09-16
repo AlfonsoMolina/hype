@@ -153,8 +153,61 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<RecyclerViewAdapter.V
     }
 
     public void buscar(String query){
+
+        mListaBusqueda.clear();
+
+        String l, t, s, e, f, h;
+        byte[] p_byte;
+        Bitmap p_bitmap;
+        String[] q = {"%" +query+"%"};
+
+        SQLiteDatabase dbr = mDB.getReadableDatabase();
+
+        Log.d(TAG,"a");
+        String []projection2 = {
+                FeedReaderContract.FeedEntryCartelera._ID,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_REF,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE,
+        };
+        Log.d(TAG,"aa");
+
+        Cursor cursor = dbr.query(
+                FeedReaderContract.FeedEntryCartelera.TABLE_NAME,                     // The table to query
+                projection2,                               // The columns to return
+                FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO + " LIKE ?",  // The columns for the WHERE clause
+                q ,                                     // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA + " ASC"                                    // The sort order
+        );
+        Log.d(TAG,"aaa " + cursor.getCount());
+
+        //Y empezamos a mirar las tuplas una a una
+        while (cursor.moveToNext()) {
+            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA));
+            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO));
+            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_REF));
+            p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA));
+            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS));
+            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO));
+            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE));
+
+            p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
+
+            mListaBusqueda.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
+
+            Log.d(TAG, "Encontrada película Cartelera: " + t + ".");
+        }
+
+        Log.d(TAG,"aaaa");
+
         //Se lee la bbdd y se guardan los elementos en cursor
-        String[] projection2 = {
+        String[] projection = {
                 FeedReaderContract.FeedEntryEstrenos._ID,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA,
@@ -166,23 +219,22 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<RecyclerViewAdapter.V
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_CORTO
         };
 
-        String[] q = {"%" +query+"%"};
-        Cursor cursor = mDB.getReadableDatabase().query(
+        cursor = dbr.query(
                 FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
-                projection2,                               // The columns to return
+                projection,                               // The columns to return
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO + " LIKE ?",  // The columns for the WHERE clause
                 q ,                                     // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA + " ASC"                                    // The sort order
         );
-        String l, t, s, e, f, h;
-        byte[] p_byte;
-        Bitmap p_bitmap;
+
+        Log.d(TAG,"aaaaa " + cursor.getCount());
+
         //Y empezamos a mirar las tuplas una a una
         while (cursor.moveToNext()) {
             f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA));
-            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO)); //Esto para el log solo
+            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO));
             l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF));
             p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA));
             s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS));
@@ -193,9 +245,12 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<RecyclerViewAdapter.V
 
             mListaBusqueda.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
 
-            Log.d(TAG, "Encontrada película: " + t + ".");
+            Log.d(TAG, "Encontrada película Estrenos: " + t + ".");
         }
         cursor.close();
+
+        Log.d(TAG,"aaaaaa ");
+
         notifyDataSetChanged();
     }
 

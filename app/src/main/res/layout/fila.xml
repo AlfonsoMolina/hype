@@ -128,7 +128,7 @@
                 android:onClick="marcarHype"
                 />
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/av_enlace"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

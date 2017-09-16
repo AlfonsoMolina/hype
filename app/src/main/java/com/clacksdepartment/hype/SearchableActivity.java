@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 /**
@@ -58,12 +59,18 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
         mBusquedaAdapter= new BusquedaAdapter(this,R.layout.fila, feedReaderDbHelper);
         mRecyclerView.setAdapter(mBusquedaAdapter);
 
+
+
+
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             doMySearch(query);
         }
+
+
+
     }
 
     @Override
@@ -72,12 +79,27 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
         // Expande el mMenu, añade las opciones
         getMenuInflater().inflate(R.menu.menu, menu);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+     //   SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.busqueda).getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
         // Assumes current activity is the searchable activity
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+     //   searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                doMySearch(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+        });
 
        return true;
     }
@@ -87,9 +109,15 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
 
     @Override
     public void onBackPressed(){
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        FrameLayout fragmento = (FrameLayout) findViewById(R.id.ficha_container);
+
+        if (fragmento != null && fragmento.getVisibility()==View.VISIBLE) {
+            super.onBackPressed();
+        }
+        else {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);        }
     }
 
 
