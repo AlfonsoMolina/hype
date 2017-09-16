@@ -299,14 +299,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         // Si estamos en la sección y la página donde se han añadido los datos:
         if (estado == CARTELERA && paginaCartelera == (mListaCartelera.size()-1)){
             try {
-                notifyItemInserted(mListaCartelera.get(mListaCartelera.size() - 1).size() - 1);
+                notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
             }
         } else if (estado == HYPE && p.getHype()){
             try {
-                notifyDataSetChanged();
+                notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
@@ -323,14 +323,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         if (estado == ESTRENOS && paginaEstrenos == (mListaEstrenos.size()-1)){
             try {
-                notifyItemInserted(mListaCartelera.get(mListaEstrenos.size() - 1).size() - 1);
+                notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
             }
         } else if (estado == HYPE && p.getHype()){
             try {
-                notifyDataSetChanged();
+                notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
@@ -352,15 +352,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     //Si la mListaEstrenos está vacía, muestra el mensaje de que no hay películas.
-    //TODO modificar.
-    void noHayPelis(){
-        if ((estado==CARTELERA) && mListaCartelera.size()==0) {
-            ((TextView) mMainActivity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
-            mMainActivity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
-        } else if ((estado==ESTRENOS) && mListaEstrenos.size()==0) {
-            ((TextView) mMainActivity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
-            mMainActivity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
-        }
+    void quitarX(){
 
         if(mMainActivity.getMenu()!= null) {
             mMainActivity.getMenu().findItem(R.id.actualizar).setEnabled(true);
@@ -370,8 +362,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
-    void mostrarNoPelis(boolean b){
-        mInterfaz.mostrarNoHayPelis(false);
+    void mostrarNoPelis(){
+        if (getItemCount()==0) {
+            mInterfaz.mostrarNoHayPelis(true);
+        } else
+            mInterfaz.mostrarNoHayPelis(false);
+
+
     }
 
     void actualizarInterfaz(){
@@ -603,5 +600,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         intent.putExtra(android.content.Intent.EXTRA_TEXT, pelicula.getEnlace());
         mMainActivity.startActivity(Intent.createChooser(intent, "Compartir película: " + pelicula.getTitulo() + "."));
 
+    }
+
+    public void actualizarDatos() {
+        mListaCartelera.clear();
+        mListaEstrenos.clear();
+        notifyDataSetChanged();
+        HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase(),this);
+        hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

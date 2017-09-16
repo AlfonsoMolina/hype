@@ -236,14 +236,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mRecyclerViewAdapter.eliminarLista();
             mRecyclerViewAdapter.notifyDataSetChanged();
             mRecyclerViewAdapter.actualizarInterfaz();
-            mRecyclerViewAdapter.noHayPelis();
+            mRecyclerViewAdapter.mostrarNoPelis();
         } else if (clave.equalsIgnoreCase("pref_pais")){
             //Cuando cambia el país se borra la mRecyclerViewAdapter anterior
             mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
             mRecyclerViewAdapter.eliminarLista();
             mRecyclerViewAdapter.notifyDataSetChanged();
             mRecyclerViewAdapter.actualizarInterfaz();
-            mRecyclerViewAdapter.noHayPelis();
+            mRecyclerViewAdapter.mostrarNoPelis();
         }
     }
 

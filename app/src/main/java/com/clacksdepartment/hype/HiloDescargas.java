@@ -80,7 +80,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         if(actFuerte) {
             lista.eliminarLista();
-            lista.noHayPelis();
+            lista.mostrarNoPelis();
         }
     }
 
@@ -109,8 +109,11 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE;
             String s_temp3 = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE :
                     FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO;
+            String s_temp4 = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA :
+                    FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA;
+
             String[] projection = {
-                    s_temp, s_temp2, s_temp3
+                    s_temp, s_temp2, s_temp3, s_temp4
             };
             String selection = s_temp + " = ?";
 
@@ -154,28 +157,17 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                         l = peliculasHTML[i].substring(0, peliculasHTML[i].indexOf("\""));
                         String[] selectionArgs = {l};
 
-                        if (estado) {
 
-                            cursor = db[0].query(
-                                    FeedReaderContract.FeedEntryCartelera.TABLE_NAME,                     // The table to query
-                                    projection,                               // The columns to return
-                                    selection,                                // The columns for the WHERE clause
-                                    selectionArgs,                            // The values for the WHERE clause
-                                    null,                                     // don't group the rows
-                                    null,                                     // don't filter by row groups
-                                    null                                    // The sort order
-                            );
-                        } else { // if (estado == ESTRENOS)
-                            cursor = db[0].query(
-                                    FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
-                                    projection,                               // The columns to return
-                                    selection,                                // The columns for the WHERE clause
-                                    selectionArgs,                            // The values for the WHERE clause
-                                    null,                                     // don't group the rows
-                                    null,                                     // don't filter by row groups
-                                    null                                    // The sort order
-                            );
-                        }
+                        cursor = db[0].query(
+                                estado?FeedReaderContract.FeedEntryCartelera.TABLE_NAME:FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
+                                projection,                               // The columns to return
+                                selection,                                // The columns for the WHERE clause
+                                selectionArgs,                            // The values for the WHERE clause
+                                null,                                     // don't group the rows
+                                null,                                     // don't filter by row groups
+                                estado?FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA + " DESC":FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA + " ASC"                                      // The sort order
+                        );
+
 
                         //Si la película no está guardada (o si es una actualización fuerte), se añade
                         if (cursor.getCount() == 0 || actFuerte) {
@@ -197,8 +189,6 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                                 p_bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
                                 p_byte = stream.toByteArray();
-
-                                //TODO hacerlo más eficiente, directamente en stream
                             }
 
                             ind = peliculasHTML[i].indexOf("mc-title ft\">");
@@ -399,7 +389,8 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
             if(actFuerte && estado){
                 String selection2 = FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE + " LIKE ?";
                 String[] selectionArgs2 = {"0"};
-                db[0].delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, selection2, selectionArgs2);
+                if (!isCancelled())
+                    db[0].delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, selection2, selectionArgs2);
 
                 //Y esto pone un 0 donde antes había un 1
                 ContentValues values2 = new ContentValues();
@@ -448,7 +439,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
     protected void onProgressUpdate(Integer... i) {
         Log.d(TAG, "Descarga al " + ((i[0]+1)*10) + "%");
         if (i[0] == -2)
-            lista.mostrarNoPelis(false);
+            lista.mostrarNoPelis();
         else if (i[0] == 0){
             for(int j = 0; j < 10; j++)
                 carga_barra.getChildAt(j).setBackgroundColor(Color.parseColor("#455a64"));
@@ -470,7 +461,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
         //lista.notifyDataSetChanged();
 
         lista.actualizarInterfaz();
-        lista.noHayPelis(); //Y esto de chanchullo para quitar el X
+        lista.quitarX(); //Y esto de chanchullo para quitar el X
         carga_barra.setVisibility(View.GONE);
     }
 
@@ -479,7 +470,8 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
         Log.d(TAG, "Descarga cancelada, actualizando interfaz");
         //lista.notifyDataSetChanged();
         lista.actualizarInterfaz();
-        lista.noHayPelis(); //Y esto de chanchullo para quitar el X
+        lista.quitarX(); //Y esto de chanchullo para quitar el X
+        lista.actualizarDatos();
         carga_barra.setVisibility(View.GONE);
     }
 
