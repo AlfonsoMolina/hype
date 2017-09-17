@@ -150,7 +150,7 @@
         android:id="@+id/contenido"
         android:orientation="vertical"
         android:layout_below="@id/navegacion"
-        android:layout_above="@+id/pie">
+        android:layout_above="@+id/carga_barra">
 
 
         <TextView
@@ -170,16 +170,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingTop="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="60dp"
+            android:paddingBottom="0dp"
             android:clipToPadding="false"
             android:backgroundTint="@color/colorPrimary"
             android:layoutAnimation="@anim/rellenar_lista"
             />
 
     </LinearLayout>
-
     <FrameLayout
         android:id="@+id/ficha_container"
         android:elevation="10dp"
@@ -190,18 +187,16 @@
         >
     </FrameLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@id/pie"
-        android:layout_alignParentBottom="true">
+
         <LinearLayout
             android:id="@+id/carga_barra"
             android:layout_width="match_parent"
             android:layout_height="5dp"
             android:orientation="horizontal"
             android:baselineAligned="false"
-            android:animateLayoutChanges="true">
+            android:layout_alignParentBottom="true"
+            android:animateLayoutChanges="true"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -254,12 +249,11 @@
                 android:layout_weight="1"
                 android:background="@color/colorWindowBackground"/>
         </LinearLayout>
-    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/pie"
+        android:layout_alignParentBottom="true"
         android:id="@+id/paginador"
         android:paddingEnd="20dp"
         android:paddingStart="20dp"

@@ -108,10 +108,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public int getItemViewType(int position) {
         // Just as an example, return 0 or 2 depending on position
         // Note that unlike in ListView adapters, types don't have to be contiguous
+
         if (flagAdds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2))
             return 0;
-        else
+        else if (position == getItemCount()-1)
             return 1;
+        else
+            return 2;
     }
 
     // Create new views (invoked by the layout manager)
@@ -125,6 +128,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             case 0:
                 v = (RelativeLayout) LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.fila_add, parent, false);
+                break;
+            case 1:
+                v = (RelativeLayout) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.footer, parent, false);
                 break;
             default:
                 v = (RelativeLayout) LayoutInflater.from(parent.getContext())
@@ -148,6 +155,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             AdView mAdView = (AdView) filaView.findViewById(R.id.adView);
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
+        } else if (position == getItemCount() -1) {
+            //Se carga el footer.
         } else {
             Pelicula pelicula = getPelicula(position);
             ((TextView) filaView.findViewById(R.id.titulo)).setText(pelicula.getTitulo());
@@ -261,6 +270,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             if (cuenta > NUM_ITEM_ADD*2)
                 cuenta++;
         }
+
+        cuenta ++; //Por el footer.
 
         return cuenta;
     }
