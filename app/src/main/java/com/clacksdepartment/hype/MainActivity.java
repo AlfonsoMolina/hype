@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas hypeadas");
 
-        if (mRecyclerViewAdapter.getEstado() != ListaModificadaAdapter.HYPE){
+        if (mRecyclerViewAdapter.getEstado() != RecyclerViewAdapter.HYPE){
             mInterfaz.animaListado();
             mRecyclerViewAdapter.mostrarHype();
             mInterfaz.seleccionaBotonHype();
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas de estreno");
 
-        if (mRecyclerViewAdapter.getEstado() != ListaModificadaAdapter.CARTELERA) {
+        if (mRecyclerViewAdapter.getEstado() != RecyclerViewAdapter.CARTELERA) {
             mInterfaz.animaListado();
             mRecyclerViewAdapter.mostrarCartelera();
             mInterfaz.seleccionaBotonCartelera();
@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d(TAG, "Mostrando películas de estreno");
 
-        if (mRecyclerViewAdapter.getEstado() != ListaModificadaAdapter.ESTRENOS) {
+        if (mRecyclerViewAdapter.getEstado() != RecyclerViewAdapter.ESTRENOS) {
 
             mInterfaz.animaListado();
             mRecyclerViewAdapter.mostrarEstrenos();
