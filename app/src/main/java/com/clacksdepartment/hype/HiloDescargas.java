@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -132,10 +133,10 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
                 if (html != null) {
 
+                    String parser_link = "https://m.filmaffinity.com/es/movie.php";
 
-                    //Se parte el HTML en la división entre las películas
-                    String[] peliculasHTML = html.split("-item\" href=\"");
-                    String l;
+                    String[] peliculasHTML = html.split("movie.php");
+                     String l;
                     String p;
                     String t;
                     String s;
@@ -154,7 +155,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     for (int i = 1; i < peliculasHTML.length && !isCancelled(); i++) {
 
                         //Se utiliza en link para ver si ya está
-                        l = peliculasHTML[i].substring(0, peliculasHTML[i].indexOf("\""));
+                        l = parser_link + peliculasHTML[i].substring(4, peliculasHTML[i].indexOf("\""));
                         String[] selectionArgs = {l};
 
 
