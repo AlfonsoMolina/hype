@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +55,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private Pelicula peliculaFocus;                             //Posición del elemento itemExpandido
     private int itemExpandido = -1;
+    private View primerElemento;
 
     private FeedReaderDbHelper mFeedReaderDbHelper;
 
@@ -124,14 +126,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         // create a new view
 
         RelativeLayout v;
-        switch (viewType){
+        switch (viewType) {
             case 0:
                 v = (RelativeLayout) LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.fila_add, parent, false);
                 break;
             case 1:
-                v = (RelativeLayout) LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.footer, parent, false);
+                if (estado == HYPE || primerElemento == null || primerElemento.isShown()) {
+                    mMainActivity.findViewById(R.id.paginador).setBackgroundColor(mMainActivity.getColor(R.color.colorPrimaryDark));
+                } else{
+                    v = (RelativeLayout) LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.footer, parent, false);
+                }
+                v=new RelativeLayout(mMainActivity.getApplicationContext());
                 break;
             default:
                 v = (RelativeLayout) LayoutInflater.from(parent.getContext())
@@ -156,8 +163,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
-            //Se carga el footer.
+            /*
+            if (estado == HYPE || primerElemento == null || primerElemento.isShown()) {
+                filaView.setVisibility(View.GONE);
+            } else{
+                filaView.setVisibility(View.VISIBLE);
+            }*/
         } else {
+            if (position == 0)
+                primerElemento = filaView;
+
             Pelicula pelicula = getPelicula(position);
             ((TextView) filaView.findViewById(R.id.titulo)).setText(pelicula.getTitulo());
             ((TextView) filaView.findViewById(R.id.estreno)).setText(pelicula.getEstrenoLetras());
