@@ -162,7 +162,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
-            if (mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0 || estado == HYPE || getItemCount() == 1) {
+            if (estado == HYPE || (mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition()+1) == getItemCount() || getItemCount() == 1) {
                 filaView.setVisibility(View.GONE);
             } else {
                 filaView.setVisibility(View.VISIBLE);
@@ -388,7 +388,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     //Si la mListaEstrenos está vacía, muestra el mensaje de que no hay películas.
     void quitarX(){
-
         if(mMainActivity.getMenu()!= null) {
             mMainActivity.getMenu().findItem(R.id.actualizar).setEnabled(true);
             mMainActivity.getMenu().findItem(R.id.actualizar).setVisible(true);
