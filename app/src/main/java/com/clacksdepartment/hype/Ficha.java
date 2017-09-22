@@ -44,6 +44,8 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     private List <String> productora;
     private List <String> genero;
     private String sinopsis;
+    private String nota;
+    private String votos;
 
     // Vista a modificar
     private final View mView;
@@ -56,6 +58,8 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     private static final String regex_DIRECTORES = "itemprop=\"director\" itemscope itemtype=\"http://schema.org/Person\".*?itemprop=\"name\">([\\p{Alnum}\\p{Punct}\\s]*?)<";
     private static final String regex_REPARTO = "itemprop=\"actor\" itemscope itemtype=\"http://schema.org/Person\".*?itemprop=\"name\">([\\p{Alnum}\\p{Punct}\\s]*?)<";
     private static final String regex_GENERO = "itemprop=\"genre\">([\\p{Alnum}\\s\\p{Punct}]*?)<";
+    private static final String regex_NOTA = "itemprop=\"ratingValue\" content=\"[\\p{Alnum}\\p{Punct}]*?\">([\\p{Alnum}\\p{Punct}]*?)<";
+    private static final String regex_VOTOS = "itemprop=\"ratingCount\" content=\"[\\p{Alnum}\\p{Punct}]*?\">([\\p{Alnum}\\p{Punct}]*?)<";
 
     // Grupo a almacenar de cada regex
     private static final int grupo_POSTER = 1;
@@ -65,6 +69,8 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     private static final int grupo_DIRECTORES = 1;
     private static final int grupo_REPARTO = 1;
     private static final int grupo_GENERO = 1;
+    private static final int grupo_NOTA = 1;
+    private static final int grupo_VOTOS = 1;
 
     // Valor de progreso resultante:
     private static final int progreso_POSTER = 0;
@@ -74,6 +80,8 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     private static final int progreso_DIRECTORES = 4;
     private static final int progreso_REPARTO = 5;
     private static final int progreso_GENERO = 6;
+    private static final int progreso_NOTA = 7;
+    private static final int progreso_VOTOS = 8;
 
     // Patterns y matchers:
     private ArrayList <Pattern> vPattern;
@@ -98,6 +106,8 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
         vPattern.add(Pattern.compile(regex_DIRECTORES));
         vPattern.add(Pattern.compile(regex_REPARTO));
         vPattern.add(Pattern.compile(regex_GENERO));
+        vPattern.add(Pattern.compile(regex_NOTA));
+        vPattern.add(Pattern.compile(regex_VOTOS));
 
     }
 
@@ -175,6 +185,21 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
                         }
                         Log.d(TAG, genero.toString());
                         break;
+                    case progreso_NOTA:
+                        nota = "No disponible";
+                        while (matcher.find()) {
+                            nota = matcher.group(grupo_NOTA);
+                        }
+                        Log.d(TAG, nota);
+                        break;
+                    case progreso_VOTOS:
+                        votos = "";
+                        while (matcher.find()) {
+                            votos = matcher.group(grupo_VOTOS);
+                        }
+
+                        Log.d(TAG, votos);
+                        break;
                     default:
                         break;
                 }
@@ -223,6 +248,14 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
                 break;
             case progreso_GENERO:
                 ((TextView) mView.findViewById(R.id.ficha_genero)).setText(genero.toString().replace("[", "").replace("]", ""));
+                break;
+            case progreso_NOTA:
+                ((TextView) mView.findViewById(R.id.ficha_nota)).setText(nota);
+                break;
+            case progreso_VOTOS:
+                if (votos.length() > 0) {
+                    ((TextView) mView.findViewById(R.id.ficha_nota)).setText(nota + " (" + votos + " " + mView.getResources().getString(R.string.votos) + ")");
+                }
                 break;
             default:
                 break;

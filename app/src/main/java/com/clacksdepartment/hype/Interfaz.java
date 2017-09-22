@@ -4,6 +4,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
@@ -12,13 +14,8 @@ import android.widget.TextView;
 class Interfaz {
 
     private MainActivity mMainActivity;
-//    private ListaModificadaAdapter mListaNueva;
     private RecyclerViewAdapter mRecyclerViewAdapter;
 
-  /*  Interfaz(MainActivity mainActivity, ListaModificadaAdapter listaModificadaAdapter){
-        this.mMainActivity = mainActivity;
-        this.mListaNueva = listaModificadaAdapter;
-    }*/
 
     Interfaz(MainActivity mainActivity, RecyclerViewAdapter RecyclerViewAdapter){
         this.mMainActivity = mainActivity;
@@ -57,17 +54,14 @@ class Interfaz {
             // Evaluamos la página en la que estamos, casos: prim. pagina, ultima pagina, cualquier pagina en medio
 
             if (mRecyclerViewAdapter.getPagina() == 0){
-                mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.GONE);
-                mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
-
+                animaBoton(mMainActivity.findViewById(R.id.previousPageButton), false);
+                animaBoton(mMainActivity.findViewById(R.id.nextPageButton), true);
             }else if ((mRecyclerViewAdapter.getPagina()+1) == mRecyclerViewAdapter.getUltPagina()){
-                mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.GONE);
-                mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
-
+                animaBoton(mMainActivity.findViewById(R.id.previousPageButton), true);
+                animaBoton(mMainActivity.findViewById(R.id.nextPageButton), false);
             }else{
-                mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.VISIBLE);
-                mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.VISIBLE);
-
+                animaBoton(mMainActivity.findViewById(R.id.previousPageButton), true);
+                animaBoton(mMainActivity.findViewById(R.id.nextPageButton), true);
             }
 
             // Quiero mostrar el paginador
@@ -76,9 +70,8 @@ class Interfaz {
         }else{
             // Quiero ocultar el navegador
             mMainActivity.findViewById(R.id.paginador).setVisibility(View.GONE);
-            mMainActivity.findViewById(R.id.previousPageButton).setVisibility(View.GONE);
-            mMainActivity.findViewById(R.id.nextPageButton).setVisibility(View.GONE);
-
+            animaBoton(mMainActivity.findViewById(R.id.previousPageButton), false);
+            animaBoton(mMainActivity.findViewById(R.id.nextPageButton), false);
         }
     }
 
@@ -143,4 +136,22 @@ class Interfaz {
         } else
             mMainActivity.findViewById(R.id.navegacion).setVisibility(View.GONE);
     }
+
+    void animaBoton(View view, Boolean mostrar){
+        //float alpha = view.getAlpha();
+        if (mostrar){
+            //AlphaAnimation animacion = new AlphaAnimation (alpha, 1.0f);
+            //animacion.setDuration(300);
+            //animacion.setFillAfter(true);
+            //view.startAnimation(animacion);
+            view.setAlpha(1.0f);
+        }else{
+            //AlphaAnimation animacion = new AlphaAnimation (alpha, 0.2f);
+            //animacion.setDuration(300);
+            //animacion.setFillAfter(true);
+            view.setAlpha(0.2f);
+            //view.startAnimation(animacion);
+        }
+    }
+
 }

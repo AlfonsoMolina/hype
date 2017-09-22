@@ -35,4 +35,6 @@
     <string name="recargar">Update</string>
     <string name="cancelar">Cancel</string>
     <string name="opciones">Settings</string>
+    <string name="label_nota">Rating</string>
+    <string name="votos">votes</string>
 </resources>

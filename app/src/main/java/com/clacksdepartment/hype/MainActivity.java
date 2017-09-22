@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         mInterfaz = new Interfaz(this, mRecyclerViewAdapter);
         mInterfaz.seleccionaBotonCartelera();
-
         mostrarCartelera(findViewById(R.id.cartelera));
     }
 
@@ -223,17 +222,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public void avanzarPagina(View view) {
         int pagina = mRecyclerViewAdapter.getPagina();
-        Log.d(TAG, "Avanzando a la página " + (pagina+2));
-        if (pagina < mRecyclerViewAdapter.getUltPagina()) {
+        if (pagina < mRecyclerViewAdapter.getUltPagina()-1) {
+            Log.d(TAG, "Avanzando a la página " + (pagina+2));
             mRecyclerViewAdapter.pasarPagina(pagina + 1);
             ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina+2));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
             //porque se ha cogido del adaptador.
             mInterfaz.enfocaPrimerElementoBrusco();
+            mRecyclerViewAdapter.notifyDataSetChanged();
         }
-
-        mRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String clave) {

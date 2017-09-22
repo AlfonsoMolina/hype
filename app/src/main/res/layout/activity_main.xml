@@ -258,8 +258,7 @@
         android:paddingEnd="20dp"
         android:paddingStart="20dp"
         android:paddingBottom="10dp"
-        android:elevation="4dp"
-        android:animateLayoutChanges="true">
+        android:elevation="4dp">
 
         <ImageButton
             android:id="@+id/previousPageButton"
@@ -273,7 +272,7 @@
             android:tint="#000000"
             android:background="@drawable/circle_shape"
             android:backgroundTint="?attr/colorAccent"
-            android:visibility="gone"
+            android:alpha="0.2"
             />
 
 

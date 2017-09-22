@@ -38,4 +38,6 @@
     <string name="recargar">Actualizar</string>
     <string name="cancelar">Cancelar</string>
     <string name="opciones">Opciones</string>
+    <string name="label_nota">Nota</string>
+    <string name="votos">votos</string>
 </resources>
