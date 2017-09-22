@@ -131,6 +131,10 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     this.cancel(true);
                 }
 
+                /*
+                 * Vamos a sustituir el parseo de las pelis
+                 */
+
                 if (html != null) {
 
                     String parser_link = "https://m.filmaffinity.com/es/movie.php";
@@ -155,7 +159,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     for (int i = 1; i < peliculasHTML.length && !isCancelled(); i++) {
 
                         //Se utiliza en link para ver si ya está
-                        l = parser_link + peliculasHTML[i].substring(4, peliculasHTML[i].indexOf("\""));
+                        l = parser_link + peliculasHTML[i].substring(0, peliculasHTML[i].indexOf("\""));
                         String[] selectionArgs = {l};
 
 
