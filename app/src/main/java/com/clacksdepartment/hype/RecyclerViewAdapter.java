@@ -162,7 +162,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
-            if (mLinearLayoutManager.findFirstVisibleItemPosition() == 0 || estado == HYPE) {
+            if (mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0 || estado == HYPE) {
                 filaView.setVisibility(View.GONE);
             } else {
                 filaView.setVisibility(View.VISIBLE);
