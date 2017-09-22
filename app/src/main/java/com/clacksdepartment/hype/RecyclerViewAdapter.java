@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -20,9 +21,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
@@ -66,6 +70,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private FragmentManager mFragmentManager;
     LinearLayoutManager mLinearLayoutManager;
+    RecyclerView mRecyclerView;
 
 
     // Provide a reference to the views for each data item
@@ -81,7 +86,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         }
     }
-
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public RecyclerViewAdapter(MainActivity mainActivity, FeedReaderDbHelper feedReaderDbHelper) {
@@ -105,7 +109,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }
 
-        mLinearLayoutManager = ((LinearLayoutManager) ((RecyclerView) mMainActivity.findViewById(R.id.lista)).getLayoutManager());
+        mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.lista));
+        mLinearLayoutManager = ((LinearLayoutManager) mRecyclerView.getLayoutManager());
 
     }
 
@@ -186,7 +191,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             //position = getPosicionAbsoluta(position);
 
             if (position == itemExpandido) {
-                avanzado.setVisibility(View.VISIBLE);
+                //avanzado.setVisibility(View.VISIBLE);
+                expand(avanzado);
                 ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis());
 
                 if (pelicula.getHype()) {
@@ -198,7 +204,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
             } else
-                avanzado.setVisibility(View.GONE);
+                collapse(avanzado);
+                //avanzado.setVisibility(View.GONE);
 
 
             Log.v(TAG, "Añadiendo película " + pelicula.getTitulo() + " a la vista número " + position);
@@ -457,7 +464,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         int posicionAntigua = itemExpandido;
         int posicion = 0;
 
-
         if (estado == HYPE){
             Pelicula p;
             Boolean flag = true;
@@ -649,4 +655,73 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase(),this);
         hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
+
+    public void expand(final View v) {
+        v.measure(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
+        final int targetHeight = v.getMeasuredHeight();
+
+        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
+        v.getLayoutParams().height = 1;
+        v.setVisibility(View.VISIBLE);
+
+
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                v.getLayoutParams().height = interpolatedTime == 1
+                        ? RecyclerView.LayoutParams.WRAP_CONTENT
+                        : (int)(targetHeight * interpolatedTime);
+                v.requestLayout();
+                mRecyclerView.scrollToPosition(itemExpandido);
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+
+            public void terminado(){
+                v.findViewById(R.id.botonera).setVisibility(View.VISIBLE);
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int) (targetHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+
+
+    }
+
+    public void collapse(final View v) {
+        final int initialHeight = v.getMeasuredHeight();
+
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                if(interpolatedTime == 1){
+                    v.setVisibility(View.GONE);
+                }else{
+                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                    v.requestLayout();
+                }
+
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+
+            public void terminado(){
+                v.findViewById(R.id.botonera).setVisibility(View.INVISIBLE);
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+    }
+
 }
