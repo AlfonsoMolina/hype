@@ -10,7 +10,9 @@ import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatImageButton;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.util.DisplayMetrics;
@@ -35,7 +37,7 @@ import java.util.Calendar;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-    private static final String TAG = "listaNueva";
+    private static final String TAG = "RecyclerViewAdapter";
 
     public static final int HYPE = 0;
     public static final int CARTELERA = 1;
@@ -63,6 +65,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private boolean flagAdds = true;
 
     private FragmentManager mFragmentManager;
+    LinearLayoutManager mLinearLayoutManager;
 
 
     // Provide a reference to the views for each data item
@@ -96,12 +99,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         flagAdds = sharedPreferences.getBoolean("pref_adds",true);
 
-
         RecyclerView.ItemAnimator animator = ((RecyclerView) mMainActivity.findViewById(R.id.lista)).getItemAnimator();
 
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }
+
+        mLinearLayoutManager = ((LinearLayoutManager) ((RecyclerView) mMainActivity.findViewById(R.id.lista)).getLayoutManager());
 
     }
 
@@ -132,13 +136,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         .inflate(R.layout.fila_add, parent, false);
                 break;
             case 1:
-                if (estado == HYPE || primerElemento == null || primerElemento.isShown()) {
-                    mMainActivity.findViewById(R.id.paginador).setBackgroundColor(mMainActivity.getColor(R.color.colorPrimaryDark));
-                } else{
-                    v = (RelativeLayout) LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.footer, parent, false);
-                }
-                v=new RelativeLayout(mMainActivity.getApplicationContext());
+                v = (RelativeLayout) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.footer, parent, false);
                 break;
             default:
                 v = (RelativeLayout) LayoutInflater.from(parent.getContext())
@@ -163,12 +162,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
-            /*
-            if (estado == HYPE || primerElemento == null || primerElemento.isShown()) {
+            if (mLinearLayoutManager.findFirstVisibleItemPosition() == 0 || estado == HYPE) {
                 filaView.setVisibility(View.GONE);
-            } else{
+            } else {
                 filaView.setVisibility(View.VISIBLE);
-            }*/
+            }
         } else {
             if (position == 0)
                 primerElemento = filaView;
@@ -201,6 +199,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             } else
                 avanzado.setVisibility(View.GONE);
+
 
             Log.v(TAG, "Añadiendo película " + pelicula.getTitulo() + " a la vista número " + position);
         }

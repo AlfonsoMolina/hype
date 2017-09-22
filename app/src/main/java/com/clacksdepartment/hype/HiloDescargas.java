@@ -23,7 +23,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Clacks Department on 11/07/2017.
@@ -40,6 +44,8 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
      */
     private static final String TAG = "HiloDescargarEstrenos";
 
+
+    private String regex = "<a href=\"(https://m.filmaffinity.com/es/movie.php\\?id=.*?)\" class=\"media mc mc-cat\" data-movie-id=.*?>.*?<div class=\"media-left mc-poster\">.*?<img width=\".*?\" height=\".*?\" src=\"(.*?)\"alt=\".*?\">.*?</div>.*?<div class=\"media-body\">.*?<div class=\"mc-title ft\">(.*?)<small>.*?</small>.*?<img src=\".*?\" alt=\".*?\" title=\".*?\">.*?</div>.*?<li class=\"synop-text\">(.*?)</li>.*?</a>.*?<span class=\"date\">(.*?)</span>";
 
     //Estoy hay que pasarlo a un array o algo
     private String[] meses_es = {"enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -137,9 +143,9 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
                 if (html != null) {
 
-                    String parser_link = "https://m.filmaffinity.com/es/movie.php";
+                    //String parser_link = "https://m.filmaffinity.com/es/movie.php";
 
-                    String[] peliculasHTML = html.split("movie.php");
+                    //String[] peliculasHTML = html.split("movie.php");
                      String l;
                     String p;
                     String t;
@@ -148,20 +154,23 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     String f;
                     byte[] p_byte;
                     Bitmap p_bitmap;
-                    int ind;
 
+                    // Setup inicial
+                    Matcher matcher;
+
+                    matcher = Pattern.compile(regex).matcher(html);
 
                     Cursor cursor;
 
                     ContentValues values = new ContentValues();
 
                     //Se analizan los trozos de HTML correspondientes a cada película
-                    for (int i = 1; i < peliculasHTML.length && !isCancelled(); i++) {
+                    while (matcher.find() && !isCancelled()) {
 
                         //Se utiliza en link para ver si ya está
-                        l = parser_link + peliculasHTML[i].substring(0, peliculasHTML[i].indexOf("\""));
-                        String[] selectionArgs = {l};
+                        l = matcher.group(1);
 
+                        String[] selectionArgs = {l};
 
                         cursor = db[0].query(
                                 estado?FeedReaderContract.FeedEntryCartelera.TABLE_NAME:FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
@@ -177,8 +186,8 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                         //Si la película no está guardada (o si es una actualización fuerte), se añade
                         if (cursor.getCount() == 0 || actFuerte) {
                             //Se buscan y guardan los diferentes elementos
-                            ind = peliculasHTML[i].indexOf("src=\"");
-                            p = peliculasHTML[i].substring(ind + 5, peliculasHTML[i].indexOf("\"", ind + 5));
+
+                            p = matcher.group(2);
 
                             try {
                                 URL url = new URL(p);
@@ -196,36 +205,24 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                                 p_byte = stream.toByteArray();
                             }
 
-                            ind = peliculasHTML[i].indexOf("mc-title ft\">");
-                            t = peliculasHTML[i].substring(ind + 13, peliculasHTML[i].indexOf("   ", ind + 13));
-                            ind = peliculasHTML[i].indexOf("synop-text\">");
+                            t = matcher.group(3);
+                            s = matcher.group(4);
+                            e = matcher.group(5);
 
-                            //La sinopsis acaba al final del campo o antes de (FILMAFFINITY) si es larga.
-                            int ind2 = peliculasHTML[i].indexOf("</li>", ind + 12);
-                            int ind3 = peliculasHTML[i].indexOf("(FILM", ind + 12);
-
-                            if (ind3 > 0 && ind3 < ind2)
-                                ind2 = ind3;
-
-                            s = peliculasHTML[i].substring(ind + 12, ind2);
-                            ind = peliculasHTML[i].indexOf("date\">");
-
-
-                            if (ind == -1) {
+                            if (e.length() == 0) {
                                 e = "Sin confirmar";
                                 f = "09/09/2099";
 
                             } else {
-                                e = peliculasHTML[i].substring(ind + 6, peliculasHTML[i].indexOf("</span>", ind + 6));
 
                                 //Ahora se mira la fecha para guardarla en el formato correcto.
-                                ind2 = e.indexOf(", ");
+                                int aux = e.indexOf(", ");
                                 String ee = "";
                                 String fecha_dia = "";
                                 String fecha_mes = "";
                                 String fecha_ano = "";
 
-                                if (ind2 > 0) {
+                                if (aux > 0) {
 
                                     int m = 0;
 
@@ -295,8 +292,8 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
                             // Me cargo sangrías y cosas raras
                             s = s.trim();
-                            t = t.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " ").replace("<br />", "\n");
-                            s = s.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " ").replace("<br />", "\n");
+                            t = t.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " ").replace("<br />", "\n").trim();
+                            s = s.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " ").replace("<br />", "\n").trim();
 
                             if (estado) {
 
