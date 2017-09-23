@@ -4,19 +4,16 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +23,6 @@ import android.view.animation.Transformation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
@@ -203,9 +199,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
 
 
-            } else
-                collapse(avanzado);
+            } else {
                 //avanzado.setVisibility(View.GONE);
+                collapse(avanzado);
+            }
 
 
             Log.v(TAG, "Añadiendo película " + pelicula.getTitulo() + " a la vista número " + position);
@@ -657,71 +654,71 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     public void expand(final View v) {
-        v.measure(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
-        final int targetHeight = v.getMeasuredHeight();
+        if (v.getVisibility() == View.GONE) {
+            Log.d(TAG, "Expandiendo!");
+            v.measure(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
+            final int targetHeight = v.getMeasuredHeight() + v.findViewById(R.id.botonera).getMeasuredHeight();
 
-        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
-        v.getLayoutParams().height = 1;
-        v.setVisibility(View.VISIBLE);
+            // Older versions of android (pre API 21) cancel animations for views with a height of 0.
+            v.getLayoutParams().height = 1;
+            v.setVisibility(View.VISIBLE);
 
+            Animation a = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
 
-        Animation a = new Animation()
-        {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                v.getLayoutParams().height = interpolatedTime == 1
-                        ? RecyclerView.LayoutParams.WRAP_CONTENT
-                        : (int)(targetHeight * interpolatedTime);
-                v.requestLayout();
-                mRecyclerView.scrollToPosition(itemExpandido);
-            }
+                    if (interpolatedTime == 1){
+                        v.getLayoutParams().height = RecyclerView.LayoutParams.WRAP_CONTENT;
+                    }else{
+                        v.getLayoutParams().height = (int) (targetHeight * interpolatedTime);
+                    }
 
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
+                    v.requestLayout();
+                    mRecyclerView.scrollToPosition(itemExpandido);
+                }
 
-            public void terminado(){
-                v.findViewById(R.id.botonera).setVisibility(View.VISIBLE);
-            }
-        };
+                @Override
+                public boolean willChangeBounds() {
+                    return true;
+                }
 
-        // 1dp/ms
-        a.setDuration((int) (targetHeight / v.getContext().getResources().getDisplayMetrics().density));
-        v.startAnimation(a);
+            };
 
-
+            // 1dp/ms
+            a.setDuration((int) (2*targetHeight / v.getContext().getResources().getDisplayMetrics().density));
+            v.startAnimation(a);
+        }
     }
 
     public void collapse(final View v) {
-        final int initialHeight = v.getMeasuredHeight();
 
-        Animation a = new Animation()
-        {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if(interpolatedTime == 1){
-                    v.setVisibility(View.GONE);
-                }else{
-                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
-                    v.requestLayout();
+        if (v.getVisibility() == View.VISIBLE) {
+            Log.d(TAG, "Contrayendo!");
+            final int initialHeight = v.getMeasuredHeight();
+
+            Animation a = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    if (interpolatedTime == 1) {
+                        v.setVisibility(View.GONE);
+                    } else {
+                        v.getLayoutParams().height = initialHeight - (int) (initialHeight * interpolatedTime);
+                        v.requestLayout();
+                    }
+
                 }
 
-            }
+                @Override
+                public boolean willChangeBounds() {
+                    return true;
+                }
 
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
+            };
 
-            public void terminado(){
-                v.findViewById(R.id.botonera).setVisibility(View.INVISIBLE);
-            }
-        };
+            // 1dp/ms
+            a.setDuration((int) (2*initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+            v.startAnimation(a);
+        }
 
-        // 1dp/ms
-        a.setDuration((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density));
-        v.startAnimation(a);
     }
-
 }

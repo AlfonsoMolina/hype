@@ -87,7 +87,6 @@
             android:orientation="horizontal"
             android:layout_gravity="center"
             android:descendantFocusability="blocksDescendants"
-            android:animateLayoutChanges="true"
             >
 
             <ImageButton
