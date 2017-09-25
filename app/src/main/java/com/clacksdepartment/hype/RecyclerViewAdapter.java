@@ -111,6 +111,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.lista));
         mLinearLayoutManager = ((LinearLayoutManager) mRecyclerView.getLayoutManager());
         vistaParaExpandir = -1;
+        vistaParaContraer = -1;
     }
 
 
