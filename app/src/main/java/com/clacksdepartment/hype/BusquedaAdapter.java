@@ -18,6 +18,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -43,6 +45,11 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
 
     private int itemExpandido = -1;
 
+    private int vistaParaExpandir;
+    private int vistaParaContraer;
+
+    private RecyclerView mRecyclerView;
+
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
@@ -63,11 +70,16 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         mFragmentManager = searchableActivity.getSupportFragmentManager();
         this.mDB = db;
 
-        RecyclerView.ItemAnimator animator = ((RecyclerView) mActivity.findViewById(R.id.lista)).getItemAnimator();
+        mRecyclerView = ((RecyclerView) mActivity.findViewById(R.id.lista));
+
+        RecyclerView.ItemAnimator animator = mRecyclerView.getItemAnimator();
 
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }
+
+        vistaParaContraer = -1;
+        vistaParaExpandir = -1;
 
     }
 
@@ -103,7 +115,7 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         View avanzado = filaView.findViewById(R.id.avanzado);
 
         if (position == itemExpandido) {
-            avanzado.setVisibility(View.VISIBLE);
+
             ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis());
 
             if (pelicula.getHype()) {
@@ -112,8 +124,21 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
                 ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_border_black_24dp);
             }
 
-        } else
-            avanzado.setVisibility(View.GONE);
+            if (vistaParaExpandir == position) {
+                expand(avanzado);
+                vistaParaExpandir = -1;
+            }else{
+                avanzado.setVisibility(View.VISIBLE);
+            }
+
+        } else{
+            if (vistaParaContraer == position) {
+                collapse(avanzado);
+                vistaParaContraer = -1;
+            }else{
+                avanzado.setVisibility(View.GONE);
+            }
+        }
 
         Log.v(TAG, "Añadiendo película " + pelicula.getTitulo() + " a la vista número " + position);
     }
@@ -139,17 +164,18 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         if (itemExpandido == posicion){
             itemExpandido = -1;
             Log.d(TAG, "Contrayendo  elemento " + posicion);
+            vistaParaContraer = posicion;
         } else {
-
             itemExpandido = posicion;
             Log.d(TAG, "Expandiendo  elemento " + posicion);
+            vistaParaExpandir = posicion;
         }
         if(posicionAntigua != -1)
             notifyItemChanged(posicionAntigua);
         notifyItemChanged(itemExpandido);
-        if (itemExpandido != -1) {
-            ((RecyclerView) mActivity.findViewById(R.id.lista)).smoothScrollToPosition(itemExpandido);
-        }
+        //if (itemExpandido != -1) {
+        //    ((RecyclerView) mActivity.findViewById(R.id.lista)).smoothScrollToPosition(itemExpandido);
+        //}
     }
 
     public void buscar(String query){
@@ -251,6 +277,10 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
 
         Log.d(TAG,"aaaaaa ");
 
+        itemExpandido = -1;
+        vistaParaExpandir = -1;
+        vistaParaContraer = -1;
+
         notifyDataSetChanged();
     }
 
@@ -259,11 +289,8 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         Log.i(TAG, "Pulsado botón de abrir fichaFragment");
         Pelicula pelicula = mListaBusqueda.get(itemExpandido);
         FichaFragment fichaFragment = FichaFragment.newInstance(pelicula.getTitulo(), pelicula.getEnlace());
-
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-
         fragmentTransaction.setCustomAnimations(R.anim.abrir_ficha, R.anim.cerrar_ficha, R.anim.abrir_ficha, R.anim.cerrar_ficha);
-
         fragmentTransaction.replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();
 
     }
@@ -367,5 +394,72 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         mActivity.startActivity(Intent.createChooser(intent, "Compartir película: " + pelicula.getTitulo() + "."));
 
     }
+
+
+    public void expand(final View v) {
+     //   if (v.getVisibility() == View.GONE) {
+            v.measure(View.MeasureSpec.makeMeasureSpec(((View) v.getParent()).getWidth(), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            final int targetHeight = v.getMeasuredHeight();
+            // Older versions of android (pre API 21) cancel animations for views with a height of 0.
+            v.getLayoutParams().height = 1;
+            v.setVisibility(View.VISIBLE);
+
+            Animation a = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+
+                    if (interpolatedTime == 1){
+                        v.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    }else{
+                        v.getLayoutParams().height = (int) (targetHeight * interpolatedTime);
+                    }
+
+                    v.requestLayout();
+                    mRecyclerView.scrollToPosition(itemExpandido);
+                }
+
+                @Override
+                public boolean willChangeBounds() {
+                    return true;
+                }
+
+            };
+
+            // 1dp/ms
+            a.setDuration((int) (2*targetHeight / v.getContext().getResources().getDisplayMetrics().density));
+            v.startAnimation(a);
+       // }
+    }
+
+    public void collapse(final View v) {
+
+       // if (v.getVisibility() == View.VISIBLE) {
+            final int initialHeight = v.getMeasuredHeight();
+
+            Animation a = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    if (interpolatedTime == 1) {
+                        v.setVisibility(View.GONE);
+                    } else {
+                        v.getLayoutParams().height = initialHeight - (int) (initialHeight * interpolatedTime);
+                        v.requestLayout();
+                    }
+
+                }
+
+                @Override
+                public boolean willChangeBounds() {
+                    return true;
+                }
+
+            };
+
+            // 1dp/ms
+            a.setDuration((int) (2*initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+            v.startAnimation(a);
+        }
+
+   // }
 
 }

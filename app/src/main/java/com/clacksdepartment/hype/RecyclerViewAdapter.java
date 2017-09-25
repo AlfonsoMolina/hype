@@ -512,10 +512,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             Log.d(TAG, "Contrayendo  elemento " + posicion);
             vistaParaContraer = posicion;
         } else {
-            if (itemExpandido != -1){
+
+            // El siguiente If habilita la posibilidad de comprimir y expandir a la vez, diferentes animaciones.
+            /*if (itemExpandido != -1){
                 Log.d(TAG, "Contrayendo  elemento " + itemExpandido);
                 vistaParaContraer = itemExpandido;
-            }
+            }*/
+
             itemExpandido = posicion;
             Log.d(TAG, "Expandiendo  elemento " + posicion);
             vistaParaExpandir = posicion;
@@ -666,7 +669,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     public void expand(final View v) {
-        if (v.getVisibility() == View.GONE) {
+        //if (v.getVisibility() == View.GONE) {
             v.measure(View.MeasureSpec.makeMeasureSpec(((View) v.getParent()).getWidth(), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
             final int targetHeight = v.getMeasuredHeight();
 
@@ -698,12 +701,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             // 1dp/ms
             a.setDuration((int) (2*targetHeight / v.getContext().getResources().getDisplayMetrics().density));
             v.startAnimation(a);
-        }
+       // }
     }
 
     public void collapse(final View v) {
 
-        if (v.getVisibility() == View.VISIBLE) {
+        //if (v.getVisibility() == View.VISIBLE) {
             final int initialHeight = v.getMeasuredHeight();
 
             Animation a = new Animation() {
@@ -728,7 +731,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             // 1dp/ms
             a.setDuration((int) (2*initialHeight / v.getContext().getResources().getDisplayMetrics().density));
             v.startAnimation(a);
-        }
+        //}
 
     }
 
