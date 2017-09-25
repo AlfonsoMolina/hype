@@ -68,6 +68,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     LinearLayoutManager mLinearLayoutManager;
     RecyclerView mRecyclerView;
 
+    private int vistaParaExpandir;
+    private int vistaParaContraer;
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -107,7 +110,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.lista));
         mLinearLayoutManager = ((LinearLayoutManager) mRecyclerView.getLayoutManager());
-
+        vistaParaExpandir = -1;
     }
 
 
@@ -184,24 +187,29 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             View avanzado = filaView.findViewById(R.id.avanzado);
 
-            //position = getPosicionAbsoluta(position);
-
             if (position == itemExpandido) {
-                //avanzado.setVisibility(View.VISIBLE);
-                expand(avanzado);
+
                 ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis());
 
                 if (pelicula.getHype()) {
                     ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
                 } else {
                     ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_border_black_24dp);
-
                 }
 
-
+                if (vistaParaExpandir == position) {
+                    expand(avanzado);
+                    vistaParaExpandir = -1;
+                }else{
+                    avanzado.setVisibility(View.VISIBLE);
+                }
             } else {
-                //avanzado.setVisibility(View.GONE);
-                collapse(avanzado);
+                if (vistaParaContraer == position) {
+                    collapse(avanzado);
+                    vistaParaContraer = -1;
+                }else{
+                    avanzado.setVisibility(View.GONE);
+                }
             }
 
 
@@ -223,10 +231,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     if (mListaCartelera.get(i).get(j).getHype()) {
                         if (position == 0)
                             return mListaCartelera.get(i).get(j);
-
                         position--;
                     }
-
                 }
             }
 
@@ -236,7 +242,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         if (position == 0)
                             return mListaEstrenos.get(i).get(j);
                         position--;
-
                     }
                 }
             }
@@ -504,9 +509,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         if (itemExpandido == posicion){
             itemExpandido = -1;
             Log.d(TAG, "Contrayendo  elemento " + posicion);
+            vistaParaContraer = posicion;
         } else {
+            if (itemExpandido != -1){
+                Log.d(TAG, "Contrayendo  elemento " + itemExpandido);
+                vistaParaContraer = itemExpandido;
+            }
             itemExpandido = posicion;
             Log.d(TAG, "Expandiendo  elemento " + posicion);
+            vistaParaExpandir = posicion;
         }
 
         if(posicionAntigua != -1)
@@ -655,9 +666,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public void expand(final View v) {
         if (v.getVisibility() == View.GONE) {
-            Log.d(TAG, "Expandiendo!");
-            v.measure(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
-            final int targetHeight = v.getMeasuredHeight() + v.findViewById(R.id.botonera).getMeasuredHeight();
+            v.measure(View.MeasureSpec.makeMeasureSpec(((View) v.getParent()).getWidth(), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            final int targetHeight = v.getMeasuredHeight();
 
             // Older versions of android (pre API 21) cancel animations for views with a height of 0.
             v.getLayoutParams().height = 1;
@@ -668,7 +678,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
 
                     if (interpolatedTime == 1){
-                        v.getLayoutParams().height = RecyclerView.LayoutParams.WRAP_CONTENT;
+                        v.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
                     }else{
                         v.getLayoutParams().height = (int) (targetHeight * interpolatedTime);
                     }
@@ -693,7 +703,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void collapse(final View v) {
 
         if (v.getVisibility() == View.VISIBLE) {
-            Log.d(TAG, "Contrayendo!");
             final int initialHeight = v.getMeasuredHeight();
 
             Animation a = new Animation() {
@@ -721,4 +730,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
     }
+
+
 }
