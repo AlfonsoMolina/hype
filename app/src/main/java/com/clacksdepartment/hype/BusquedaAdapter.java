@@ -149,6 +149,7 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
     }
 
     void  setItemExpandido(View view){
+        Log.d(TAG, "Hacemos click!");
         //Encontramos la posición del elemento.
         String titulo = (String) ((TextView) view.findViewById(R.id.titulo)).getText();
         int posicionAntigua = itemExpandido;
@@ -282,6 +283,7 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         vistaParaContraer = -1;
 
         notifyDataSetChanged();
+        mRecyclerView.requestLayout();
     }
 
 
