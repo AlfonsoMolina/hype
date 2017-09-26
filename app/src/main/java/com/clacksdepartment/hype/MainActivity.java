@@ -207,17 +207,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public void retrocederPagina(View view) {
         int pagina = mRecyclerViewAdapter.getPagina();
-        Log.d(TAG, "Retrocediendo a la página " + pagina);
         if (pagina > 0) {
+            Log.d(TAG, "Retrocediendo a la página " + pagina);
             mRecyclerViewAdapter.pasarPagina(pagina - 1);
             ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina));
             //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
             //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
             //porque se ha cogido del adaptador. Así que, se queda igual.
             mInterfaz.enfocaPrimerElementoBrusco();
+            mRecyclerViewAdapter.notifyDataSetChanged();
         }
-
-        mRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     public void avanzarPagina(View view) {
