@@ -33,6 +33,7 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
     private RecyclerView mRecyclerView;
     private BusquedaAdapter mBusquedaAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private String query;
 
     private static final String TAG = "SearchableActivity";
 
@@ -61,14 +62,12 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
         mBusquedaAdapter= new BusquedaAdapter(this,R.layout.fila, feedReaderDbHelper);
         mRecyclerView.setAdapter(mBusquedaAdapter);
 
-
-
-
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
+            query = intent.getStringExtra(SearchManager.QUERY);
             doMySearch(query);
+
         }
 
 
@@ -87,7 +86,6 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
         // Assumes current activity is the searchable activity
      //   searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -102,6 +100,8 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
                 return false;
             }
         });
+
+        searchView.setQuery(query, false);
 
        return true;
     }
