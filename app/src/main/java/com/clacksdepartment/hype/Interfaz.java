@@ -4,10 +4,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
+import android.view.animation.Transformation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -137,21 +139,42 @@ class Interfaz {
             mMainActivity.findViewById(R.id.navegacion).setVisibility(View.GONE);
     }
 
-    void animaBoton(View view, Boolean mostrar){
-        //float alpha = view.getAlpha();
+    void animaBoton(final View v, Boolean mostrar){
+
+        final float initialAlpha = v.getAlpha();
+        final float targetAlpha;
+
         if (mostrar){
-            //AlphaAnimation animacion = new AlphaAnimation (alpha, 1.0f);
-            //animacion.setDuration(300);
-            //animacion.setFillAfter(true);
-            //view.startAnimation(animacion);
-            view.setAlpha(1.0f);
+            targetAlpha = 1.0f;
         }else{
-            //AlphaAnimation animacion = new AlphaAnimation (alpha, 0.2f);
-            //animacion.setDuration(300);
-            //animacion.setFillAfter(true);
-            view.setAlpha(0.2f);
-            //view.startAnimation(animacion);
+            targetAlpha = 0.2f;
         }
+
+        final float alphaIncrease = targetAlpha - initialAlpha;
+
+        Animation a = new Animation() {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+
+                if (interpolatedTime == 1){
+                    v.setAlpha(targetAlpha);
+                }else{
+                    v.setAlpha(initialAlpha + alphaIncrease * interpolatedTime);
+                }
+
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return false;
+            }
+
+        };
+
+        // 1dp/ms
+        a.setDuration(250);
+        v.startAnimation(a);
     }
+
 
 }
