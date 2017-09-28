@@ -2,9 +2,13 @@ package com.clacksdepartment.hype;
 
 import android.app.SearchManager;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -25,6 +29,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.ads.MobileAds;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, FichaFragment.OnFragmentInteractionListener{
@@ -110,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mInterfaz = new Interfaz(this, mRecyclerViewAdapter);
         mInterfaz.seleccionaBotonCartelera();
         mostrarCartelera(findViewById(R.id.cartelera));
+
+        inflarDummies();
     }
 
 
@@ -335,6 +342,103 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public void abrirMenuCompartir(View view) {
         mRecyclerViewAdapter.abrirMenuCompartir();
+    }
+
+    private void inflarDummies(){
+
+        SQLiteDatabase db = mFeedReaderDbHelper.getWritableDatabase();
+        String l;
+        String p;
+        String t;
+        String s;
+        String e;
+        String f;
+        byte[] p_byte;
+        Bitmap p_bitmap;
+        ContentValues values = new ContentValues();
+
+
+        //Ahora por cada película...
+
+        p_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.portada1);
+        p_bitmap = Bitmap.createScaledBitmap(p_bitmap, 50, 80, false);
+
+        l = "001";
+        t = "Dos VS el mundo";
+        s = "Sinopsis que no va a salir";
+        e = "VIERNES, 29 DE SEPTIEMBRE";
+        f = "29/09/2017";
+
+        mRecyclerViewAdapter.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, false));
+
+        //Ahora por cada película...
+
+        p_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.portada2);
+        p_bitmap = Bitmap.createScaledBitmap(p_bitmap, 50, 80, false);
+
+        l = "002";
+        t = "Un camino";
+        s = "Sinopsis que no va a salir";
+        e = "VIERNES, 29 DE SEPTIEMBRE";
+        f = "29/09/2017";
+
+        mRecyclerViewAdapter.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, false));
+
+        //Ahora por cada película...
+
+        p_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.portada3);
+        p_bitmap = Bitmap.createScaledBitmap(p_bitmap, 50, 80, false);
+
+        l = "003";
+        t = "Una película de aliens";
+        s = "Sinopsis que no va a salir";
+        e = "VIERNES, 29 DE SEPTIEMBRE";
+        f = "29/09/2017";
+
+        mRecyclerViewAdapter.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, false));
+
+        //Ahora por cada película...
+
+        p_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.portada4);
+        p_bitmap = Bitmap.createScaledBitmap(p_bitmap, 50, 80, false);
+
+        l = "004";
+        t = "El secreto de Napoleón";
+        s = "Sinopsis que no va a salir";
+        e = "VIERNES, 29 DE SEPTIEMBRE";
+        f = "29/09/2017";
+
+        mRecyclerViewAdapter.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, false));
+
+        //Ahora por cada película...
+
+        p_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.portada5);
+        p_bitmap = Bitmap.createScaledBitmap(p_bitmap, 50, 80, false);
+
+        l = "005";
+        t = "Aventura en la mazmorra";
+        s = "Un grupo de aventureros explora una mazmorra para acabar con las fuerzas del mal.";
+        e = "VIERNES, 29 DE SEPTIEMBRE";
+        f = "29/09/2017";
+
+        mRecyclerViewAdapter.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, false));
+
+        //Ahora por cada película...
+
+        p_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.portada6);
+        p_bitmap = Bitmap.createScaledBitmap(p_bitmap, 50, 80, false);
+
+        l = "006";
+        t = "EL DRAGÓN Y LA PRINCESA";
+        s = "Sinopsis que no va a salir";
+        e = "VIERNES, 29 DE SEPTIEMBRE";
+        f = "29/09/2017";
+
+        mRecyclerViewAdapter.addCartelera(new Pelicula(l, p_bitmap, t, s, e, f, false));
+
+
+        mRecyclerViewAdapter.actualizarInterfaz();
+
     }
 
 }
