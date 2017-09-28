@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      */
     private static final String TAG = "MainActivity";
 
-    private static final String MY_ADMOB_APP_ID = "ca-app-pub-3940256099942544~3347511713";
+    private static final String MY_ADMOB_APP_ID = "ca-app-pub-6428634425759083~8703294528";
 
    // private ListaModificadaAdapter mRecyclerViewAdapter;
     private FeedReaderDbHelper mFeedReaderDbHelper;

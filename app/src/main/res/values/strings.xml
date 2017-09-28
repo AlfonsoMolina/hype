@@ -29,6 +29,7 @@
     <string name="texto_seccion_cartelera">In theaters</string>
     <string name="texto_seccion_estrenos">Coming soon</string>
     <string name="search_hint">Search by title</string>
+    <string name="no_busqueda">No results.</string>
     <string name="anuncios">Show adds</string>
     <string name="pref_bbdd">Clear database</string>
     <string name="menu_buscar">Search</string>

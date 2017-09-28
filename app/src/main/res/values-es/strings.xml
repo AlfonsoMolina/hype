@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Hype!</string>
-    <string name="button_html">cargar</string>
     <string name="descripcion_portada">Portada</string>
     <string name="flecha">flecha</string>
     <string name="get_hype">get hype!</string>

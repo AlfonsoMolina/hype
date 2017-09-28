@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_pais_nombres">
-        <item>Spain</item>
-        <item>The United States</item>
-        <item>United Kingdom</item>
-        <item>France</item>
-        <item>Mexico</item>
+        <item>España</item>
+        <item>Estados Unidos</item>
+        <item>Reino Unido</item>
+        <item>Francia</item>
+        <item>México</item>
         <item>Argentina</item>
         <item>Chile</item>
         <item>Colombia</item>
