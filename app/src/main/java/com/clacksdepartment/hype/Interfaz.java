@@ -79,7 +79,9 @@ class Interfaz {
 
     void mostrarNoHayPelis(Boolean mostrar){
         if (mostrar){
-            ((TextView) mMainActivity.findViewById(R.id.nopelis)).setText(R.string.no_pelis);
+            ((TextView) mMainActivity.findViewById(R.id.nopelis)).setText(
+                    mRecyclerViewAdapter.getEstado() == RecyclerViewAdapter.HYPE?
+                            R.string.no_hype : R.string.no_pelis);
             mMainActivity.findViewById(R.id.nopelis).setVisibility(View.VISIBLE);
         }else{
             mMainActivity.findViewById(R.id.nopelis).setVisibility(View.GONE);
@@ -111,7 +113,7 @@ class Interfaz {
     void actualizar(){
 
         if (mRecyclerViewAdapter.getEstado() != RecyclerViewAdapter.HYPE) {
-            if (mRecyclerViewAdapter.getItemCount() == 0 ) {
+            if (mRecyclerViewAdapter.getItemCount() == 1 ) {
                 mostrarPaginador(false);
                 mostrarNoHayPelis(true);
             } else if (mRecyclerViewAdapter.getUltPagina() > 1) {
@@ -123,7 +125,7 @@ class Interfaz {
             }
         }else{
             mostrarPaginador(false);
-            if (mRecyclerViewAdapter.getItemCount() == 0) {
+            if (mRecyclerViewAdapter.getItemCount() == 1) {
                 mostrarNoHayPelis(true);
             } else {
                 mostrarNoHayPelis(false);

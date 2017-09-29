@@ -8,6 +8,7 @@
     <string name="actual_page_header">Page</string>
     <string name="actual_page_number">1</string>
     <string name="no_pelis">\n\nThere aren\'t any movie yet :(</string>
+    <string name="no_hype">\n\nYou don\'t have any movie saved.</string>
     <string name="cargando">Loading…</string>
     <string name="leyendo">\n\nDatabase is been read.\nWait a second…</string>
     <string name="pref_pais">Country</string>

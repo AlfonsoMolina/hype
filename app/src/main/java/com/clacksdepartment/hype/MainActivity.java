@@ -273,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mRecyclerViewAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
             ((RecyclerView) findViewById(R.id.lista)).smoothScrollToPosition(0);
+            mRecyclerViewAdapter.mostrarNoPelis();
         }else{
             mInterfaz.enfocaPrimerElementoSuave();
         }
@@ -291,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.seleccionaBotonCartelera();
             mRecyclerViewAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
+            mRecyclerViewAdapter.mostrarNoPelis();
         }else{
             mInterfaz.enfocaPrimerElementoSuave();
         }
@@ -307,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mInterfaz.seleccionaBotonEstrenos();
             mRecyclerViewAdapter.notifyDataSetChanged();
             mInterfaz.enfocaPrimerElementoBrusco();
-
+            mRecyclerViewAdapter.mostrarNoPelis();
         }else{
             mInterfaz.enfocaPrimerElementoSuave();
         }

@@ -408,12 +408,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     void mostrarNoPelis(){
-        if (getItemCount()==0) {
+        if (getItemCount()==1) {
             mInterfaz.mostrarNoHayPelis(true);
         } else
             mInterfaz.mostrarNoHayPelis(false);
-
-
     }
 
     void actualizarInterfaz(){
@@ -625,7 +623,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }else{
             notifyDataSetChanged();
             itemExpandido = -1;
-            if (getItemCount() == 0){
+            if (getItemCount() == 1){
                 mInterfaz.actualizar();
             }
         }
