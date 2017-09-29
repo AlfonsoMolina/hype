@@ -2,13 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <com.google.android.gms.ads.AdView
+    <com.google.android.gms.ads.NativeExpressAdView
         xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-6428634425759083/5699341756">
-    </com.google.android.gms.ads.AdView>
+        ads:adUnitId="ca-app-pub-6428634425759083/9044889506"
+        ads:adSize="320x80">
+    </com.google.android.gms.ads.NativeExpressAdView>
+
 </RelativeLayout>

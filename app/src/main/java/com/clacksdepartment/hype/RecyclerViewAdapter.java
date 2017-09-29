@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.NativeExpressAdView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -163,7 +164,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         View filaView = holder.mView;
 
         if (flagAdds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2)) {
-            AdView mAdView = (AdView) filaView.findViewById(R.id.adView);
+            NativeExpressAdView mAdView = (NativeExpressAdView) filaView.findViewById(R.id.adView);
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
