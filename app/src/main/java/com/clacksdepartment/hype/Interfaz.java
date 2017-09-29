@@ -4,8 +4,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
@@ -18,10 +16,13 @@ class Interfaz {
     private MainActivity mMainActivity;
     private RecyclerViewAdapter mRecyclerViewAdapter;
 
+    private LayoutAnimationController layoutAnimationController;
 
     Interfaz(MainActivity mainActivity, RecyclerViewAdapter RecyclerViewAdapter){
         this.mMainActivity = mainActivity;
         this.mRecyclerViewAdapter = RecyclerViewAdapter;
+
+        layoutAnimationController = AnimationUtils.loadLayoutAnimation(mMainActivity,R.anim.rellenar_lista);
     }
 
     void seleccionaBotonHype(){
@@ -106,7 +107,6 @@ class Interfaz {
     }
 
     void animaListado(){
-        LayoutAnimationController layoutAnimationController = AnimationUtils.loadLayoutAnimation(mMainActivity,R.anim.rellenar_lista);
         ((RecyclerView) mMainActivity.findViewById(R.id.lista)).setLayoutAnimation(layoutAnimationController);
     }
 
@@ -141,7 +141,7 @@ class Interfaz {
             mMainActivity.findViewById(R.id.navegacion).setVisibility(View.GONE);
     }
 
-    void animaBoton(final View v, Boolean mostrar){
+    private void animaBoton(final View v, Boolean mostrar){
 
         final float initialAlpha = v.getAlpha();
         final float targetAlpha;

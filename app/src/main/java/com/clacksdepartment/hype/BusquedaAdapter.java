@@ -58,7 +58,10 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         public ViewHolder(RelativeLayout v) {
             super(v);
             mView = v;
+        }
 
+        public void clearAnimation(){
+            mView.clearAnimation();
         }
     }
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -283,7 +286,6 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         vistaParaContraer = -1;
 
         notifyDataSetChanged();
-        mRecyclerView.requestLayout();
     }
 
 
@@ -463,5 +465,11 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         }
 
    // }
+
+    @Override
+    public void onViewDetachedFromWindow(ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        ((ViewHolder) holder).clearAnimation();
+    }
 
 }

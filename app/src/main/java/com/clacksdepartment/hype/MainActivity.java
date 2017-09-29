@@ -303,7 +303,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Log.d(TAG, "Mostrando películas de estreno");
 
         if (mRecyclerViewAdapter.getEstado() != RecyclerViewAdapter.ESTRENOS) {
-
             mInterfaz.animaListado();
             mRecyclerViewAdapter.mostrarEstrenos();
             mInterfaz.seleccionaBotonEstrenos();

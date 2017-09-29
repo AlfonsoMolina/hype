@@ -85,6 +85,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             mView = v;
 
         }
+
+        public void clearAnimation(){
+            mView.clearAnimation();
+        }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -214,9 +218,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             }
 
-
             Log.v(TAG, "Añadiendo película " + pelicula.getTitulo() + " a la vista número " + position);
         }
+
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        ((ViewHolder) holder).clearAnimation();
     }
 
     private Pelicula getPelicula(int position) {
@@ -538,9 +548,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         FichaFragment fichaFragment = FichaFragment.newInstance(pelicula.getTitulo(), pelicula.getEnlace());
 
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-
         fragmentTransaction.setCustomAnimations(R.anim.abrir_ficha, R.anim.cerrar_ficha, R.anim.abrir_ficha, R.anim.cerrar_ficha);
-
         fragmentTransaction.replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();
 
     }
