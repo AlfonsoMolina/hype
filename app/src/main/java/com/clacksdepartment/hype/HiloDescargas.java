@@ -45,7 +45,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
     private static final String TAG = "HiloDescargarEstrenos";
 
 
-    private String regex = "<a href=\"(https://m.filmaffinity.com/es/movie.php\\?id=.*?)\" class=\"media mc mc-cat\" data-movie-id=.*?>.*?<div class=\"media-left mc-poster\">.*?<img width=\".*?\" height=\".*?\" src=\"(.*?)\"alt=\".*?\">.*?</div>.*?<div class=\"media-body\">.*?<div class=\"mc-title ft\">(.*?)<small>.*?</small>.*?<img src=\".*?\" alt=\".*?\" title=\".*?\">.*?</div>.*?<li class=\"synop-text\">(.*?)</li>.*?</a>.*?<span class=\"date\">(.*?)</span>";
+    private String regex;
 
     //Estoy hay que pasarlo a un array o algo
     private String[] meses_es = {"enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -89,6 +89,9 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
             lista.eliminarLista();
             lista.mostrarNoPelis();
         }
+
+        regex = "<a href=\"(https://m.filmaffinity.com/"+idioma+"/movie.php\\?id=.*?)\" class=\"media mc mc-cat\" data-movie-id=.*?>.*?<div class=\"media-left mc-poster\">.*?<img width=\".*?\" height=\".*?\" src=\"(.*?)\"alt=\".*?\">.*?</div>.*?<div class=\"media-body\">.*?<div class=\"mc-title ft\">(.*?)<small>.*?</small>.*?<img src=\".*?\" alt=\".*?\" title=\".*?\">.*?</div>.*?<li class=\"synop-text\">(.*?)</li>.*?</a>.*?<span class=\"date\">(.*?)</span>";
+
     }
 
     @Override

@@ -32,6 +32,8 @@
         android:layout_gravity="bottom"
         android:layout_margin="10dp"
         android:text="@string/derechos"
+        android:textColor="?attr/colorAccent"
         android:textAlignment="center"
-        android:textSize="20sp" />
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="14sp" />
 </LinearLayout>
