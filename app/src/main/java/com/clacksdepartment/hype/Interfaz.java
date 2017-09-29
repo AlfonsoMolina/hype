@@ -53,7 +53,6 @@ class Interfaz {
             // Actualizo el número de la página
             String txt = "" + (mRecyclerViewAdapter.getPagina()+1);
             ((TextView) mMainActivity.findViewById(R.id.paginaActual)).setText(txt);
-
             // Evaluamos la página en la que estamos, casos: prim. pagina, ultima pagina, cualquier pagina en medio
 
             if (mRecyclerViewAdapter.getPagina() == 0){
