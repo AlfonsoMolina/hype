@@ -3,6 +3,7 @@ package com.clacksdepartment.hype;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -29,8 +30,13 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.NativeExpressAdView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Usuario on 12/09/2017.
@@ -659,11 +665,57 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         Log.d(TAG, "Pulsado botón \"Share\" en película " + pelicula.getTitulo());
 
+        String mensaje = "";
+
+        int estado = this.estado;
+
+        if (estado == HYPE) {
+
+            for (ArrayList<Pelicula> pp : mListaCartelera) {
+                if (pp.contains(pelicula))
+                    estado = CARTELERA;
+            }
+            for (ArrayList<Pelicula> pp : mListaEstrenos) {
+                if (pp.contains(pelicula))
+                    estado = ESTRENOS;
+            }
+        }
+
+        Resources res = mMainActivity.getResources();
+
+        if (estado == CARTELERA){
+            mensaje = res.getString(R.string.share_cartelera,pelicula.getTitulo());
+        } else if (estado == ESTRENOS){
+            //Se coge el día de hoy
+            String f = "09/09/2099";
+            if (f.matches(pelicula.getEstrenoFecha())){
+                mensaje = res.getString(R.string.share_estreno_ind,pelicula.getTitulo());;
+            } else {
+                SimpleDateFormat myFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH);
+
+                try {
+                    Date date1 = myFormat.parse(pelicula.getEstrenoFecha());
+                    Date date2 = new Date();
+                    long diff = date1.getTime() - date2.getTime();
+                    int dias = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+                    mensaje = res.getString(R.string.share_estreno,dias,pelicula.getTitulo());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    mensaje = res.getString(R.string.share_estreno_ind,pelicula.getTitulo());;
+                }
+            }
+        } else {
+            mensaje = pelicula.getTitulo();
+        }
+
+        mensaje = mensaje + "\n" + pelicula.getEnlace();
+
         Intent intent = new Intent(android.content.Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "He compartido \"" + pelicula.getTitulo() + "\" a través de Hype!");
-        intent.putExtra(android.content.Intent.EXTRA_TEXT, pelicula.getEnlace());
-        mMainActivity.startActivity(Intent.createChooser(intent, "Compartir película: " + pelicula.getTitulo() + "."));
+
+        //intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "He compartido \"" + pelicula.getTitulo() + "\" a través de Hype!");
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, mensaje);
+        mMainActivity.startActivity(Intent.createChooser(intent,res.getString(R.string.share_mensaje,pelicula.getTitulo())));
 
     }
 
