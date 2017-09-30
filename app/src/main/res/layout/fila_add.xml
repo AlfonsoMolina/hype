@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         ads:adUnitId="ca-app-pub-6428634425759083/9044889506"
-        ads:adSize="320x80">
+        ads:adSize="360x100">
     </com.google.android.gms.ads.NativeExpressAdView>
 
 </RelativeLayout>
