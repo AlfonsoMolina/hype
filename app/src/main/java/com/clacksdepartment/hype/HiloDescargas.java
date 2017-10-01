@@ -248,7 +248,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                                         default:
                                             ee = e.substring(e.indexOf(", ") + 2);
                                             fecha_mes = ee.substring(0, ee.indexOf(" "));
-                                            fecha_dia = ee.substring(ee.indexOf(" "));
+                                            fecha_dia = ee.substring(ee.indexOf(" ")+1);
 
                                             if (fecha_dia.length() == 1)
                                                 fecha_dia = '0' + fecha_dia;
