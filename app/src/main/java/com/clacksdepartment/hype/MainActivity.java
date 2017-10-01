@@ -338,4 +338,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRecyclerViewAdapter.abrirMenuCompartir();
     }
 
+    public void verCines(View view){
+        startActivity(mRecyclerViewAdapter.verCines());
+    }
 }

@@ -87,8 +87,21 @@
             android:orientation="horizontal"
             android:layout_gravity="center"
             android:descendantFocusability="blocksDescendants"
-            android:weightSum="5"
             >
+
+            <ImageButton
+                android:id="@+id/av_cines"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_theaters_black_24dp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="?android:attr/selectableItemBackground"
+                android:tint="@color/colorAppText"
+                android:backgroundTint="@color/colorWindowBackground"
+                android:gravity="center"
+                android:onClick="verCines"
+                />
 
             <ImageButton
                 android:id="@+id/av_fecha"

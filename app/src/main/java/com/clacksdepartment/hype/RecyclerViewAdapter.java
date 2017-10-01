@@ -514,6 +514,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
                 posicion++;
             }
+
         }
 
         if (flagAdds && posicion >= NUM_ITEM_ADD){
@@ -544,6 +545,34 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         notifyItemChanged(itemExpandido);
         if (itemExpandido != -1) {
             ((RecyclerView) mMainActivity.findViewById(R.id.lista)).smoothScrollToPosition(itemExpandido);
+        }
+
+        String [] fecha = getPelicula(posicion).getEstrenoFecha().split("/");
+
+        int difAno = Integer.parseInt(fecha[0]) - Calendar.getInstance().get(Calendar.YEAR);
+        int difMes = Integer.parseInt(fecha[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
+        int difDia = Integer.parseInt(fecha[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+
+        boolean futuro = false;
+
+        if (difAno == 0){
+            if (difMes == 0){
+                if (difDia > 0){
+                    futuro = true;
+                }
+            }else if (difMes > 0){
+                futuro = true;
+            }
+        }else if (difAno > 0){
+            futuro = true;
+        }
+
+        if (!futuro){
+            view.findViewById(R.id.av_cines).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.av_fecha).setVisibility(View.GONE);
+        }else{
+            view.findViewById(R.id.av_cines).setVisibility(View.GONE);
+            view.findViewById(R.id.av_fecha).setVisibility(View.VISIBLE);
         }
     }
 
@@ -655,6 +684,20 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Intent intent = new Intent(Intent.ACTION_VIEW);
         // Se le pasa la web parseada
         intent.setData(Uri.parse(pelicula.getEnlace()));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        return intent;
+    }
+
+    public Intent verCines(){
+        Pelicula pelicula = getPelicula(itemExpandido);
+
+        Log.d(TAG, "Pulsado botón \"Cines\" en película " + pelicula.getTitulo());
+
+        // Instanciamos el intent de navegador
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        // Se le pasa la web parseada
+        intent.setData(Uri.parse(pelicula.getEnlace().replace("movie","movie-showtimes")));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         return intent;
