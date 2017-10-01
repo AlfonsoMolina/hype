@@ -46,6 +46,12 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
 
     private String regex;
+    private static int grupo_link = 1;
+    private static int grupo_portada = 2;
+    private static int grupo_titulo = 3;
+    private static int grupo_sinopsis = 4;
+    private static int grupo_estreno = 5;
+
 
     //Estoy hay que pasarlo a un array o algo
     private String[] meses_es = {"enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -90,7 +96,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
             lista.mostrarNoPelis();
         }
 
-        regex = "<a href=\"(https://m.filmaffinity.com/"+idioma+"/movie.php\\?id=.*?)\" class=\"media mc mc-cat\" data-movie-id=.*?>.*?<div class=\"media-left mc-poster\">.*?<img width=\".*?\" height=\".*?\" src=\"(.*?)\"alt=\".*?\">.*?</div>.*?<div class=\"media-body\">.*?<div class=\"mc-title ft\">(.*?)<small>.*?</small>.*?<img src=\".*?\" alt=\".*?\" title=\".*?\">.*?</div>.*?<li class=\"synop-text\">(.*?)</li>.*?</a>.*?<span class=\"date\">(.*?)</span>";
+        regex = "(?><div class=\"list-group-item\">(?>.*?<a.*?href=\"(https://m.filmaffinity.com/"+idioma+"/movie.php\\?id=[\\p{Digit}]*?)\".*?>)(?>.*?<div class=\"media-left mc-poster\">)(?>.*?<img.*?src=\"(.*?)\".*?>)(?>.*?</div>)(?>.*?<div class=\"mc-title ft\">)(?>(.*?)<small>)(?>.*?</small>)(?>.*?<img.*?>)(?>.*?</div>)(?>.*?<li class=\"synop-text\">)(?>(.*?)</li>)(?>.*?</div>)(?>.*?</a>)(?>.*?<span class=\"date\">)(?>(.*?)</span>))";
 
     }
 
@@ -138,6 +144,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     Log.d(TAG, "Error en la descarga de HTML.");
                     html = null;
                     this.cancel(true);
+                    estado = true;
                 }
 
                 /*
@@ -149,6 +156,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     //String parser_link = "https://m.filmaffinity.com/es/movie.php";
 
                     //String[] peliculasHTML = html.split("movie.php");
+
                      String l;
                     String p;
                     String t;
@@ -171,7 +179,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     while (matcher.find() && !isCancelled()) {
 
                         //Se utiliza en link para ver si ya está
-                        l = matcher.group(1);
+                        l = matcher.group(grupo_link);
 
                         String[] selectionArgs = {l};
 
@@ -190,7 +198,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                         if (cursor.getCount() == 0 || actFuerte) {
                             //Se buscan y guardan los diferentes elementos
 
-                            p = matcher.group(2);
+                            p = matcher.group(grupo_portada);
 
                             try {
                                 URL url = new URL(p);
@@ -208,9 +216,9 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                                 p_byte = stream.toByteArray();
                             }
 
-                            t = matcher.group(3);
-                            s = matcher.group(4);
-                            e = matcher.group(5);
+                            t = matcher.group(grupo_titulo);
+                            s = matcher.group(grupo_sinopsis);
+                            e = matcher.group(grupo_estreno);
 
                             if (e.length() == 0) {
                                 e = "Sin confirmar";
