@@ -96,7 +96,7 @@ public class Pelicula {
 
                 } catch (Exception ee) {
                     p_bitmap = Bitmap.createBitmap(50, 80, Bitmap.Config.ARGB_8888);
-                    p_bitmap.eraseColor(Color.BLACK);
+                    p_bitmap.eraseColor(Color.parseColor("#37474f"));
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     p_bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
                 }

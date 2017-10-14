@@ -130,9 +130,15 @@ public class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO;
             String s_temp4 = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA :
                     FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA;
+            String s_temp5 = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO :
+                    FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO;
+            String s_temp6 = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS :
+                    FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS;
+            String s_temp7 = estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO :
+                    FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO;
 
             String[] projection = {
-                    s_temp, s_temp2, s_temp3, s_temp4
+                    s_temp, s_temp2, s_temp3, s_temp4, s_temp5, s_temp6, s_temp7
             };
             String selection = s_temp + " = ?";
 
@@ -242,6 +248,34 @@ public class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     actualProgress++;
 
 
+                }else if(cursor.getCount() > 0){
+                    cursor.moveToFirst();
+                    boolean somethingChanged = false;
+                    if(!cursor.getString(cursor.getColumnIndexOrThrow(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO : FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO)).equalsIgnoreCase(peli.getTitulo())) {
+                        values.put(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO : FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO, peli.getTitulo());
+                        somethingChanged = true;
+                    }
+                    if(!cursor.getString(cursor.getColumnIndexOrThrow(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS : FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS)).equalsIgnoreCase(peli.getSinopsis())) {
+                        values.put(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS : FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS, peli.getSinopsis());
+                        somethingChanged = true;
+                    }
+                    if(!cursor.getString(cursor.getColumnIndexOrThrow(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO : FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO)).equalsIgnoreCase(peli.getEstrenoLetras())) {
+                        values.put(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO : FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO, peli.getEstrenoLetras());
+                        somethingChanged = true;
+                    }
+                    if(!cursor.getString(cursor.getColumnIndexOrThrow(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA : FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA)).equalsIgnoreCase(peli.getEstrenoFecha())) {
+                        values.put(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA : FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA, peli.getEstrenoFecha());
+                        somethingChanged = true;
+                    }
+                    if (somethingChanged) {
+                        Log.d(TAG, "Actualizando película " + peli.getTitulo());
+                        // Si ha cambiado algo de lo de arriba, actualizo la portada, por si ha cambiado...
+                        // TODO: COMPARAR HASH O ALGO?
+                        values.put(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA : FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA, bitmapToByte(peli.getPortada()));
+                        db[1].update(estado ? FeedReaderContract.FeedEntryCartelera.TABLE_NAME : FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values, estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_REF : FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "= '" + peli.getEnlace() + "'", null);
+                        values.clear();
+                    }
+                    actualProgress++;
                 }
                 publishProgress((int) Math.floor(actualProgress*10/totalProgress));
                 cursor.close();
@@ -301,7 +335,6 @@ public class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         ArrayList<Pelicula> peliculas = new ArrayList<>();
         String urlJson;
-        String tipo_texto;
 
         switch (TIPO){
             case INDEX_CARTELERA:
@@ -349,26 +382,28 @@ public class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
                 for (int results = 0;!ended && (totalresults<200);results++){
                     try {
-                        Log.d(TAG, "-----------------");
+                        //Log.d(TAG, "-----------------");
                         id = pageresults.getJSONObject(results).getInt("id");
-                        Log.d(TAG, "ID: " + id);
+                        //Log.d(TAG, "ID: " + id);
                         link = preLink + pageresults.getJSONObject(results).getString("id");
-                        Log.d(TAG, "LINK: " + link);
+                        //Log.d(TAG, "LINK: " + link);
                         title = pageresults.getJSONObject(results).getString("title");
-                        Log.d(TAG, "Título: " + title);
+                        //Log.d(TAG, "Título: " + title);
                         poster = preImagen + pageresults.getJSONObject(results).getString("poster_path");
-                        Log.d(TAG, "Portada: " + poster);
+                        //Log.d(TAG, "Portada: " + poster);
                         sinopsis = pageresults.getJSONObject(results).getString("overview");
-                        Log.d(TAG, "Sinopsis: " + sinopsis);
+                        //Log.d(TAG, "Sinopsis: " + sinopsis);
                         date = pageresults.getJSONObject(results).getString("release_date");
-                        Log.d(TAG, "Fecha: " + date);
+                        //Log.d(TAG, "Fecha: " + date);
                         textdate = getDateText(date);
-                        Log.d(TAG, "Fecha en texto: " + textdate);
+                        //Log.d(TAG, "Fecha en texto: " + textdate);
 
-                        if (TIPO == INDEX_ESTRENOS || esCartelera(date)){
+                        if (TIPO == INDEX_ESTRENOS && !esCartelera(date)){
+                            peliculas.add(new Pelicula(id, link, poster, title, sinopsis, textdate, date, false));
+                        }else if (TIPO == INDEX_CARTELERA && esCartelera(date)){
                             peliculas.add(new Pelicula(id, link, poster, title, sinopsis, textdate, date, false));
                         }else{
-                            Log.d(TAG, "Saltando película supuesta cartelera que aún no está en cartelera");
+                            Log.d(TAG, "Saltando película en sección incorrecta");
                         }
                         totalresults++;
                     }catch (Exception e){

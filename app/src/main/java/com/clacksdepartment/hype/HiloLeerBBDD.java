@@ -55,7 +55,6 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
         Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
 
-
         //Y ahora los estrenos
 
         //Se lee la bbdd y se guardan los elementos en cursor
