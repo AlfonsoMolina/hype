@@ -31,7 +31,8 @@ public class FichaFragment extends Fragment {
     private String titulo;
     private String link;
 
-    private Ficha ficha;
+    private FichaFA fichaFA;
+    private FichaTMDB fichaTMDB;
     private ViewGroup contenedor;
 
     private OnFragmentInteractionListener mListener;
@@ -83,14 +84,19 @@ public class FichaFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-        // Fijamos el título, ya conocido, para ir rellenando algo la ficha...
+        // Fijamos el título, ya conocido, para ir rellenando algo la fichaFA...
         ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
 
-        // Creamos la ficha con su constructor, lo que va agilizando algunas operaciones de compilación de regex
-        ficha = new Ficha(link, view);
+        // Creamos la fichaFA con su constructor, lo que va agilizando algunas operaciones de compilación de regex
+        //fichaFA = new FichaFA(link, view);
 
-        // Iniciamos el hilo, que trata la descarga de info y su representación
-        ficha.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if (link.contains("themoviedb")){
+            fichaTMDB = new FichaTMDB(link, view);
+            fichaTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }else if (link.contains("filmaffinity")){
+            fichaFA = new FichaFA(link, view);
+            fichaFA.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
     }
 
     public void onButtonPressed(Uri uri) {

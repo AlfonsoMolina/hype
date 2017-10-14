@@ -14,6 +14,16 @@
             android:key="pref_db"
             android:defaultValue="0"/>
 
+        <ListPreference
+            android:dependency="provider"
+            android:key="provider"
+            android:title="@string/pref_provider"
+            android:summary="%s"
+            android:dialogTitle="@string/pref_provider"
+            android:entries="@array/pref_provider"
+            android:entryValues="@array/pref_provider"
+            android:defaultValue="@string/pref_provider_def" />
+
         <SwitchPreference android:title="@string/anuncios"
             android:key="pref_adds"
             android:defaultValue="true"

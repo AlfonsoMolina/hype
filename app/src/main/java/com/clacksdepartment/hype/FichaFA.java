@@ -29,12 +29,12 @@ import static android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
  * Created by Vicente on 04/08/2017.
  */
 
-public class Ficha extends AsyncTask<Void,Integer,Void> {
+public class FichaFA extends AsyncTask<Void,Integer,Void> {
 
-    private static final String TAG = "Ficha";
+    private static final String TAG = "FichaFA";
 
     // Atributos
-    private String UrlFA;
+    private String url;
     private String ano;
     private String duracion;
     private String portadaUrl;
@@ -86,8 +86,8 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
     // Patterns y matchers:
     private ArrayList <Pattern> vPattern;
 
-    Ficha (String url, View view){
-        this.UrlFA = url;
+    FichaFA(String url, View view){
+        this.url = url;
         mView = view;
 
         director = new ArrayList<>();
@@ -121,7 +121,7 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
             Matcher matcher;
 
             // Leo el HTML
-            String contenido = getHTML(UrlFA);
+            String contenido = getHTML(url);
 
             // Aquí el parseo:
 
@@ -273,8 +273,8 @@ public class Ficha extends AsyncTask<Void,Integer,Void> {
         super.onCancelled();
     }
 
-    public String getUrlFA() {
-        return UrlFA;
+    public String getUrl() {
+        return url;
     }
 
     public String getAno() {

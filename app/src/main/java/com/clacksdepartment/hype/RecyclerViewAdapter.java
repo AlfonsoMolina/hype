@@ -201,7 +201,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             if (position == itemExpandido) {
 
-                ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis());
+                ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis().substring(0, Math.min(pelicula.getSinopsis().length(), 200)) + "...");
 
                 if (pelicula.getHype()) {
                     ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
@@ -547,7 +547,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             ((RecyclerView) mMainActivity.findViewById(R.id.lista)).smoothScrollToPosition(itemExpandido);
         }
 
-        String [] fecha = getPelicula(posicion).getEstrenoFecha().split("/");
+        String [] fecha = getPelicula(posicion).getEstrenoFecha().split("-");
 
         int difAno = Integer.parseInt(fecha[0]) - Calendar.getInstance().get(Calendar.YEAR);
         int difMes = Integer.parseInt(fecha[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
@@ -594,7 +594,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             Pelicula pelicula = getPelicula(itemExpandido);
 
             Calendar beginTime = Calendar.getInstance();
-            String [] f = pelicula.getEstrenoFecha().split("/");
+            String [] f = pelicula.getEstrenoFecha().split("-");
             int[] fecha = {Integer.parseInt(f[0]), Integer.parseInt(f[1]),Integer.parseInt(f[2])};
             beginTime.set(fecha[0], fecha[1]-1, fecha[2], 0, 0);
             // Primero comprobar si puedo editar el evento.

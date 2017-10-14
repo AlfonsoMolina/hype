@@ -13,6 +13,7 @@
     <string name="cargando">Cargando…</string>
     <string name="leyendo">\n\nEstamos leyendo la base de datos.\nEspere un momento…</string>
     <string name="pref_pais">País</string>
+    <string name="pref_provider">Proveedor</string>
     <string name="pref_pais_def">es</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ficha_titulo_default">Título</string>

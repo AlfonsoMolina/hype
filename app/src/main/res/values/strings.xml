@@ -12,7 +12,9 @@
     <string name="cargando">Loading…</string>
     <string name="leyendo">\n\nDatabase is been read.\nWait a second…</string>
     <string name="pref_pais">Country</string>
+    <string name="pref_provider">Provider</string>
     <string name="pref_pais_def">es</string>
+    <string name="pref_provider_def">TMDB</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ficha_titulo_default">Title</string>
     <string name="loading_text">Loading…</string>

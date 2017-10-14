@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 
 // TODO: Actualizar también el resto de pelis
 
-class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
+class HiloDescargasFA extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
     /*
      * Declaración de variables
@@ -72,7 +72,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
     //Elementos del layout para la barra de carga
     private LinearLayout carga_barra;
 
-    HiloDescargas(Context context, RecyclerViewAdapter lista, LinearLayout carga_barra, boolean act) {
+    HiloDescargasFA(Context context, RecyclerViewAdapter lista, LinearLayout carga_barra, boolean act) {
         Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
         this.lista = lista;
         this.carga_barra = carga_barra;
@@ -269,7 +269,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                                     if (fecha_mes.length() == 1)
                                         fecha_mes = '0' + fecha_mes;
 
-                                    f = "" + Calendar.getInstance().get(Calendar.YEAR) + '/' + fecha_mes + '/' + fecha_dia;
+                                    f = "" + Calendar.getInstance().get(Calendar.YEAR) + '-' + fecha_mes + '-' + fecha_dia;
 
                                 } else {
                                     fecha_dia = e.split("/")[0];
@@ -295,7 +295,7 @@ class HiloDescargas extends AsyncTask<SQLiteDatabase,Integer,Void> {
                                     if (fecha_mes.length() == 1)
                                         fecha_mes = '0' + fecha_mes;
 
-                                    f = "" + fecha_ano + '/' + fecha_mes + '/' + fecha_dia;
+                                    f = "" + fecha_ano + '-' + fecha_mes + '-' + fecha_dia;
 
                                 }
 

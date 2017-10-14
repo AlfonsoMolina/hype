@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Process;
 import android.util.Log;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -80,26 +81,6 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA + " ASC"                                    // The sort order
         );
 
-        //Se coge el día de hoy
-        String year = "" + Calendar.getInstance().get(Calendar.YEAR);
-        int month_i = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        int day_i = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-
-        String month;
-        String day;
-
-        if (month_i < 10)
-            month = "0" + month_i;
-        else
-            month = "" + month_i;
-
-        if (day_i < 10)
-            day = "0" + day_i;
-        else
-            day = "" + day_i;
-
-        String fecha_hoy = year + '/' + month + '/' + day;
-
         ContentValues values = new ContentValues();
 
         //Datos de las películas:
@@ -120,24 +101,42 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
             p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
 
-            if (fecha_hoy.compareTo(f) >= 0) {
+            String [] fecha = f.split("-");
+
+            int difAno = Integer.parseInt(fecha[0]) - Calendar.getInstance().get(Calendar.YEAR);
+            int difMes = Integer.parseInt(fecha[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
+            int difDia = Integer.parseInt(fecha[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+
+            boolean futuro = false;
+
+            if (difAno == 0){
+                if (difMes == 0){
+                    if (difDia > 0){
+                        futuro = true;
+                    }
+                }else if (difMes > 0){
+                    futuro = true;
+                }
+            }else if (difAno > 0){
+                futuro = true;
+            }
+
+            if (!futuro){
                 String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
                 String[] selectionArgs = {l};
                 dbr.delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, selection, selectionArgs);
 
-                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF, l);
-                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO, t);
-                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA, p_byte);
-                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS, s);
-                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, h);
-                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO, e);
-                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA, f);
-
-                dbw.insert(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, values);
+                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_REF, l);
+                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO, t);
+                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA, p_byte);
+                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS, s);
+                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, h);
+                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO, e);
+                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA, f);
+                dbw.insert(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, values);
 
                 cartelera.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
-
-            } else {
+            }else{
                 estrenos.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
             }
 
@@ -167,8 +166,6 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 null,                                     // don't filter by row groups
                 FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA + " DESC"                                    // The sort order
         );
-
-
 
         //Y empezamos a mirar las tuplas una a una
         while (cursor.moveToNext()) {

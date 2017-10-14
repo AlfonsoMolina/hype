@@ -20,4 +20,9 @@
         <item>cl</item>
         <item>co</item>
     </string-array>
+    <string-array name="pref_provider">
+        <item>TMDB</item>
+        <item>FA</item>
+    </string-array>
+
 </resources>

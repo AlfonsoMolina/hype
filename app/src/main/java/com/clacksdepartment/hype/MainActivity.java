@@ -38,9 +38,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
    // private ListaModificadaAdapter mRecyclerViewAdapter;
     private FeedReaderDbHelper mFeedReaderDbHelper;
-    private HiloDescargas mHiloDescargas;
+    private HiloDescargasTMDB mHiloDescargasTMDB;
+    private HiloDescargasFA mHiloDescargasFA;
     private Interfaz mInterfaz;
     private Menu mMenu;
+
+    SharedPreferences sharedPreferences;
 
 
     private RecyclerView mRecyclerView;
@@ -67,8 +70,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-
-
         // Creamos el helper de la BBDD
         mFeedReaderDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
@@ -87,19 +88,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRecyclerViewAdapter = new RecyclerViewAdapter(this, mFeedReaderDbHelper);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         //Se actualiza una vez al día
         int diaHoy = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
         //int semanaHoy = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
         int diaGuardado = sharedPreferences.getInt("dia",0);
+
+        sharedPreferences.edit().putString("provider","tmdb").apply();
+
         if (diaHoy > diaGuardado) {
             //Se hace una actualización suave
-            mHiloDescargas = new HiloDescargas(this, mRecyclerViewAdapter,
-                    ((LinearLayout) findViewById(R.id.carga_barra)),false);
-
-            mHiloDescargas.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
+            if (sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("tmdb")){
+                mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
+                        ((LinearLayout) findViewById(R.id.carga_barra)),false);
+                mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
+            }else if(sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("fa")){
+                mHiloDescargasFA = new HiloDescargasFA(this, mRecyclerViewAdapter,
+                        ((LinearLayout) findViewById(R.id.carga_barra)),false);
+                mHiloDescargasFA.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
+            }
 
             SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
             sharedPreferencesEditor.putInt("iniciado", 1);
@@ -110,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mInterfaz = new Interfaz(this, mRecyclerViewAdapter);
         mInterfaz.seleccionaBotonCartelera();
         mostrarCartelera(findViewById(R.id.cartelera));
+
     }
 
 
@@ -168,10 +178,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             //Actualiza las películas guardadas..
             case R.id.actualizar:
-                mHiloDescargas = new HiloDescargas(this, mRecyclerViewAdapter,
-                        ((LinearLayout) findViewById(R.id.carga_barra)),true);
-                // Lanzamos el Thread que descargará la información.
-                mHiloDescargas.execute(mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
+
+                if (sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("tmdb")){
+                    mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
+                            ((LinearLayout) findViewById(R.id.carga_barra)),false);
+                    mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
+                }else if(sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("fa")){
+                    mHiloDescargasFA = new HiloDescargasFA(this, mRecyclerViewAdapter,
+                            ((LinearLayout) findViewById(R.id.carga_barra)),false);
+                    mHiloDescargasFA.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
+                }
+
                 selectedItem.setEnabled(false);
                 selectedItem.setVisible(false);
                 mMenu.findItem(R.id.cancelar).setEnabled(true);
@@ -183,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             case R.id.cancelar:
 
-                mHiloDescargas.cancel(true);
+                mHiloDescargasTMDB.cancel(true);
                 selectedItem.setEnabled(false);
                 selectedItem.setVisible(false);
                 mMenu.findItem(R.id.actualizar).setEnabled(true);
@@ -242,6 +259,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         } else if (clave.equalsIgnoreCase("pref_pais")){
             //Cuando cambia el país se borra la mRecyclerViewAdapter anterior
             mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
+            mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, null);
+            mRecyclerViewAdapter.eliminarLista();
+            mRecyclerViewAdapter.notifyDataSetChanged();
+            mRecyclerViewAdapter.actualizarInterfaz();
+            mRecyclerViewAdapter.mostrarNoPelis();
+        } else if (clave.equalsIgnoreCase("provider")){
+            mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
+            mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, null);
             mRecyclerViewAdapter.eliminarLista();
             mRecyclerViewAdapter.notifyDataSetChanged();
             mRecyclerViewAdapter.actualizarInterfaz();
