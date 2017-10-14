@@ -96,8 +96,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //int semanaHoy = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
         int diaGuardado = sharedPreferences.getInt("dia",0);
 
-        sharedPreferences.edit().putString("provider","tmdb").apply();
-
         if (diaHoy > diaGuardado) {
             //Se hace una actualización suave
             if (sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("tmdb")){

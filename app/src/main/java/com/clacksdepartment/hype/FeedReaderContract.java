@@ -37,7 +37,7 @@ public final class FeedReaderContract {
                     FeedEntryEstrenos.COLUMN_PORTADA + " BLOB," +
                     FeedEntryEstrenos.COLUMN_SINOPSIS + " TEXT," +
                     FeedEntryEstrenos.COLUMN_ESTRENO + " TEXT," +
-                    FeedEntryEstrenos.COLUMN_FECHA + " TEXT," +
+                    FeedEntryEstrenos.COLUMN_FECHA + " DATE," +
                     FeedEntryEstrenos.COLUMN_CORTO + " TEXT," +
                     FeedEntryEstrenos.COLUMN_HYPE + " TEXT)";
 
@@ -65,7 +65,7 @@ public final class FeedReaderContract {
                     FeedEntryCartelera.COLUMN_PORTADA + " BLOB," +
                     FeedEntryCartelera.COLUMN_SINOPSIS + " TEXT," +
                     FeedEntryCartelera.COLUMN_ESTRENO + " TEXT," +
-                    FeedEntryCartelera.COLUMN_FECHA + " TEXT," +
+                    FeedEntryCartelera.COLUMN_FECHA + " DATE," +
                     FeedEntryCartelera.COLUMN_HYPE + " TEXT," +
                     FeedEntryCartelera.COLUMN_SIGUE + " INTEGER(1))";
 
