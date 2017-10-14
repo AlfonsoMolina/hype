@@ -70,7 +70,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
         Log.d(TAG, "Actualizando UI antes de ejecutar el hilo");
         //Se coge el país elegido
         pais = sharedPref.getString("pref_pais", "");
-        idioma = pais;
+        idioma = "es-ES";
         if (pais.equalsIgnoreCase("uk") || pais.equalsIgnoreCase("us") || pais.equalsIgnoreCase("fr"))
             idioma = "en-US";
 
