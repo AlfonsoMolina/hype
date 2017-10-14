@@ -212,16 +212,26 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
         super.onProgressUpdate(values);
         switch (values[0]){
             case progreso_POSTER:
-                ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageBitmap(portada);
+                if (portada != null)
+                    ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageBitmap(portada);
                 break;
             case progreso_SINOPSIS:
-                ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " "));
+                if (!sinopsis.equalsIgnoreCase("null"))
+                    ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " "));
+                else
+                    ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText("N/A");
                 break;
             case progreso_ANO:
-                ((TextView) mView.findViewById(R.id.ficha_year)).setText(ano);
+                if (!ano.equalsIgnoreCase("null"))
+                    ((TextView) mView.findViewById(R.id.ficha_year)).setText(ano);
+                else
+                    ((TextView) mView.findViewById(R.id.ficha_year)).setText("N/A");
                 break;
             case progreso_DURACION:
-                ((TextView) mView.findViewById(R.id.ficha_duracion)).setText(duracion);
+                if (!duracion.equalsIgnoreCase("null min"))
+                    ((TextView) mView.findViewById(R.id.ficha_duracion)).setText(duracion);
+                else
+                    ((TextView) mView.findViewById(R.id.ficha_duracion)).setText("N/A");
                 break;
             case progreso_DIRECTORES:
                 ((TextView) mView.findViewById(R.id.ficha_directores)).setText(director.toString().replace("[", "").replace("]", ""));
@@ -233,7 +243,8 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                 ((TextView) mView.findViewById(R.id.ficha_genero)).setText(genero.toString().replace("[", "").replace("]", ""));
                 break;
             case progreso_NOTA:
-                ((TextView) mView.findViewById(R.id.ficha_nota)).setText(nota + " (" + votos + " " + mView.getResources().getString(R.string.votos) + ")");
+                if (nota != null)
+                    ((TextView) mView.findViewById(R.id.ficha_nota)).setText(nota + " (" + votos + " " + mView.getResources().getString(R.string.votos) + ")");
                 break;
             default:
                 break;
@@ -310,14 +321,13 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
     public Bitmap getBitmap(String enlacePortada) {
 
+        Bitmap portada;
         try {
             URL url = new URL(enlacePortada);
             Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            this.portada = Bitmap.createScaledBitmap(bmp, 654, 868, false);
+            portada = Bitmap.createScaledBitmap(bmp, 654, 868, false);
         }catch (Exception ee) {
-            Bitmap bmp = Bitmap.createBitmap(654, 868, Bitmap.Config.ARGB_8888);
-            bmp.eraseColor(Color.BLACK);
-            this.portada = bmp;
+            portada = null;
         }
 
         return portada;

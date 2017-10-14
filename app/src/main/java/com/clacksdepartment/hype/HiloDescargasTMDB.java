@@ -336,6 +336,7 @@ public class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
             String sinopsis;
             String date;
             String textdate;
+            int totalresults = 0;
 
             do {
                 Log.d(TAG, urlJson);
@@ -346,7 +347,7 @@ public class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 pageresults = jObject.getJSONArray("results");
                 ended = false;
 
-                for (int results = 0;!ended;results++){
+                for (int results = 0;!ended && (totalresults<200);results++){
                     try {
                         Log.d(TAG, "-----------------");
                         id = pageresults.getJSONObject(results).getInt("id");
@@ -369,13 +370,13 @@ public class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                         }else{
                             Log.d(TAG, "Saltando película supuesta cartelera que aún no está en cartelera");
                         }
-
+                        totalresults++;
                     }catch (Exception e){
                         ended = true;
                     }
                 }
                 page++;
-            } while (page <= numpages);
+            } while ((page <= numpages) && (totalresults < 200));
         }catch (Exception e){
             Log.e(TAG, e.getMessage());
         }
