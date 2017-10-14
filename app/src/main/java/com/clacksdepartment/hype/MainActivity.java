@@ -117,9 +117,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mInterfaz = new Interfaz(this, mRecyclerViewAdapter);
         mInterfaz.seleccionaBotonCartelera();
         mostrarCartelera(findViewById(R.id.cartelera));
-
     }
-
 
 
     @Override

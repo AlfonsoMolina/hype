@@ -135,7 +135,7 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA, f);
                 dbw.insert(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, values);
 
-                cartelera.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
+                //cartelera.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
             }else{
                 estrenos.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
             }

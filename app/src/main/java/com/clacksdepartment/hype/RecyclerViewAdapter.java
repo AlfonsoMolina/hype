@@ -70,6 +70,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private int estado = CARTELERA;
     private boolean flagAdds = true;
+    private boolean flagTickets = false;
 
     private FragmentManager mFragmentManager;
     LinearLayoutManager mLinearLayoutManager;
@@ -112,6 +113,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
 
         flagAdds = sharedPreferences.getBoolean("pref_adds",true);
+
+        if (sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("fa")){
+            flagTickets = true;
+        }
 
         RecyclerView.ItemAnimator animator = ((RecyclerView) mMainActivity.findViewById(R.id.lista)).getItemAnimator();
 
@@ -568,7 +573,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
         if (!futuro){
-            view.findViewById(R.id.av_cines).setVisibility(View.VISIBLE);
+            if (flagTickets) {
+                view.findViewById(R.id.av_cines).setVisibility(View.VISIBLE);
+            }else{
+                view.findViewById(R.id.av_cines).setVisibility(View.GONE);
+            }
             view.findViewById(R.id.av_fecha).setVisibility(View.GONE);
         }else{
             view.findViewById(R.id.av_cines).setVisibility(View.GONE);
