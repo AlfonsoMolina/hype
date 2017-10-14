@@ -85,6 +85,7 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
         //Datos de las películas:
         //link, título, sinopsis, estreno (letras, fecha e hype.
         String l, t, s, e, f, h;
+        int sigue;
         byte[] p_byte;
         Bitmap p_bitmap;
 
@@ -153,7 +154,8 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS,
                 FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO,
                 FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE
+                FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE,
+                FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE
         };
 
         cursor = dbr.query(
@@ -175,6 +177,7 @@ public class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
             s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS));
             e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO));
             h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE));
+            sigue = cursor.getInt(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE));
 
             p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
 

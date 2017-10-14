@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -45,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     SharedPreferences sharedPreferences;
 
-
     private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mRecyclerViewAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // Hook y setup del Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
+
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Creamos el helper de la BBDD
@@ -139,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Drawable drawable = mMenu.getItem(i).getIcon();
             if(drawable != null) {
                 drawable.mutate();
+                //noinspection deprecation
                 drawable.setColorFilter(getResources().getColor(R.color.colorAppText), PorterDuff.Mode.SRC_ATOP);
             }
         }
