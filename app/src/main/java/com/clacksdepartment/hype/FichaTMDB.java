@@ -95,16 +95,16 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             jObject = new JSONObject(basico);
 
-            sinopsis = jObject.getString("overview");
-            Log.d(TAG, sinopsis);
-
-            publishProgress(progreso_SINOPSIS);
-
             portadaUrl = preImagen + jObject.getString("poster_path");
             Log.d(TAG, portadaUrl);
             portada = getBitmap(portadaUrl);
 
             publishProgress(progreso_POSTER);
+
+            sinopsis = jObject.getString("overview");
+            Log.d(TAG, sinopsis);
+
+            publishProgress(progreso_SINOPSIS);
 
             duracion = jObject.getString("runtime") + " min";
             Log.d(TAG, duracion);
