@@ -84,10 +84,9 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
 
-
             // Leo el HTML
             String basico = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+"&language=es-ES");
-            String cast = getHTML("https://api.themoviedb.org/3/movie/"+id+"/credits?api_key="+apiKey+"&language=es-ES");
+
 
             // Aquí el parseo:
             JSONObject jObject;
@@ -153,6 +152,8 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                     mustContinue = false;
                 }
             }*/
+
+            String cast = getHTML("https://api.themoviedb.org/3/movie/"+id+"/credits?api_key="+apiKey+"&language=es-ES");
 
             jObject = new JSONObject(cast);
             jArray = jObject.getJSONArray("cast");
