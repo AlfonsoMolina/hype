@@ -268,14 +268,17 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 cursor.close();
             }
 
-            //Se eliminan las películas que no hayan aparecido
-            String selection2 = FeedEntryEstrenos.COLUMN_TIPO + "<'0'";
-
-            if (!isCancelled())
-                db[0].delete(FeedEntryEstrenos.TABLE_NAME, selection2, null);
 
             estado = !estado;
         }while(!estado);
+
+        //Se eliminan las películas que no hayan aparecido
+        String selection2 = FeedEntryEstrenos.COLUMN_TIPO + "<'0'";
+
+        if (!isCancelled())
+            db[0].delete(FeedEntryEstrenos.TABLE_NAME, selection2, null);
+
+        
         return null;
     }
 
