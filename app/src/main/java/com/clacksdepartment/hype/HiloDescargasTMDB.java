@@ -414,7 +414,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
     protected void onPostExecute(Void v) {
         Log.d(TAG, "Descarga finalizada, actualizando interfaz");
         //lista.notifyDataSetChanged();
-
+        lista.actualizarDatos();
         lista.actualizarInterfaz();
         lista.quitarX(); //Y esto de chanchullo para quitar el X
         carga_barra.setVisibility(View.GONE);

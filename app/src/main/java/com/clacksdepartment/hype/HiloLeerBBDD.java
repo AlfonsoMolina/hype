@@ -12,6 +12,8 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
@@ -142,6 +144,13 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
         }
 
         cursor.close();
+
+        Collections.sort(cartelera, new Comparator<Pelicula>() {
+            @Override
+            public int compare(Pelicula p1, Pelicula p2) {
+                return (p2.getEstrenoFecha()).compareToIgnoreCase(p1.getEstrenoFecha());
+            }
+        });
 
         lista.addCartelera(cartelera);
         lista.addEstrenos(estrenos);
