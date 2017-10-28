@@ -32,6 +32,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
+import static com.clacksdepartment.hype.FeedReaderContract.FeedEntryEstrenos;
+
 class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
     private static final String TAG = "HiloDescargasTMDB";
@@ -102,26 +104,26 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
         boolean estado = true; //Se hace dos veces, una con carteleray otra con estrenos
 
         //Cambio el tipo a -1 de las peliculas en cartelera (1) y estrenos (2)
-        values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO, -1);
+        values.put(FeedEntryEstrenos.COLUMN_TIPO, -1);
 
-        String clause = FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO + "=1 OR " +
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO + "=2";
-        db[1].update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values,
+        String clause = FeedEntryEstrenos.COLUMN_TIPO + "='1' OR " +
+                FeedEntryEstrenos.COLUMN_TIPO + "='2'";
+        db[1].update(FeedEntryEstrenos.TABLE_NAME, values,
                 clause, null);
 
 
         String[] projection = {
-                //FeedReaderContract.FeedEntryEstrenos._ID,
-                //FeedReaderContract.FeedEntryEstrenos.COLUMN_REF,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO,
-                //FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA_ENLACE,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS,
-                //FeedReaderContract.FeedEntryEstrenos.COLUMN_TRAILER,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO
+                //FeedEntryEstrenos._ID,
+                //FeedEntryEstrenos.COLUMN_REF,
+                FeedEntryEstrenos.COLUMN_TITULO,
+                //FeedEntryEstrenos.COLUMN_PORTADA,
+                FeedEntryEstrenos.COLUMN_PORTADA_ENLACE,
+                FeedEntryEstrenos.COLUMN_SINOPSIS,
+                //FeedEntryEstrenos.COLUMN_TRAILER,
+                FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS,
+                FeedEntryEstrenos.COLUMN_ESTRENO_FECHA,
+                FeedEntryEstrenos.COLUMN_HYPE,
+                FeedEntryEstrenos.COLUMN_TIPO
         };
 
         do {
@@ -134,13 +136,14 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 Log.d(TAG, "Nº de películas de estrenos: " + estrenos.size());
             }
 
-            String whereClauseColumns = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " = ?";
+            String whereClauseColumns = FeedEntryEstrenos.COLUMN_REF + " = ?";
 
             String enlace;
             String titulo;
             String sinopsis;
             String estreno_letras;
             String estreno_fecha;
+            String portada_enlace;
             byte[] portada_byte;
             Bitmap portada_bitmap;
 
@@ -152,13 +155,13 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 String[] whereClauseValues = {enlace};
 
                 cursor = db[0].query(
-                        FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
+                        FeedEntryEstrenos.TABLE_NAME,                     // The table to query
                         projection,                               // The columns to return
                         whereClauseColumns,                                // The columns for the WHERE clause
                         whereClauseValues,                            // The values for the WHERE clause
                         null,                                     // don't group the rows
                         null,                                     // don't filter by row groups
-                        FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + (estado ? " DESC" : " ASC")                                      // The sort order
+                        FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + (estado ? " DESC" : " ASC")                                      // The sort order
                 );
 
                 //Si la película no está guardada se añade
@@ -166,21 +169,24 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     //Se buscan y guardan los diferentes elementos
 
                     titulo = peli.getTitulo();
-                    portada_byte = bitmapToByte(peli.getPortada());
+                    portada_enlace = peli.getPortadaEnlace();
                     sinopsis = peli.getSinopsis();
                     estreno_letras = peli.getEstrenoLetras();
                     estreno_fecha = peli.getEstrenoFecha();
                     portada_bitmap = peli.getPortada();
+                    portada_byte = bitmapToByte(portada_bitmap);
 
-                    values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF, enlace);
-                    values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO, titulo);
-                    values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA, portada_byte);
-                    values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS, sinopsis);
-                    values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS, estreno_letras);
-                    values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA, estreno_fecha);
-                    values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO, estado?1:2);
 
-                    db[1].insert(Fe, null, values);
+                    values.put(FeedEntryEstrenos.COLUMN_REF, enlace);
+                    values.put(FeedEntryEstrenos.COLUMN_TITULO, titulo);
+                    values.put(FeedEntryEstrenos.COLUMN_PORTADA, portada_byte);
+                    values.put(FeedEntryEstrenos.COLUMN_PORTADA_ENLACE, portada_enlace);
+                    values.put(FeedEntryEstrenos.COLUMN_SINOPSIS, sinopsis);
+                    values.put(FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS, estreno_letras);
+                    values.put(FeedEntryEstrenos.COLUMN_ESTRENO_FECHA, estreno_fecha);
+                    values.put(FeedEntryEstrenos.COLUMN_TIPO, estado?1:2);
+
+                    db[1].insert(FeedEntryEstrenos.TABLE_NAME, null, values);
 
 /*
                     if (estado) {
@@ -229,64 +235,46 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     }
                     */
                     values.clear();
-                    Log.d(TAG, "Encontrada película: " + title + ".");
+                    Log.d(TAG, "Encontrada película: " + titulo + ".");
 
-                }else if(cursor.getCount() > 0){
+                //Si ya está se modifica
+                }else {
                     cursor.moveToFirst();
-                    boolean somethingChanged = false;
-                    if(!cursor.getString(cursor.getColumnIndexOrThrow(column_titulo)).equalsIgnoreCase(peli.getTitulo())) {
-                        values.put(column_titulo, peli.getTitulo());
-                        somethingChanged = true;
+                    if(!cursor.getString(cursor.getColumnIndexOrThrow(FeedEntryEstrenos.COLUMN_TITULO)).equalsIgnoreCase(peli.getTitulo())) {
+                        values.put(FeedEntryEstrenos.COLUMN_TITULO, peli.getTitulo());
                     }
-                    if(!cursor.getString(cursor.getColumnIndexOrThrow(column_sinopsis)).equalsIgnoreCase(peli.getSinopsis())) {
-                        values.put(column_sinopsis, peli.getSinopsis());
-                        somethingChanged = true;
+                    if(!cursor.getString(cursor.getColumnIndexOrThrow(FeedEntryEstrenos.COLUMN_SINOPSIS)).equalsIgnoreCase(peli.getSinopsis())) {
+                        values.put(FeedEntryEstrenos.COLUMN_SINOPSIS, peli.getSinopsis());
                     }
-                    if(!cursor.getString(cursor.getColumnIndexOrThrow(column_estreno)).equalsIgnoreCase(peli.getEstrenoLetras())) {
-                        values.put(column_estreno, peli.getEstrenoLetras());
-                        somethingChanged = true;
+                    if(!cursor.getString(cursor.getColumnIndexOrThrow(FeedEntryEstrenos.COLUMN_ESTRENO_FECHA)).equalsIgnoreCase(peli.getEstrenoFecha())) {
+                        values.put(FeedEntryEstrenos.COLUMN_ESTRENO_FECHA, peli.getEstrenoFecha());
+                        values.put(FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS, peli.getEstrenoLetras());
                     }
-                    if(!cursor.getString(cursor.getColumnIndexOrThrow(column_fecha)).equalsIgnoreCase(peli.getEstrenoFecha())) {
-                        values.put(column_fecha, peli.getEstrenoFecha());
-                        somethingChanged = true;
+                    if(!cursor.getString(cursor.getColumnIndexOrThrow(FeedEntryEstrenos.COLUMN_PORTADA_ENLACE)).equalsIgnoreCase(peli.getPortadaEnlace())) {
+                        values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA, bitmapToByte(peli.getPortada()));
+                        values.put(FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS, peli.getEstrenoLetras());
                     }
-                    if (somethingChanged) {
-                        Log.d(TAG, "Actualizando película " + peli.getTitulo());
+                    values.put(FeedEntryEstrenos.COLUMN_TIPO, estado?1:2);
+
+                    Log.d(TAG, "Actualizando película " + peli.getTitulo());
                         // Si ha cambiado algo de lo de arriba, actualizo la portada, por si ha cambiado...
                         // TODO: COMPARAR HASH O ALGO?
-                        values.put(estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA : FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA, bitmapToByte(peli.getPortada()));
-                        db[1].update(estado ? FeedReaderContract.FeedEntryCartelera.TABLE_NAME : FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values, estado ? FeedReaderContract.FeedEntryCartelera.COLUMN_REF : FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "= '" + peli.getEnlace() + "'", null);
-                        values.clear();
-                    }
+                    db[1].update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values, FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "= '" + peli.getEnlace() + "'", null);
+                    values.clear();
+
                 }
+
                 actualProgress++;
                 publishProgress((int) Math.floor(actualProgress*10/totalProgress));
                 cursor.close();
             }
 
-            //Para la actualización fuerte de la cartelera hay que borrar a las antiguas. Para eso:
-            //He marcado con SIGUE a las que he encontrado
-            //Ahora borro las no marcadas
-            //Cambio los valores SIGUE por 0
-            if(actFuerte && estado){
-                String selection2 = FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE + " LIKE ?";
-                String[] selectionArgs2 = {"0"};
-                if (!isCancelled())
-                    db[0].delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, selection2, selectionArgs2);
+            //Se eliminan las películas que no hayan aparecido
+            String selection2 = FeedEntryEstrenos.COLUMN_TIPO + "<'0'";
 
-                //Y esto pone un 0 donde antes había un 1
-                ContentValues values2 = new ContentValues();
-                values2.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE, 0);
+            if (!isCancelled())
+                db[0].delete(FeedEntryEstrenos.TABLE_NAME, selection2, null);
 
-                String[] selectionArgs3 = { "1" };
-
-                db[1].update(
-                        FeedReaderContract.FeedEntryCartelera.TABLE_NAME,
-                        values2,
-                        selection2,
-                        selectionArgs3);
-
-            }
             estado = !estado;
         }while(!estado);
         return null;
