@@ -47,4 +47,5 @@
     <string name="share_estreno">¡Quedan %1$d días para el estreno de <i>%2$s</i>!</string>
     <string name="share_mensaje">Compartir la película <i>%1$s</i>.</string>
     <string name="votes_structure"><i>%1$s</i> (<i>%2$s</i> votos) </string>
+    <string name="watch_trailer">Ver trailer en Youtube</string>
 </resources>

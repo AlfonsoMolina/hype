@@ -75,7 +75,7 @@
                 android:orientation="vertical"
                 android:paddingLeft="30dp"
                 android:paddingRight="30dp"
-                android:paddingBottom="30dp"
+                android:paddingBottom="10dp"
                 android:stretchColumns="1"
                 android:shrinkColumns="1">
 
@@ -227,6 +227,29 @@
                         android:textSize="16sp"/>
                 </TableRow>
             </TableLayout>
+            
+            <LinearLayout
+                android:id="@+id/ficha_video_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="30dp"
+                android:visibility="gone"
+                >
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/ficha_video"
+                    android:src="@drawable/ic_play_circle_outline_black_24dp"
+                    android:tint="@color/colorAccent"
+                    style="@style/Widget.AppCompat.Button.Borderless"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorAppText"
+                    android:text="@string/watch_trailer"/>
+            </LinearLayout>
 
         </LinearLayout>
 

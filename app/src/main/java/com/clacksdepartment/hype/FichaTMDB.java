@@ -1,13 +1,17 @@
 package com.clacksdepartment.hype;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Process;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,7 +33,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
     private static final String TAG = "FichaTMDB";
     private static final String apiKey = "8ac0d37839748f4647039ef00d859d13";
     private static final String preImagen = "https://image.tmdb.org/t/p/w640";
-    private static final String preYoutube = "https://www.youtube.com/watch?v=/";
+    private static final String preYoutube = "https://www.youtube.com/watch?v=";
 
     // Valor de progreso resultante:
     private static final int progreso_POSTER = 0;
@@ -39,6 +43,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
     private static final int progreso_REPARTO = 5;
     private static final int progreso_GENERO = 6;
     private static final int progreso_NOTA = 7;
+    private static final int progreso_VIDEO = 8;
 
     // Atributos
     private String id;
@@ -74,7 +79,11 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
             Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
 
             // Leo el HTML
-            String basico = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+"&language=es-ES&append_to_response=videos,credits");
+            String pais = PreferenceManager.getDefaultSharedPreferences(mView.getContext()).getString("pref_pais", "");
+            String idioma = "es-ES";
+            if (pais.equalsIgnoreCase("uk") || pais.equalsIgnoreCase("us") || pais.equalsIgnoreCase("fr"))
+                idioma = "en-US";
+            String basico = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+"&language=" + idioma + "&append_to_response=videos,credits");
 
             // Aquí el parseo:
             JSONObject jObject;
@@ -162,6 +171,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
             }
             Log.d(TAG, videoLink);
 
+            publishProgress(progreso_VIDEO);
         }catch (Exception e){
             Log.e(TAG, e.toString());
         }
@@ -215,6 +225,18 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                 }else {
                     ((TextView) mView.findViewById(R.id.ficha_nota)).setText("N/A");
                 }
+                break;
+            case progreso_VIDEO:
+                mView.findViewById(R.id.ficha_video).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(videoLink));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mView.getContext().startActivity(intent);
+                    }
+                });
+                mView.findViewById(R.id.ficha_video_container).setVisibility(View.VISIBLE);
                 break;
             default:
                 break;
