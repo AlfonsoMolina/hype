@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
    // private ListaModificadaAdapter mRecyclerViewAdapter;
     private FeedReaderDbHelper mFeedReaderDbHelper;
     private HiloDescargasTMDB mHiloDescargasTMDB;
-    private HiloDescargasFA mHiloDescargasFA;
     private Interfaz mInterfaz;
     private Menu mMenu;
 
@@ -100,15 +99,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         if (diaHoy > diaGuardado) {
             //Se hace una actualización suave
-            if (sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("tmdb")){
-                mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
-                        ((LinearLayout) findViewById(R.id.carga_barra)),false);
-                mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
-            }else if(sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("fa")){
-                mHiloDescargasFA = new HiloDescargasFA(this, mRecyclerViewAdapter,
-                        ((LinearLayout) findViewById(R.id.carga_barra)),false);
-                mHiloDescargasFA.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
-            }
+            mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
+                    ((LinearLayout) findViewById(R.id.carga_barra)),false);
+            mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
 
             SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
             sharedPreferencesEditor.putInt("iniciado", 1);
@@ -178,15 +171,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //Actualiza las películas guardadas..
             case R.id.actualizar:
 
-                if (sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("tmdb")){
-                    mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
-                            ((LinearLayout) findViewById(R.id.carga_barra)),false);
-                    mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
-                }else if(sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("fa")){
-                    mHiloDescargasFA = new HiloDescargasFA(this, mRecyclerViewAdapter,
-                            ((LinearLayout) findViewById(R.id.carga_barra)),false);
-                    mHiloDescargasFA.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
-                }
+                mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
+                        ((LinearLayout) findViewById(R.id.carga_barra)),false);
+                mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
 
                 selectedItem.setEnabled(false);
                 selectedItem.setVisible(false);

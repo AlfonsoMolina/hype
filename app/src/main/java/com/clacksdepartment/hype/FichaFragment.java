@@ -32,8 +32,6 @@ public class FichaFragment extends Fragment {
     private String titulo;
     private String link;
     private String sinopsis;
-
-    private FichaFA fichaFA;
     private FichaTMDB fichaTMDB;
     private ViewGroup contenedor;
 
@@ -91,16 +89,8 @@ public class FichaFragment extends Fragment {
         ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
         ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)",""));
 
-        // Creamos la fichaFA con su constructor, lo que va agilizando algunas operaciones de compilación de regex
-        //fichaFA = new FichaFA(link, view);
-
-        if (link.contains("themoviedb")){
-            fichaTMDB = new FichaTMDB(link, view);
-            fichaTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }else if (link.contains("filmaffinity")){
-            fichaFA = new FichaFA(link, view);
-            fichaFA.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+        fichaTMDB = new FichaTMDB(link, view);
+        fichaTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void onButtonPressed(Uri uri) {
