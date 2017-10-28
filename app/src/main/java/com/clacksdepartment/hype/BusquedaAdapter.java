@@ -119,7 +119,7 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
 
         if (position == itemExpandido) {
 
-            ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis());
+            ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis().substring(0, Math.min(pelicula.getSinopsis().length(), 200)) + "...");
 
             if (pelicula.getHype()) {
                 ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
@@ -209,10 +209,6 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
             view.findViewById(R.id.av_cines).setVisibility(View.GONE);
             view.findViewById(R.id.av_fecha).setVisibility(View.VISIBLE);
         }
-
-        //if (itemExpandido != -1) {
-        //    ((RecyclerView) mActivity.findViewById(R.id.lista)).smoothScrollToPosition(itemExpandido);
-        //}
     }
 
     public void buscar(String query){
