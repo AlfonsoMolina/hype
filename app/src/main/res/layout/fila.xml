@@ -185,7 +185,7 @@
         android:contentDescription="@string/get_hype"
         android:layout_marginEnd="5dp"
         android:layout_marginTop="5dp"
-        android:src="@drawable/hype3"
+        android:src="@drawable/hype_mark"
         android:tint="@color/colorAccent"
         android:visibility="invisible" />
 
