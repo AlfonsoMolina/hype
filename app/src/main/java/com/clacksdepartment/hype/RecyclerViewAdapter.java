@@ -183,7 +183,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
-            if (estado == HYPE || (mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition()+1) == getItemCount() || getItemCount() == 1) {
+            if (estado == HYPE ||
+                    (mLinearLayoutManager.findFirstVisibleItemPosition() == mLinearLayoutManager.findFirstCompletelyVisibleItemPosition()) &&
+                            ((mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() +2 - getItemCount()) >= 0)) {
                 filaView.setVisibility(View.GONE);
             } else {
                 filaView.setVisibility(View.VISIBLE);
