@@ -634,19 +634,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         SQLiteDatabase dbw = mFeedReaderDbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        String isHyped;
 
         pelicula.setHype(!pelicula.getHype());
 
         if (pelicula.getHype()) {
-            isHyped = "T";
             ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_black_24dp);
         } else {
-            isHyped = "F";
             ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
 
-            contentValues.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, isHyped);
+            contentValues.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, pelicula.getHype()?1:0);
 
             String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
             String[] selectionArgs = {pelicula.getEnlace()};
