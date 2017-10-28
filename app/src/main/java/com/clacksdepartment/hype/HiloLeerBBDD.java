@@ -50,56 +50,61 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
         //Y ahora los estrenos
 
         //Se lee la bbdd y se guardan los elementos en cursor
-        String[] projection2 = {
+        String[] projection = {
                 FeedReaderContract.FeedEntryEstrenos._ID,
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_REF,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_REF,
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA_ENLACE,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA,
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_TRAILER,
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS,
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_CORTO
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO
         };
 
         Cursor cursor = dbr.query(
                 FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
-                projection2,                               // The columns to return
+                projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
                 null,                                     // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA + " ASC"                                    // The sort order
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + " ASC"                                    // The sort order
         );
 
         ContentValues values = new ContentValues();
 
         //Datos de las películas:
-        //link, título, sinopsis, estreno (letras, fecha e hype.
-        String l, t, s, e, f, h;
-        int sigue;
-        byte[] p_byte;
-        Bitmap p_bitmap;
+        //link, título, sinopsis, estreno (letras), fecha e hype.
+        String enlace, titulo, sinopsis, estreno_letras, estreno_fecha, trailer, portada_enlace;
+        int tipo;
+        boolean hype;
+        byte[] portada_byte;
+        Bitmap portada_bitmap;
 
         //Y empezamos a mirar las tuplas una a una
         while (cursor.moveToNext()) {
-            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA));
-            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO)); //Esto para el log solo
-            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF));
-            p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA));
-            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS));
-            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO));
-            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE));
+            enlace = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF));
+            titulo = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO));
+            sinopsis = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS));
+            estreno_letras = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS));
+            estreno_fecha = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA));
+            hype = (cursor.getInt(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE)) == 1);
+            tipo = cursor.getInt(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO));
+            trailer = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_TRAILER));
+            portada_enlace = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA_ENLACE));
+            portada_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA));
 
-            p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
-
-            String [] fecha = f.split("-");
+            portada_bitmap = BitmapFactory.decodeByteArray(portada_byte, 0, portada_byte.length);
+            String [] fecha = estreno_fecha.split("-");
 
             int difAno = Integer.parseInt(fecha[0]) - Calendar.getInstance().get(Calendar.YEAR);
             int difMes = Integer.parseInt(fecha[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
             int difDia = Integer.parseInt(fecha[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 
-            boolean futuro = false;
+            boolean futuro = false; //true si aun no se ha estrenado
 
             if (difAno == 0){
                 if (difMes == 0){
@@ -113,70 +118,27 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 futuro = true;
             }
 
-            if (!futuro){
-                String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
-                String[] selectionArgs = {l};
-                dbr.delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, selection, selectionArgs);
+            if (tipo == 1) { //Si es de cartelera
+                cartelera.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
+                        estreno_letras, estreno_fecha, hype));
 
-                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_REF, l);
-                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO, t);
-                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA, p_byte);
-                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS, s);
-                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, h);
-                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO, e);
-                values.put(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA, f);
-                dbw.insert(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, values);
 
-                //cartelera.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
-            }else{
-                estrenos.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
+            } else if (tipo == 2 && !futuro) {  //Es de cartelera pero está mal catalogada
+                values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO, 1);
+
+                dbw.update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values,
+                        FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "= '" +
+                                enlace + "'", null);
+
+                cartelera.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
+                        estreno_letras, estreno_fecha, hype));
+
+            } else { //Es de estrenos
+                estrenos.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
+                        estreno_letras, estreno_fecha, hype));
             }
 
-            Log.d(TAG, "Encontrada película: " + t + ".");
-        }
-
-        //Despues se carga la cartelera
-
-        //Se lee la bbdd y se guardan los elementos en cursor
-        String[] projection = {
-                FeedReaderContract.FeedEntryCartelera._ID,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_REF,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE
-        };
-
-        cursor = dbr.query(
-                FeedReaderContract.FeedEntryCartelera.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                                     // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA + " DESC"                                    // The sort order
-        );
-
-        //Y empezamos a mirar las tuplas una a una
-        while (cursor.moveToNext()) {
-            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA));
-            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO)); //Esto para el log solo
-            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_REF));
-            p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA));
-            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS));
-            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO));
-            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE));
-            sigue = cursor.getInt(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_SIGUE));
-
-            p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
-
-            cartelera.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
-
-            Log.d(TAG, "Encontrada película: " + t + ".");
-
+            Log.d(TAG, "Encontrada película: " + titulo + ".");
         }
 
         cursor.close();

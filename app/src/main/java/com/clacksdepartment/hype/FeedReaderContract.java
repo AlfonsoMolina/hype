@@ -22,7 +22,7 @@ public final class FeedReaderContract {
         public static final String COLUMN_REF = "Ref";
         public static final String COLUMN_TITULO = "Titulo";
         public static final String COLUMN_PORTADA = "Portada";
-        public static final String COLUMN_PORTADA_LINK = "Portada_Link";
+        public static final String COLUMN_PORTADA_ENLACE = "Portada_Enlace";
         public static final String COLUMN_SINOPSIS = "Sinopsis";
         public static final String COLUMN_TRAILER = "Trailer";
         public static final String COLUMN_ESTRENO_LETRAS = "Estreno_Letras";
@@ -37,12 +37,12 @@ public final class FeedReaderContract {
                     FeedEntryEstrenos.COLUMN_REF + " TEXT," +
                     FeedEntryEstrenos.COLUMN_TITULO + " TEXT," +
                     FeedEntryEstrenos.COLUMN_PORTADA + " BLOB," +
-                    FeedEntryEstrenos.COLUMN_PORTADA_LINK + " TEXT," +
+                    FeedEntryEstrenos.COLUMN_PORTADA_ENLACE+ " TEXT," +
                     FeedEntryEstrenos.COLUMN_SINOPSIS + " TEXT," +
                     FeedEntryEstrenos.COLUMN_TRAILER + " TEXT," +
                     FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS + " TEXT," +
                     FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + " DATE," +
-                    FeedEntryEstrenos.COLUMN_HYPE + " TEXT," +
+                    FeedEntryEstrenos.COLUMN_HYPE + " INTEGER," +
                     FeedEntryEstrenos.COLUMN_TIPO + " INTEGER)";
 
     public static final String SQL_DELETE_ENTRIES_ESTRENOS =

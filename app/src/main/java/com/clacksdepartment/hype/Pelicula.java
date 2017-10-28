@@ -28,6 +28,7 @@ public class Pelicula {
     private String estrenoLetras;      //Viernes, 4 de febrero
     private String estrenoFecha;       //2018/02/04
     private String enlace;
+    private String portadaEnlace;
 
 
     private String enlacePortada;
@@ -39,7 +40,7 @@ public class Pelicula {
      */
 
     //link, portada, titulo, sinopsis, estreno (con letras), fecha (exacto), hay hype?
-    Pelicula (String enlace, Bitmap portada, String titulo, String sinopsis, String estrenoLetras, String estrenoFecha, Boolean hype){
+    Pelicula (String enlace, Bitmap portada, String portadaEnlace, String titulo, String sinopsis, String estrenoLetras, String estrenoFecha, Boolean hype){
         Log.v(TAG, "Objeto Pelicula construido");
         this.titulo = titulo;
         this.sinopsis = sinopsis;
@@ -48,9 +49,7 @@ public class Pelicula {
         this.estrenoFecha = estrenoFecha;
         this.hype = hype;
         this.portada = portada;
-
-        //Descarga el bitmap de la portada cada vez que se coge la película de la bbdd.
-        //Si no hay, se pone negro.
+        this.portadaEnlace = portadaEnlace;
 
     }
 
