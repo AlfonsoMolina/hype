@@ -218,7 +218,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                 break;
             case progreso_SINOPSIS:
                 if (!sinopsis.equalsIgnoreCase("null"))
-                    ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)","").replace("&amp;", "&").replace("&quot;", "\"").replace("&apos;", "\'").replace("&lt;","<").replace("&gt;",">").replace("&nbsp;", " "));
+                    ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)",""));
                 else
                     ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText("N/A");
                 break;
@@ -229,7 +229,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                     ((TextView) mView.findViewById(R.id.ficha_year)).setText("N/A");
                 break;
             case progreso_DURACION:
-                if (!duracion.equalsIgnoreCase("null min"))
+                if (!duracion.equalsIgnoreCase("0 min") && !duracion.equalsIgnoreCase("null min"))
                     ((TextView) mView.findViewById(R.id.ficha_duracion)).setText(duracion);
                 else
                     ((TextView) mView.findViewById(R.id.ficha_duracion)).setText("N/A");
