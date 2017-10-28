@@ -117,14 +117,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         if (sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("fa")){
             flagTickets = true;
         }
+        mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.lista));
 
-        RecyclerView.ItemAnimator animator = ((RecyclerView) mMainActivity.findViewById(R.id.lista)).getItemAnimator();
+        RecyclerView.ItemAnimator animator = mRecyclerView.getItemAnimator();
 
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }
 
-        mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.lista));
         mLinearLayoutManager = ((LinearLayoutManager) mRecyclerView.getLayoutManager());
         vistaParaExpandir = -1;
         vistaParaContraer = -1;
