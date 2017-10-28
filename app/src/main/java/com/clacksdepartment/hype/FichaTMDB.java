@@ -1,8 +1,6 @@
 package com.clacksdepartment.hype;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Process;
 import android.support.annotation.NonNull;
@@ -52,7 +50,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
     private String ano;
     private String duracion;
     private String portadaUrl;
-    private Bitmap portada;
+    private Drawable portada;
     private List<String> director;
     private List <String> reparto;
     private List <String> productora;
@@ -96,7 +94,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             portadaUrl = preImagen + jObject.getString("poster_path");
             Log.d(TAG, portadaUrl);
-            portada = getBitmap(portadaUrl);
+            portada = loadImageFromURL(portadaUrl, "Poster");
 
             publishProgress(progreso_POSTER);
 
@@ -216,7 +214,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
         switch (values[0]){
             case progreso_POSTER:
                 if (portada != null)
-                    ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageBitmap(portada);
+                    ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageDrawable(portada);
                 break;
             case progreso_SINOPSIS:
                 if (!sinopsis.equalsIgnoreCase("null"))
@@ -322,17 +320,15 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
         return html.toString();
     }
 
-    public Bitmap getBitmap(String enlacePortada) {
-
-        Bitmap portada;
+    private Drawable loadImageFromURL(String url, String name) {
         try {
-            URL url = new URL(enlacePortada);
-            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            portada = Bitmap.createScaledBitmap(bmp, 654, 868, false);
-        }catch (Exception ee) {
-            portada = null;
+            InputStream is = (InputStream) new URL(url).getContent();
+            Drawable d = Drawable.createFromStream(is, name);
+            return d;
+        } catch (Exception e) {
+            return null;
         }
-
-        return portada;
     }
+
+
 }
