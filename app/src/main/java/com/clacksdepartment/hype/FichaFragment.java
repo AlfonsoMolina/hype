@@ -87,10 +87,9 @@ public class FichaFragment extends Fragment {
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         // Fijamos el título, ya conocido, para ir rellenando algo la fichaFA...
         ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
-        ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText(sinopsis);
+        ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)",""));
 
         // Creamos la fichaFA con su constructor, lo que va agilizando algunas operaciones de compilación de regex
         //fichaFA = new FichaFA(link, view);

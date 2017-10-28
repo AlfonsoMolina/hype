@@ -29,6 +29,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
     private static final String TAG = "FichaTMDB";
     private static final String apiKey = "8ac0d37839748f4647039ef00d859d13";
     private static final String preImagen = "https://image.tmdb.org/t/p/w640";
+    private static final String preYoutube = "https://www.youtube.com/watch?v=/";
 
     // Valor de progreso resultante:
     private static final int progreso_POSTER = 0;
@@ -49,6 +50,8 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
     private List <String> genero;
     private String nota;
     private String votos;
+    private String videoProvider;
+    private String videoLink;
 
     // Vista a modificar
     private final View mView;
@@ -71,8 +74,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
             Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
 
             // Leo el HTML
-            String basico = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+"&language=es-ES");
-
+            String basico = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+"&language=es-ES&append_to_response=videos,credits");
 
             // Aquí el parseo:
             JSONObject jObject;
@@ -119,10 +121,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             publishProgress(progreso_GENERO);
 
-            String cast = getHTML("https://api.themoviedb.org/3/movie/"+id+"/credits?api_key="+apiKey+"&language=es-ES");
-
-            jObject = new JSONObject(cast);
-            jArray = jObject.getJSONArray("cast");
+            jArray = jObject.getJSONObject("credits").getJSONArray("cast");
 
             mustContinue = true;
             cont = 0;
@@ -138,7 +137,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             publishProgress(progreso_REPARTO);
 
-            jArray = jObject.getJSONArray("crew");
+            jArray = jObject.getJSONObject("credits").getJSONArray("crew");
 
             mustContinue = true;
             cont = 0;
@@ -155,6 +154,13 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                 }
             }
             publishProgress(progreso_DIRECTORES);
+
+            jArray = jObject.getJSONObject("videos").getJSONArray("results");
+            videoProvider = jArray.getJSONObject(0).getString("site");
+            if (videoProvider.equalsIgnoreCase("youtube")) {
+                videoLink = preYoutube + jArray.getJSONObject(0).getString("key");
+            }
+            Log.d(TAG, videoLink);
 
         }catch (Exception e){
             Log.e(TAG, e.toString());
