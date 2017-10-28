@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (diaHoy > diaGuardado) {
             //Se hace una actualización suave
             mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
-                    ((LinearLayout) findViewById(R.id.carga_barra)),false);
+                    ((LinearLayout) findViewById(R.id.carga_barra)));
             mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
 
             SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             case R.id.actualizar:
 
                 mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
-                        ((LinearLayout) findViewById(R.id.carga_barra)),false);
+                        ((LinearLayout) findViewById(R.id.carga_barra)));
                 mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
 
                 selectedItem.setEnabled(false);
@@ -245,14 +245,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         } else if (clave.equalsIgnoreCase("pref_pais")){
             //Cuando cambia el país se borra la mRecyclerViewAdapter anterior
             mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
-            mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, null);
             mRecyclerViewAdapter.eliminarLista();
             mRecyclerViewAdapter.notifyDataSetChanged();
             mRecyclerViewAdapter.actualizarInterfaz();
             mRecyclerViewAdapter.mostrarNoPelis();
         } else if (clave.equalsIgnoreCase("provider")){
             mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
-            mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryCartelera.TABLE_NAME, null, null);
             mRecyclerViewAdapter.eliminarLista();
             mRecyclerViewAdapter.notifyDataSetChanged();
             mRecyclerViewAdapter.actualizarInterfaz();

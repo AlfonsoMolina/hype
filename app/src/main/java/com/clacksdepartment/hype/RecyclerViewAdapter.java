@@ -646,34 +646,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
 
-        //if (estado == CARTELERA) {
-
-        // Primero intentamos en la bbdd de cartelera...
-            contentValues.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, isHyped);
-
-            String selection = FeedReaderContract.FeedEntryCartelera.COLUMN_REF + " LIKE ?";
-            String[] selectionArgs = {pelicula.getEnlace()};
-
-            dbw.update(
-                    FeedReaderContract.FeedEntryCartelera.TABLE_NAME,
-                    contentValues,
-                    selection,
-                    selectionArgs);
-
-        //} else {
-        // luego en la bbdd de hype
             contentValues.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, isHyped);
 
-            selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
-            //String[] selectionArgs = {pelicula.getEnlace()};
+            String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
+            String[] selectionArgs = {pelicula.getEnlace()};
 
             dbw.update(
                     FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,
                     contentValues,
                     selection,
                     selectionArgs);
-
-        //}
 
         if (estado != HYPE) {
             notifyItemChanged(itemExpandido);

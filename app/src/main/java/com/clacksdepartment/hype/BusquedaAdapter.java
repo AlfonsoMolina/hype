@@ -219,100 +219,56 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
 
         mListaBusqueda.clear();
 
-        String l, t, s, e, f, h;
-        byte[] p_byte;
-        Bitmap p_bitmap;
+        String titulo, portada_enlace, enlace, sinopsis, estreno_letras, estreno_fecha;
+        boolean hype;
+        byte[] portada_byte;
+        Bitmap portada_bitmap;
         String[] q = {"%" +query+"%"};
 
         SQLiteDatabase dbr = mDB.getReadableDatabase();
-
-        Log.d(TAG,"a");
-        String []projection2 = {
-                FeedReaderContract.FeedEntryCartelera._ID,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_REF,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA,
-                FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE,
-        };
-        Log.d(TAG,"aa");
-
-        Cursor cursor = dbr.query(
-                FeedReaderContract.FeedEntryCartelera.TABLE_NAME,                     // The table to query
-                projection2,                               // The columns to return
-                FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO + " LIKE ?",  // The columns for the WHERE clause
-                q ,                                     // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA + " ASC"                                    // The sort order
-        );
-        Log.d(TAG,"aaa " + cursor.getCount());
-
-        //Y empezamos a mirar las tuplas una a una
-        while (cursor.moveToNext()) {
-            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_FECHA));
-            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_TITULO));
-            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_REF));
-            p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_PORTADA));
-            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_SINOPSIS));
-            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_ESTRENO));
-            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE));
-
-            p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
-
-            mListaBusqueda.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
-
-            Log.d(TAG, "Encontrada película Cartelera: " + t + ".");
-        }
-
-        Log.d(TAG,"aaaa");
 
         //Se lee la bbdd y se guardan los elementos en cursor
         String[] projection = {
                 FeedReaderContract.FeedEntryEstrenos._ID,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA,
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA_ENLACE,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_REF,
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE,
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_CORTO
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS,
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA,
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE
         };
 
-        cursor = dbr.query(
+        Cursor cursor = dbr.query(
                 FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO + " LIKE ?",  // The columns for the WHERE clause
                 q ,                                     // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA + " ASC"                                    // The sort order
+                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + " ASC"                                    // The sort order
         );
-
-        Log.d(TAG,"aaaaa " + cursor.getCount());
 
         //Y empezamos a mirar las tuplas una a una
         while (cursor.moveToNext()) {
-            f = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_FECHA));
-            t = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO));
-            l = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF));
-            p_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA));
-            s = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS));
-            e = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO));
-            h = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE));
+            estreno_fecha = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA));
+            titulo = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_TITULO));
+            enlace = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_REF));
+            portada_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA));
+            portada_enlace = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA_ENLACE));
+            sinopsis = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_SINOPSIS));
+            estreno_letras = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS));
+            hype = cursor.getInt(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE)) == 1;
 
-            p_bitmap = BitmapFactory.decodeByteArray(p_byte, 0, p_byte.length);
+            portada_bitmap = BitmapFactory.decodeByteArray(portada_byte, 0, portada_byte.length);
 
-            mListaBusqueda.add(new Pelicula(l, p_bitmap, t, s, e, f, h.equalsIgnoreCase("T")));
+            mListaBusqueda.add(new Pelicula(enlace, portada_bitmap, portada_enlace, titulo, sinopsis,
+                    estreno_letras, estreno_fecha, hype));
 
-            Log.d(TAG, "Encontrada película Estrenos: " + t + ".");
+            Log.d(TAG, "Encontrada película Estrenos: " + titulo + ".");
         }
         cursor.close();
-
-        Log.d(TAG,"aaaaaa ");
 
         itemExpandido = -1;
         vistaParaExpandir = -1;
@@ -376,21 +332,10 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
             ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
 
-        // Primero intentamos en la bbdd de cartelera...
-        contentValues.put(FeedReaderContract.FeedEntryCartelera.COLUMN_HYPE, isHyped);
-
-        String selection = FeedReaderContract.FeedEntryCartelera.COLUMN_REF + " LIKE ?";
-        String[] selectionArgs = {pelicula.getEnlace()};
-
-        dbw.update(
-                FeedReaderContract.FeedEntryCartelera.TABLE_NAME,
-                contentValues,
-                selection,
-                selectionArgs);
-
         contentValues.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, isHyped);
 
-        selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
+        String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
+        String[] selectionArgs = {pelicula.getEnlace()};
 
         dbw.update(
                 FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,
