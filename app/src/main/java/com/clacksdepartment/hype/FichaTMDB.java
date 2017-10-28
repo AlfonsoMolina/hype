@@ -24,19 +24,14 @@ import java.util.List;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
 
-/**
- * Created by Vicente on 14/10/2017.
- */
-
 public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
     private static final String TAG = "FichaTMDB";
     private static final String apiKey = "8ac0d37839748f4647039ef00d859d13";
-    private static String preImagen = "https://image.tmdb.org/t/p/w640";
+    private static final String preImagen = "https://image.tmdb.org/t/p/w640";
 
     // Valor de progreso resultante:
     private static final int progreso_POSTER = 0;
-    private static final int progreso_SINOPSIS = 1;
     private static final int progreso_ANO = 2;
     private static final int progreso_DURACION = 3;
     private static final int progreso_DIRECTORES = 4;
@@ -45,33 +40,26 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
     private static final int progreso_NOTA = 7;
 
     // Atributos
-    private String url;
     private String id;
     private String ano;
     private String duracion;
-    private String portadaUrl;
     private Drawable portada;
     private List<String> director;
     private List <String> reparto;
-    private List <String> productora;
     private List <String> genero;
-    private String sinopsis;
     private String nota;
     private String votos;
-    private String collection;
 
     // Vista a modificar
     private final View mView;
 
     FichaTMDB(String url, View view){
-        this.url = url;
         String [] urlSplit = url.split("/");
         this.id = urlSplit[urlSplit.length-1];
         mView = view;
 
         director = new ArrayList<>();
         reparto = new ArrayList<>();
-        productora = new ArrayList<>();
         genero = new ArrayList<>();
 
     }
@@ -92,9 +80,9 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             jObject = new JSONObject(basico);
 
-            portadaUrl = preImagen + jObject.getString("poster_path");
+            String portadaUrl = preImagen + jObject.getString("poster_path");
             Log.d(TAG, portadaUrl);
-            portada = loadImageFromURL(portadaUrl, "Poster");
+            portada = loadImageFromURL(portadaUrl, portadaUrl);
 
             publishProgress(progreso_POSTER);
 
@@ -107,13 +95,6 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
             Log.d(TAG, ano);
 
             publishProgress(progreso_ANO);
-
-            /*
-            sinopsis = jObject.getString("overview");
-            Log.d(TAG, sinopsis);
-
-            publishProgress(progreso_SINOPSIS);
-            */
 
             nota = jObject.getString("vote_average");
             Log.d(TAG, nota);
@@ -137,21 +118,6 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
             }
 
             publishProgress(progreso_GENERO);
-            /*
-            // Productoras, por ahora no implementado
-            jArray = jObject.getJSONArray("production_companies");
-
-            mustContinue = true;
-            cont = 1;
-
-            while (mustContinue){
-                try{
-                    productora.add(jArray.getJSONObject(cont).getString("name"));
-                    cont++;
-                }catch (Exception e){
-                    mustContinue = false;
-                }
-            }*/
 
             String cast = getHTML("https://api.themoviedb.org/3/movie/"+id+"/credits?api_key="+apiKey+"&language=es-ES");
 
@@ -216,12 +182,6 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                 if (portada != null)
                     ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageDrawable(portada);
                 break;
-            case progreso_SINOPSIS:
-                if (!sinopsis.equalsIgnoreCase("null"))
-                    ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)",""));
-                else
-                    ((TextView) mView.findViewById(R.id.ficha_sinopsis)).setText("N/A");
-                break;
             case progreso_ANO:
                 if (!ano.equalsIgnoreCase("null"))
                     ((TextView) mView.findViewById(R.id.ficha_year)).setText(ano);
@@ -265,42 +225,6 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
         super.onCancelled();
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public String getAno() {
-        return ano;
-    }
-
-    public String getDuracion() {
-        return duracion;
-    }
-
-    public String getPortadaUrl() {
-        return portadaUrl;
-    }
-
-    public List<String> getDirector() {
-        return director;
-    }
-
-    public List<String> getReparto() {
-        return reparto;
-    }
-
-    public List<String> getProductora() {
-        return productora;
-    }
-
-    public List<String> getGenero() {
-        return genero;
-    }
-
-    public String getSinopsis() {
-        return sinopsis;
-    }
-
     @NonNull
     private String getHTML(String url) throws IOException {
         Log.d(TAG, "Obteniendo contenido HTML desde " + url);
@@ -325,8 +249,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
     private Drawable loadImageFromURL(String url, String name) {
         try {
             InputStream is = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, name);
-            return d;
+            return Drawable.createFromStream(is, name);
         } catch (Exception e) {
             return null;
         }

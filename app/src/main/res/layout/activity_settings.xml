@@ -36,4 +36,9 @@
         android:textAlignment="center"
         android:fontFamily="sans-serif-condensed"
         android:textSize="14sp" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:src="@drawable/poweredbytmdb"/>
 </LinearLayout>

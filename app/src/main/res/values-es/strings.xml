@@ -41,7 +41,7 @@
     <string name="opciones">Opciones</string>
     <string name="label_nota">Nota</string>
     <string name="votos">votos</string>
-    <string name="derechos">Todos los datos e imágenes mostrados aquí son obtenidos de www.themoviedatabase.com</string>
+    <string name="derechos">Este producto utiliza la API de TMDb pero no está respaldado ni certificado por TMDb</string>
     <string name="share_cartelera">¡<i>%1$s</i> ya está en cines!</string>
     <string name="share_estreno_ind">Mira la película <i>%1$s</i>.</string>
     <string name="share_estreno">¡Quedan %1$d días para el estreno de <i>%2$s</i>!</string>
