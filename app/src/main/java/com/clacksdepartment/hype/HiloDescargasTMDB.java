@@ -235,7 +235,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     }
                     */
                     values.clear();
-                    Log.d(TAG, "Encontrada película: " + titulo + ".");
+                    Log.d(TAG, "Añadiendo película: " + titulo + ".");
 
                 //Si ya está se modifica
                 }else {
@@ -257,9 +257,8 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     values.put(FeedEntryEstrenos.COLUMN_TIPO, estado?1:2);
 
                     Log.d(TAG, "Actualizando película " + peli.getTitulo());
-                        // Si ha cambiado algo de lo de arriba, actualizo la portada, por si ha cambiado...
                         // TODO: COMPARAR HASH O ALGO?
-                    db[1].update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values, FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "= '" + peli.getEnlace() + "'", null);
+                    db[1].update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values, FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "='" + peli.getEnlace() + "'", null);
                     values.clear();
 
                 }
@@ -370,7 +369,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                         }else if (TIPO == INDEX_CARTELERA && esCartelera(date)){
                             peliculas.add(new Pelicula(id, link, poster, title, sinopsis, textdate, date, false));
                         }else{
-                            Log.d(TAG, "Saltando película en sección incorrecta");
+                            Log.d(TAG, "Saltando película en sección incorrecta: " + title);
                         }
                         totalresults++;
                     }catch (Exception e){
@@ -463,11 +462,11 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 carga_barra.getChildAt(j).setBackgroundColor(Color.parseColor("#455a64"));
             carga_barra.setVisibility(View.VISIBLE);
             carga_barra.getChildAt(0).setBackgroundColor(Color.parseColor("#37474f"));
-            lista.actualizarInterfaz();
+            //ista.actualizarInterfaz();
         } else if(i[0]<10) {
             carga_barra.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#37474f"));
             //lista.notifyDataSetChanged();
-            lista.actualizarInterfaz();
+            //lista.actualizarInterfaz();
 
         }
     }

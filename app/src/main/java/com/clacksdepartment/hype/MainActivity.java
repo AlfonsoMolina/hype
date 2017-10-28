@@ -180,8 +180,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 mMenu.findItem(R.id.cancelar).setEnabled(true);
                 mMenu.findItem(R.id.cancelar).setVisible(true);
 
-                mRecyclerViewAdapter.reiniciarPagina();
-                mInterfaz.mostrarPaginador(false);
+                //mRecyclerViewAdapter.reiniciarPagina();
+                //mInterfaz.mostrarPaginador(false);
                 return true;
 
             case R.id.cancelar:

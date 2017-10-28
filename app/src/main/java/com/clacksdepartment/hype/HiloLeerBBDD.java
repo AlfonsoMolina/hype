@@ -79,7 +79,6 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
         ContentValues values = new ContentValues();
 
         //Datos de las películas:
-        //link, título, sinopsis, estreno (letras), fecha e hype.
         String enlace, titulo, sinopsis, estreno_letras, estreno_fecha, trailer, portada_enlace;
         int tipo;
         boolean hype;
@@ -129,7 +128,7 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO, 1);
 
                 dbw.update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values,
-                        FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "= '" +
+                        FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "='" +
                                 enlace + "'", null);
 
                 cartelera.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
