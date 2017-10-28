@@ -119,7 +119,11 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
 
         if (position == itemExpandido) {
 
-            ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis().substring(0, Math.min(pelicula.getSinopsis().length(), 200)) + "...");
+            if (pelicula.getSinopsis().length() > 0){
+                ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText(pelicula.getSinopsis().substring(0, Math.min(pelicula.getSinopsis().length(), 200)) + "...");
+            }else{
+                ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText("");
+            }
 
             if (pelicula.getHype()) {
                 ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);

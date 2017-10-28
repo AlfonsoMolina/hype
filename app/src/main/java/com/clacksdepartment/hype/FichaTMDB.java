@@ -244,13 +244,15 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                 ((TextView) mView.findViewById(R.id.ficha_genero)).setText(genero.toString().replace("[", "").replace("]", ""));
                 break;
             case progreso_NOTA:
-                if (nota != null)
+                if (nota != null && !votos.equalsIgnoreCase("0")) {
                     ((TextView) mView.findViewById(R.id.ficha_nota)).setText(nota + " (" + votos + " " + mView.getResources().getString(R.string.votos) + ")");
+                }else {
+                    ((TextView) mView.findViewById(R.id.ficha_nota)).setText("N/A");
+                }
                 break;
             default:
                 break;
         }
-
     }
 
     @Override
