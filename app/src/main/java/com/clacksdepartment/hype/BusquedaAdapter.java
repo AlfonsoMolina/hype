@@ -177,6 +177,39 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         if(posicionAntigua != -1)
             notifyItemChanged(posicionAntigua);
         notifyItemChanged(itemExpandido);
+
+        if (itemExpandido != -1) {
+            ((RecyclerView) mActivity.findViewById(R.id.lista)).smoothScrollToPosition(itemExpandido);
+        }
+
+        String [] fecha = mListaBusqueda.get(posicion).getEstrenoFecha().split("-");
+
+        int difAno = Integer.parseInt(fecha[0]) - Calendar.getInstance().get(Calendar.YEAR);
+        int difMes = Integer.parseInt(fecha[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
+        int difDia = Integer.parseInt(fecha[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+
+        boolean futuro = false;
+
+        if (difAno == 0){
+            if (difMes == 0){
+                if (difDia > 0){
+                    futuro = true;
+                }
+            }else if (difMes > 0){
+                futuro = true;
+            }
+        }else if (difAno > 0){
+            futuro = true;
+        }
+
+        if (!futuro){
+            view.findViewById(R.id.av_cines).setVisibility(View.GONE);
+            view.findViewById(R.id.av_fecha).setVisibility(View.GONE);
+        }else{
+            view.findViewById(R.id.av_cines).setVisibility(View.GONE);
+            view.findViewById(R.id.av_fecha).setVisibility(View.VISIBLE);
+        }
+
         //if (itemExpandido != -1) {
         //    ((RecyclerView) mActivity.findViewById(R.id.lista)).smoothScrollToPosition(itemExpandido);
         //}
