@@ -94,6 +94,7 @@
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:visibility="gone"
                 android:src="@drawable/ic_theaters_black_24dp"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:background="?android:attr/selectableItemBackground"

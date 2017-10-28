@@ -46,4 +46,6 @@
     <string name="share_estreno_ind">Check out the movie <i>%1$s</i>.</string>
     <string name="share_estreno">Only %1$d days left to <i>%2$s</i>!</string>
     <string name="share_mensaje">Share the movie <i>%1$s</i>.</string>
+    <string name="sinopsis_list_structure"><i>%1$s</i>…</string>
+    <string name="votes_structure"><i>%1$s</i> (<i>%2$s</i> votes) </string>
 </resources>
