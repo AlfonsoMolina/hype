@@ -321,7 +321,7 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
     public void abrirFicha(){
         Log.i(TAG, "Pulsado botón de abrir fichaFragment");
         Pelicula pelicula = mListaBusqueda.get(itemExpandido);
-        FichaFragment fichaFragment = FichaFragment.newInstance(pelicula.getTitulo(), pelicula.getEnlace());
+        FichaFragment fichaFragment = FichaFragment.newInstance(pelicula.getTitulo(), pelicula.getEnlace(), pelicula.getSinopsis());
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.abrir_ficha, R.anim.cerrar_ficha, R.anim.abrir_ficha, R.anim.cerrar_ficha);
         fragmentTransaction.replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();

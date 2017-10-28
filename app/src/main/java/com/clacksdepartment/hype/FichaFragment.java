@@ -24,12 +24,14 @@ import android.widget.TextView;
 public class FichaFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String TÍTULO = "Título";
-    private static final String LINK = "LINK";
+    private static final String LINK = "Link";
+    private static final String SINOPSIS = "Sinopsis";
 
     private static final String TAG = "FichaFragment";
 
     private String titulo;
     private String link;
+    private String sinopsis;
 
     private FichaFA fichaFA;
     private FichaTMDB fichaTMDB;
@@ -49,11 +51,12 @@ public class FichaFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment FichaFragment.
      */
-    public static FichaFragment newInstance(String param1, String param2) {
+    public static FichaFragment newInstance(String param1, String param2, String param3) {
         FichaFragment fragment = new FichaFragment();
         Bundle args = new Bundle();
         args.putString(TÍTULO, param1);
         args.putString(LINK, param2);
+        args.putString(SINOPSIS, param3);
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,6 +67,7 @@ public class FichaFragment extends Fragment {
         if (getArguments() != null) {
             titulo = getArguments().getString(TÍTULO);
             link = getArguments().getString(LINK);
+            sinopsis = getArguments().getString(SINOPSIS);
         }
     }
 
@@ -86,6 +90,7 @@ public class FichaFragment extends Fragment {
 
         // Fijamos el título, ya conocido, para ir rellenando algo la fichaFA...
         ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
+        ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText(sinopsis);
 
         // Creamos la fichaFA con su constructor, lo que va agilizando algunas operaciones de compilación de regex
         //fichaFA = new FichaFA(link, view);

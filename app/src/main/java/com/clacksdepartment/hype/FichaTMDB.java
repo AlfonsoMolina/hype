@@ -100,11 +100,6 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             publishProgress(progreso_POSTER);
 
-            sinopsis = jObject.getString("overview");
-            Log.d(TAG, sinopsis);
-
-            publishProgress(progreso_SINOPSIS);
-
             duracion = jObject.getString("runtime") + " min";
             Log.d(TAG, duracion);
 
@@ -114,6 +109,13 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
             Log.d(TAG, ano);
 
             publishProgress(progreso_ANO);
+
+            /*
+            sinopsis = jObject.getString("overview");
+            Log.d(TAG, sinopsis);
+
+            publishProgress(progreso_SINOPSIS);
+            */
 
             nota = jObject.getString("vote_average");
             Log.d(TAG, nota);
