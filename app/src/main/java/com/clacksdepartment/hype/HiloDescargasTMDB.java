@@ -35,7 +35,7 @@ import java.util.Date;
 class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
     private static final String TAG = "HiloDescargasTMDB";
-    private static final String preImagen = "https://image.tmdb.org/t/p/w640";
+    private static final String preImagen = "https://image.tmdb.org/t/p/w160";
     private static final String preLink = "https://www.themoviedb.org/movie/";
     private static final String apiKey = "8ac0d37839748f4647039ef00d859d13";
 
