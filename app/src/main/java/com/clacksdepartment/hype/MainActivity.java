@@ -249,12 +249,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mRecyclerViewAdapter.notifyDataSetChanged();
             mRecyclerViewAdapter.actualizarInterfaz();
             mRecyclerViewAdapter.mostrarNoPelis();
-        } else if (clave.equalsIgnoreCase("provider")){
-            mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
-            mRecyclerViewAdapter.eliminarLista();
-            mRecyclerViewAdapter.notifyDataSetChanged();
-            mRecyclerViewAdapter.actualizarInterfaz();
-            mRecyclerViewAdapter.mostrarNoPelis();
         }
     }
 

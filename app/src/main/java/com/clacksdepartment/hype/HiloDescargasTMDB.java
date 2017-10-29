@@ -335,7 +335,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
         Date today = calendar.getTime();
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         Date tomorrow = calendar.getTime();
-        calendar.add(Calendar.WEEK_OF_YEAR, -12);
+        calendar.add(Calendar.WEEK_OF_YEAR, -9);
         Date sixWeeksAgo = calendar.getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 

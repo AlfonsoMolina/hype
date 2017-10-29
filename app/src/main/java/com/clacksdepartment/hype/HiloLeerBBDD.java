@@ -17,8 +17,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+import static com.clacksdepartment.hype.FeedReaderContract.SQL_CREATE_ENTRIES_ESTRENOS;
+import static com.clacksdepartment.hype.FeedReaderContract.SQL_DELETE_ENTRIES_ESTRENOS;
 
 /**
  * Created by Usuario on 23/07/2017.
@@ -47,10 +50,15 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
     protected Void doInBackground(Void... v) {
         Log.d(TAG, "Comenzando lectura de la BBDD");
 
+        Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+
         ArrayList<Pelicula> estrenos = new ArrayList<>();
         ArrayList<Pelicula> cartelera = new ArrayList<>();
 
-        Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+        Calendar calendar = Calendar.getInstance();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String today = dateFormat.format(calendar.getTime());
+
 
         //Y ahora los estrenos
 
@@ -69,15 +77,39 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO
         };
 
-        Cursor cursor = dbr.query(
-                FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                                     // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + " ASC"                                    // The sort order
-        );
+        Cursor cursor;
+
+        try {
+            cursor = dbr.query(
+                    FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
+                    projection,                               // The columns to return
+                    null,                                // The columns for the WHERE clause
+                    null,                                     // The values for the WHERE clause
+                    null,                                     // don't group the rows
+                    null,                                     // don't filter by row groups
+                    FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + " ASC"                                    // The sort order
+            );
+        }catch (Exception e){
+
+            // query to obtain the names of all tables in your database
+            Cursor c = dbw.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+            List<String> tables = new ArrayList<>();
+
+            // iterate over the result set, adding every table name to a list
+            while (c.moveToNext()) {
+                tables.add(c.getString(0));
+            }
+
+            // call DROP TABLE on every table name
+            for (String table : tables) {
+                String dropQuery = "DROP TABLE IF EXISTS " + table;
+                dbw.execSQL(dropQuery);
+            }
+
+            dbw.execSQL(SQL_DELETE_ENTRIES_ESTRENOS);
+            dbw.execSQL(SQL_CREATE_ENTRIES_ESTRENOS);
+            return null;
+        }
 
         ContentValues values = new ContentValues();
 
@@ -103,29 +135,16 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
             portada_bitmap = BitmapFactory.decodeByteArray(portada_byte, 0, portada_byte.length);
 
-            String [] fecha = estreno_fecha.split("-");
+            boolean esCartelera; //true si aun no se ha estrenado
 
-            int difAno = Integer.parseInt(fecha[0]) - Calendar.getInstance().get(Calendar.YEAR);
-            int difMes = Integer.parseInt(fecha[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
-            int difDia = Integer.parseInt(fecha[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-
-            Calendar calendar = Calendar.getInstance();
-            Date today = calendar.getTime();
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-
-            boolean futuro = false; //true si aun no se ha estrenado
-
-            Log.d(TAG, dateFormat.format(today) +  " vs " + estreno_fecha);
-
-            futuro = dateFormat.format(today).compareToIgnoreCase(estreno_fecha) <= 0;
+            esCartelera = today.compareToIgnoreCase(estreno_fecha) > 0;
 
             if (tipo == 1) { //Si es de cartelera
                 cartelera.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
                         estreno_letras, estreno_fecha, hype));
 
 
-            } else if (tipo == 2 && !futuro) {  //Es de cartelera pero está mal catalogada
+            } else if (tipo == 2 && esCartelera) {  //Es de cartelera pero está mal catalogada
                 values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO, 1);
 
                 dbw.update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values,
