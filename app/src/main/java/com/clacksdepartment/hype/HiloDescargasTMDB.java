@@ -345,10 +345,10 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         switch (TIPO){
             case INDEX_CARTELERA:
-                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.desc&primary_release_date.lte="+todayAsString+"&primary_release_date.gte="+sixWeeksAgoAsString+"&with_release_type=2|3";
+                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.desc&release_date.lte="+todayAsString+"&release_date.gte="+sixWeeksAgoAsString+"&with_release_type=3";
                 break;
             case INDEX_ESTRENOS:
-                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.asc&primary_release_date.gte="+tomorrowAsString;
+                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.asc&release_date.gte="+tomorrowAsString+"&adult=true";
                 break;
             default:
                 return null;
@@ -440,26 +440,15 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
     }
 
     private boolean esCartelera(String fecha){
-        String [] f = fecha.split("-");
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        int difAno = Integer.parseInt(f[0]) - Calendar.getInstance().get(Calendar.YEAR);
-        int difMes = Integer.parseInt(f[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
-        int difDia = Integer.parseInt(f[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        boolean cartelera;
 
-        boolean futuro = false;
+        cartelera = dateFormat.format(today).compareToIgnoreCase(fecha) > 0;
 
-        if (difAno == 0){
-            if (difMes == 0){
-                if (difDia > 0){
-                    futuro = true;
-                }
-            }else if (difMes > 0){
-                futuro = true;
-            }
-        }else if (difAno > 0){
-            futuro = true;
-        }
-        return (!futuro);
+        return cartelera;
     }
 
     @Override

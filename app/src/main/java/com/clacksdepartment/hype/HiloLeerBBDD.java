@@ -10,10 +10,13 @@ import android.os.Process;
 import android.util.Log;
 import android.view.View;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
@@ -99,25 +102,23 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
             portada_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA));
 
             portada_bitmap = BitmapFactory.decodeByteArray(portada_byte, 0, portada_byte.length);
+
             String [] fecha = estreno_fecha.split("-");
 
             int difAno = Integer.parseInt(fecha[0]) - Calendar.getInstance().get(Calendar.YEAR);
             int difMes = Integer.parseInt(fecha[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
             int difDia = Integer.parseInt(fecha[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 
+            Calendar calendar = Calendar.getInstance();
+            Date today = calendar.getTime();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+
             boolean futuro = false; //true si aun no se ha estrenado
 
-            if (difAno == 0){
-                if (difMes == 0){
-                    if (difDia > 0){
-                        futuro = true;
-                    }
-                }else if (difMes > 0){
-                    futuro = true;
-                }
-            }else if (difAno > 0){
-                futuro = true;
-            }
+            Log.d(TAG, dateFormat.format(today) +  " vs " + estreno_fecha);
+
+            futuro = dateFormat.format(today).compareToIgnoreCase(estreno_fecha) <= 0;
 
             if (tipo == 1) { //Si es de cartelera
                 cartelera.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
@@ -139,6 +140,7 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                         estreno_letras, estreno_fecha, hype));
             }
 
+            values.clear();
             Log.d(TAG, "Encontrada película: " + titulo + ".");
         }
 
