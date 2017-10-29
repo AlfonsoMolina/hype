@@ -137,6 +137,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
             }
 
             String whereClauseColumns = FeedEntryEstrenos.COLUMN_REF + " = ?";
+            String[] whereClauseValues = new String[1];
 
             String enlace;
             String titulo;
@@ -147,12 +148,13 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
             byte[] portada_byte;
             Bitmap portada_bitmap;
 
+
             for (Pelicula peli:peliculasAtratar) {
 
                 //Se utiliza en link para ver si ya está
                 enlace = peli.getEnlace();
 
-                String[] whereClauseValues = {enlace};
+                whereClauseValues[0] = enlace;
 
                 cursor = db[0].query(
                         FeedEntryEstrenos.TABLE_NAME,                     // The table to query
@@ -257,7 +259,6 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     values.put(FeedEntryEstrenos.COLUMN_TIPO, estado?1:2);
 
                     Log.d(TAG, "Actualizando película " + peli.getTitulo());
-                        // TODO: COMPARAR HASH O ALGO?
                     db[1].update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values, FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "='" + peli.getEnlace() + "'", null);
                     values.clear();
 
@@ -267,15 +268,17 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 publishProgress((int) Math.floor(actualProgress*10/totalProgress));
                 cursor.close();
             }
-
-            //Se eliminan las películas que no hayan aparecido
-            String selection2 = FeedEntryEstrenos.COLUMN_TIPO + "<'0'";
-
-            if (!isCancelled())
-                db[0].delete(FeedEntryEstrenos.TABLE_NAME, selection2, null);
-
             estado = !estado;
         }while(!estado);
+
+
+        //Se eliminan las películas que no hayan aparecido
+        String selection2 = FeedEntryEstrenos.COLUMN_TIPO + "<'0'";
+
+        if (!isCancelled())
+            db[0].delete(FeedEntryEstrenos.TABLE_NAME, selection2, null);
+
+
         return null;
     }
 
