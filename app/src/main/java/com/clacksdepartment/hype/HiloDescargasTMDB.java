@@ -328,16 +328,23 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
         String date;
         String textdate;
 
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        Date tomorrow = calendar.getTime();
+        calendar.add(Calendar.WEEK_OF_YEAR, -12);
+        Date sixWeeksAgo = calendar.getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        String todayAsString = dateFormat.format(today);
+        String tomorrowAsString = dateFormat.format(tomorrow);
+        String sixWeeksAgoAsString = dateFormat.format(sixWeeksAgo);
+
         switch (TIPO){
             case INDEX_CARTELERA:
-                staticUrl = "https://api.themoviedb.org/3/movie/now_playing?api_key="+apiKey+"&sort_by=primary_release_date.desc";
+                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.desc&primary_release_date.lte="+todayAsString+"&primary_release_date.gte="+sixWeeksAgoAsString+"&with_release_type=2|3";
                 break;
             case INDEX_ESTRENOS:
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
-                Date tomorrow = calendar.getTime();
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                String tomorrowAsString = dateFormat.format(tomorrow);
                 staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.asc&primary_release_date.gte="+tomorrowAsString;
                 break;
             default:
