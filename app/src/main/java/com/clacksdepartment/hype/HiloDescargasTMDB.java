@@ -371,7 +371,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                         link = preLink + pageresults.getJSONObject(results).getString("id");
                         title = pageresults.getJSONObject(results).getString("title");
                         poster = preImagen + pageresults.getJSONObject(results).getString("poster_path");
-                        sinopsis = pageresults.getJSONObject(results).getString("overview");
+                        sinopsis = pageresults.getJSONObject(results).getString("overview").replace("(FILMAFFINITY)","");
                         date = pageresults.getJSONObject(results).getString("release_date");
                         textdate = getDateText(date);
                         if (TIPO == INDEX_ESTRENOS && !esCartelera(date)){

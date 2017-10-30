@@ -209,7 +209,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             if (position == itemExpandido) {
 
                 if (pelicula.getSinopsis().length() > 0){
-                    ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText( mMainActivity.getResources().getString(R.string.sinopsis_list_structure,pelicula.getSinopsis().replace("(FILMAFFINITY)","").substring(0, Math.min(pelicula.getSinopsis().length(), 200))));
+                    ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText( mMainActivity.getResources().getString(R.string.sinopsis_list_structure,pelicula.getSinopsis().substring(0, Math.min(pelicula.getSinopsis().length(), 200))));
                 }else{
                     ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText("");
                 }
