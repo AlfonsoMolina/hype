@@ -10,12 +10,18 @@ import android.os.Process;
 import android.util.Log;
 import android.view.View;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+import static com.clacksdepartment.hype.FeedReaderContract.SQL_CREATE_ENTRIES_ESTRENOS;
+import static com.clacksdepartment.hype.FeedReaderContract.SQL_DELETE_ENTRIES_ESTRENOS;
 
 /**
  * Created by Usuario on 23/07/2017.
@@ -44,10 +50,15 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
     protected Void doInBackground(Void... v) {
         Log.d(TAG, "Comenzando lectura de la BBDD");
 
+        Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+
         ArrayList<Pelicula> estrenos = new ArrayList<>();
         ArrayList<Pelicula> cartelera = new ArrayList<>();
 
-        Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+        Calendar calendar = Calendar.getInstance();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String today = dateFormat.format(calendar.getTime());
+
 
         //Y ahora los estrenos
 
@@ -66,15 +77,39 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                 FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO
         };
 
-        Cursor cursor = dbr.query(
-                FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                                     // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + " ASC"                                    // The sort order
-        );
+        Cursor cursor;
+
+        try {
+            cursor = dbr.query(
+                    FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,                     // The table to query
+                    projection,                               // The columns to return
+                    null,                                // The columns for the WHERE clause
+                    null,                                     // The values for the WHERE clause
+                    null,                                     // don't group the rows
+                    null,                                     // don't filter by row groups
+                    FeedReaderContract.FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + " ASC"                                    // The sort order
+            );
+        }catch (Exception e){
+
+            // query to obtain the names of all tables in your database
+            Cursor c = dbw.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+            List<String> tables = new ArrayList<>();
+
+            // iterate over the result set, adding every table name to a list
+            while (c.moveToNext()) {
+                tables.add(c.getString(0));
+            }
+
+            // call DROP TABLE on every table name
+            for (String table : tables) {
+                String dropQuery = "DROP TABLE IF EXISTS " + table;
+                dbw.execSQL(dropQuery);
+            }
+
+            dbw.execSQL(SQL_DELETE_ENTRIES_ESTRENOS);
+            dbw.execSQL(SQL_CREATE_ENTRIES_ESTRENOS);
+            return null;
+        }
 
         ContentValues values = new ContentValues();
 
@@ -99,32 +134,17 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
             portada_byte = cursor.getBlob(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntryEstrenos.COLUMN_PORTADA));
 
             portada_bitmap = BitmapFactory.decodeByteArray(portada_byte, 0, portada_byte.length);
-            String [] fecha = estreno_fecha.split("-");
 
-            int difAno = Integer.parseInt(fecha[0]) - Calendar.getInstance().get(Calendar.YEAR);
-            int difMes = Integer.parseInt(fecha[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
-            int difDia = Integer.parseInt(fecha[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+            boolean esCartelera; //true si aun no se ha estrenado
 
-            boolean futuro = false; //true si aun no se ha estrenado
-
-            if (difAno == 0){
-                if (difMes == 0){
-                    if (difDia > 0){
-                        futuro = true;
-                    }
-                }else if (difMes > 0){
-                    futuro = true;
-                }
-            }else if (difAno > 0){
-                futuro = true;
-            }
+            esCartelera = today.compareToIgnoreCase(estreno_fecha) > 0;
 
             if (tipo == 1) { //Si es de cartelera
                 cartelera.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
                         estreno_letras, estreno_fecha, hype));
 
 
-            } else if (tipo == 2 && !futuro) {  //Es de cartelera pero está mal catalogada
+            } else if (tipo == 2 && esCartelera) {  //Es de cartelera pero está mal catalogada
                 values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO, 1);
 
                 dbw.update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values,
@@ -139,6 +159,7 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
                         estreno_letras, estreno_fecha, hype));
             }
 
+            values.clear();
             Log.d(TAG, "Encontrada película: " + titulo + ".");
         }
 

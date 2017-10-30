@@ -137,6 +137,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
             }
 
             String whereClauseColumns = FeedEntryEstrenos.COLUMN_REF + " = ?";
+            String[] whereClauseValues = new String[1];
 
             String enlace;
             String titulo;
@@ -147,12 +148,13 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
             byte[] portada_byte;
             Bitmap portada_bitmap;
 
+
             for (Pelicula peli:peliculasAtratar) {
 
                 //Se utiliza en link para ver si ya está
                 enlace = peli.getEnlace();
 
-                String[] whereClauseValues = {enlace};
+                whereClauseValues[0] = enlace;
 
                 cursor = db[0].query(
                         FeedEntryEstrenos.TABLE_NAME,                     // The table to query
@@ -257,7 +259,6 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     values.put(FeedEntryEstrenos.COLUMN_TIPO, estado?1:2);
 
                     Log.d(TAG, "Actualizando película " + peli.getTitulo());
-                        // TODO: COMPARAR HASH O ALGO?
                     db[1].update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values, FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "='" + peli.getEnlace() + "'", null);
                     values.clear();
 
@@ -267,10 +268,9 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 publishProgress((int) Math.floor(actualProgress*10/totalProgress));
                 cursor.close();
             }
-
-
             estado = !estado;
         }while(!estado);
+
 
         //Se eliminan las películas que no hayan aparecido
         String selection2 = FeedEntryEstrenos.COLUMN_TIPO + "<'0'";
@@ -278,7 +278,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
         if (!isCancelled())
             db[0].delete(FeedEntryEstrenos.TABLE_NAME, selection2, null);
 
-        
+
         return null;
     }
 
@@ -331,17 +331,24 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
         String date;
         String textdate;
 
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        Date tomorrow = calendar.getTime();
+        calendar.add(Calendar.WEEK_OF_YEAR, -9);
+        Date sixWeeksAgo = calendar.getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        String todayAsString = dateFormat.format(today);
+        String tomorrowAsString = dateFormat.format(tomorrow);
+        String sixWeeksAgoAsString = dateFormat.format(sixWeeksAgo);
+
         switch (TIPO){
             case INDEX_CARTELERA:
-                staticUrl = "https://api.themoviedb.org/3/movie/now_playing?api_key="+apiKey+"&sort_by=primary_release_date.desc";
+                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.desc&release_date.lte="+todayAsString+"&release_date.gte="+sixWeeksAgoAsString+"&with_release_type=3";
                 break;
             case INDEX_ESTRENOS:
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
-                Date tomorrow = calendar.getTime();
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                String tomorrowAsString = dateFormat.format(tomorrow);
-                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.asc&primary_release_date.gte="+tomorrowAsString;
+                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.asc&release_date.gte="+tomorrowAsString+"&adult=true";
                 break;
             default:
                 return null;
@@ -433,26 +440,15 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
     }
 
     private boolean esCartelera(String fecha){
-        String [] f = fecha.split("-");
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        int difAno = Integer.parseInt(f[0]) - Calendar.getInstance().get(Calendar.YEAR);
-        int difMes = Integer.parseInt(f[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
-        int difDia = Integer.parseInt(f[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        boolean cartelera;
 
-        boolean futuro = false;
+        cartelera = dateFormat.format(today).compareToIgnoreCase(fecha) > 0;
 
-        if (difAno == 0){
-            if (difMes == 0){
-                if (difDia > 0){
-                    futuro = true;
-                }
-            }else if (difMes > 0){
-                futuro = true;
-            }
-        }else if (difAno > 0){
-            futuro = true;
-        }
-        return (!futuro);
+        return cartelera;
     }
 
     @Override
