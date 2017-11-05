@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ImageButton;
@@ -46,9 +47,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private static final String TAG = "RecyclerViewAdapter";
 
-    public static final int HYPE = 0;
-    public static final int CARTELERA = 1;
-    public static final int ESTRENOS = 2;
+    static final int HYPE = 0;
+    static final int CARTELERA = 1;
+    static final int ESTRENOS = 2;
 
     private static final int NUM_ITEM_ADD = 9;
 
@@ -78,6 +79,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private int vistaParaExpandir;
     private int vistaParaContraer;
+
+    final int viewMeasureSpecHeight;
 
 
     // Provide a reference to the views for each data item
@@ -128,6 +131,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         mLinearLayoutManager = ((LinearLayoutManager) mRecyclerView.getLayoutManager());
         vistaParaExpandir = -1;
         vistaParaContraer = -1;
+
+        viewMeasureSpecHeight = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
     }
 
 
@@ -212,6 +217,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText( mMainActivity.getResources().getString(R.string.sinopsis_list_structure,pelicula.getSinopsis().substring(0, Math.min(pelicula.getSinopsis().length(), 200))));
                 }else{
                     ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText("");
+                    avanzado.findViewById(R.id.av_sinopsis).setVisibility(View.GONE);
                 }
 
                 if (pelicula.getHype()) {
@@ -765,7 +771,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public void expand(final View v) {
         //if (v.getVisibility() == View.GONE) {
-            v.measure(View.MeasureSpec.makeMeasureSpec(((View) v.getParent()).getWidth(), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            v.measure(View.MeasureSpec.makeMeasureSpec(((View) v.getParent()).getWidth(), View.MeasureSpec.EXACTLY), viewMeasureSpecHeight);
             final int targetHeight = v.getMeasuredHeight();
 
             // Older versions of android (pre API 21) cancel animations for views with a height of 0.
@@ -795,6 +801,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             // 1dp/ms
             a.setDuration((int) (2*targetHeight / v.getContext().getResources().getDisplayMetrics().density));
+            a.setInterpolator(new AccelerateDecelerateInterpolator());
             v.startAnimation(a);
        // }
     }
@@ -825,6 +832,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             // 1dp/ms
             a.setDuration((int) (2*initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+            a.setInterpolator(new AccelerateDecelerateInterpolator());
             v.startAnimation(a);
         //}
 

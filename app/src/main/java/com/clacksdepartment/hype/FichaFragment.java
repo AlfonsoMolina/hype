@@ -87,7 +87,12 @@ public class FichaFragment extends Fragment {
 
         // Fijamos el título, ya conocido, para ir rellenando algo la fichaFA...
         ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
-        ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText(sinopsis.replace("(FILMAFFINITY)",""));
+        if (sinopsis.length() > 0) {
+            ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText(sinopsis);
+        }else{
+            ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText("");
+            view.findViewById(R.id.ficha_sinopsis).setVisibility(View.GONE);
+        }
 
         fichaTMDB = new FichaTMDB(link, view);
         fichaTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
