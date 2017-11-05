@@ -80,7 +80,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private int vistaParaExpandir;
     private int vistaParaContraer;
 
-    final int viewMeasureSpecHeight;
+    private final int viewMeasureSpecHeight;
 
 
     // Provide a reference to the views for each data item
