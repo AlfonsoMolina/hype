@@ -108,6 +108,9 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
             dbw.execSQL(SQL_DELETE_ENTRIES_ESTRENOS);
             dbw.execSQL(SQL_CREATE_ENTRIES_ESTRENOS);
+
+            c.close();
+
             return null;
         }
 
@@ -137,7 +140,7 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
             boolean esCartelera; //true si aun no se ha estrenado
 
-            esCartelera = today.compareToIgnoreCase(estreno_fecha) > 0;
+            esCartelera = today.compareToIgnoreCase(estreno_fecha) >= 0;
 
             if (tipo == 1) { //Si es de cartelera
                 cartelera.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,

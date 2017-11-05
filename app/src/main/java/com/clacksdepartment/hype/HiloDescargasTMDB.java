@@ -85,7 +85,8 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
         ArrayList<Pelicula> cartelera = getPeliculas(INDEX_CARTELERA);
         ArrayList<Pelicula> estrenos = getPeliculas(INDEX_ESTRENOS);
 
-        cartelera = ordenaPelis(cartelera, true);      // true para descendente
+        // Ya no hace falta ordenar nada
+        //cartelera = ordenaPelis(cartelera, true);      // true para descendente
 
         publishProgress(0);
 
@@ -190,52 +191,6 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
                     db[1].insert(FeedEntryEstrenos.TABLE_NAME, null, values);
 
-/*
-                    if (estado) {
-                        //Si es una act fuerte, primero se borra
-                        if (actFuerte && cursor.getCount() > 0) {
-                            cursor.moveToFirst();
-                            values.put(column_sigue, 1);
-                            hype = cursor.getString(cursor.getColumnIndexOrThrow(column_hype));
-                            values.put(column_hype, hype);
-
-                            String whereClauseColumns2 = column_ref + " LIKE ?";
-                            String[] whereClauseValues_2 = {link};
-                            db[0].delete(table_name, whereClauseColumns2, whereClauseValues_2);
-
-                        } else if (actFuerte) {
-                            values.put(column_hype, false);
-                            values.put(column_sigue, 1);
-                        } else {
-                            values.put(column_hype, false);
-                            values.put(column_sigue, 0);
-                        }
-
-                        //Y se insertan en la bbdd y en la mListaModificadaAdapter de películas de la mListaModificadaAdapter
-                        db[1].insert(table_name, null, values);
-                        lista.addCartelera(new Pelicula(link, p_bitmap, title, sinopsis, estreno_letras, estreno_fecha, hype.equals("T")));
-
-                    } else {
-                        values.put(column_hype, false);
-
-                        if (actFuerte && cursor.getCount() > 0) {
-                            cursor.moveToNext();
-                            hype = cursor.getString(cursor.getColumnIndexOrThrow(column_hype));
-                            values.put(column_hype, hype);
-
-                            String selection2 = column_ref + " LIKE ?";
-                            String[] selectionArgs2 = {link};
-                            db[0].delete(table_name, selection2, selectionArgs2);
-                        } else {
-                            values.put(column_hype, false);
-                        }
-
-                        //Y se insertan en la bbdd y en la mListaModificadaAdapter de películas de la mListaModificadaAdapter
-                        db[1].insert(table_name, null, values);
-                        lista.addEstrenos(new Pelicula(link, p_bitmap, title, sinopsis, estreno_letras, estreno_fecha, hype.equals("T")));
-
-                    }
-                    */
                     values.clear();
                     Log.d(TAG, "Añadiendo película: " + titulo + ".");
 
@@ -348,7 +303,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.desc&release_date.lte="+todayAsString+"&release_date.gte="+sixWeeksAgoAsString+"&with_release_type=3";
                 break;
             case INDEX_ESTRENOS:
-                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.asc&release_date.gte="+tomorrowAsString+"&adult=true";
+                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.asc&release_date.gte="+tomorrowAsString;
                 break;
             default:
                 return null;
@@ -358,7 +313,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
             do {
                 Log.d(TAG, staticUrl);
-                response = getHTML(staticUrl + "&language=" + idioma + "&page=" + page + "&region=" + pais);
+                response = getHTML(staticUrl + "&language=" + idioma + "&page=" + page + "&region=" + pais + "&adult=true");
 
                 jObject = new JSONObject(response);
                 numpages = jObject.getInt("total_pages");
@@ -374,13 +329,26 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                         sinopsis = pageresults.getJSONObject(results).getString("overview").replace("(FILMAFFINITY)","");
                         date = pageresults.getJSONObject(results).getString("release_date");
                         textdate = getDateText(date);
-                        if (TIPO == INDEX_ESTRENOS && !esCartelera(date)){
-                            peliculas.add(new Pelicula(id, link, poster, title, sinopsis, textdate, date, false));
-                        }else if (TIPO == INDEX_CARTELERA && esCartelera(date)){
-                            peliculas.add(new Pelicula(id, link, poster, title, sinopsis, textdate, date, false));
-                        }else{
-                            Log.d(TAG, "Saltando película en sección incorrecta: " + title);
+
+                        switch (TIPO) {
+                            case INDEX_CARTELERA:
+                                if (esCartelera(date)){
+                                    peliculas.add(new Pelicula(id, link, poster, title, sinopsis, textdate, date, false));
+                                }else{
+                                    Log.d(TAG, "Saltando película en sección incorrecta: " + title);
+                                }
+                                break;
+                            case INDEX_ESTRENOS:
+                                if (!esCartelera(date)){
+                                    peliculas.add(new Pelicula(id, link, poster, title, sinopsis, textdate, date, false));
+                                }else{
+                                    Log.d(TAG, "Saltando película en sección incorrecta: " + title);
+                                }
+                                break;
+                            default:
+                                break;
                         }
+
                         totalresults++;
                     }catch (Exception e){
                         hasEnded = true;
@@ -446,7 +414,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         boolean cartelera;
 
-        cartelera = dateFormat.format(today).compareToIgnoreCase(fecha) > 0;
+        cartelera = dateFormat.format(today).compareToIgnoreCase(fecha) >= 0;
 
         return cartelera;
     }
