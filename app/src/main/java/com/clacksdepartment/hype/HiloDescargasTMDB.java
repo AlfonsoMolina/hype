@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.clacksdepartment.hype.FeedReaderContract.FeedEntryEstrenos;
 
@@ -292,7 +293,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
         Date tomorrow = calendar.getTime();
         calendar.add(Calendar.WEEK_OF_YEAR, -9);
         Date sixWeeksAgo = calendar.getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
         String todayAsString = dateFormat.format(today);
         String tomorrowAsString = dateFormat.format(tomorrow);
