@@ -79,10 +79,14 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
 
         mRecyclerView = ((RecyclerView) mActivity.findViewById(R.id.lista));
 
+        setHasStableIds(true);
+
         RecyclerView.ItemAnimator animator = mRecyclerView.getItemAnimator();
 
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+            animator.setRemoveDuration(0);
+            animator.setAddDuration(0);
         }
 
         vistaParaContraer = -1;
@@ -154,6 +158,12 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
         }
 
         Log.v(TAG, "Añadiendo película " + pelicula.getTitulo() + " a la vista número " + position);
+    }
+
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override

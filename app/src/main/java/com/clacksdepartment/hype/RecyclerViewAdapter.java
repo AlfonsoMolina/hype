@@ -99,6 +99,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public void clearAnimation(){
             mView.clearAnimation();
         }
+
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -122,10 +123,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.lista));
 
+        setHasStableIds(true);
+
         RecyclerView.ItemAnimator animator = mRecyclerView.getItemAnimator();
 
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+            animator.setRemoveDuration(0);
+            animator.setAddDuration(0);
+            //animator.setMoveDuration(0);
+            //animator.setChangeDuration(0);
         }
 
         mLinearLayoutManager = ((LinearLayoutManager) mRecyclerView.getLayoutManager());
@@ -133,10 +140,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         vistaParaContraer = -1;
 
         viewMeasureSpecHeight = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+
     }
 
-
-    @Override
     public int getItemViewType(int position) {
         // Just as an example, return 0 or 2 depending on position
         // Note that unlike in ListView adapters, types don't have to be contiguous
@@ -147,6 +153,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             return 1;
         else
             return 2;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     // Create new views (invoked by the layout manager)
@@ -378,14 +389,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         // Si estamos en la sección y la página donde se han añadido los datos:
         if (estado == CARTELERA && paginaCartelera == (mListaCartelera.size()-1)){
             try {
-                notifyItemInserted(getItemCount()-1);
+                notifyItemChanged(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
             }
         } else if (estado == HYPE && p.getHype()){
             try {
-                notifyItemInserted(getItemCount()-1);
+                notifyItemChanged(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
@@ -402,14 +413,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         if (estado == ESTRENOS && paginaEstrenos == (mListaEstrenos.size()-1)){
             try {
-                notifyItemInserted(getItemCount()-1);
+                notifyItemChanged(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
             }
         } else if (estado == HYPE && p.getHype()){
             try {
-                notifyItemInserted(getItemCount()-1);
+                notifyItemChanged(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
@@ -762,9 +773,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     public void actualizarDatos() {
-        mListaCartelera.clear();
-        mListaEstrenos.clear();
-        notifyDataSetChanged();
+        //mListaCartelera.clear();
+        //mListaEstrenos.clear();
+        //notifyDataSetChanged();
         HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase(),this);
         hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
