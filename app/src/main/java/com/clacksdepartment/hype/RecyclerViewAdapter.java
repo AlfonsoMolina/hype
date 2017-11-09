@@ -389,14 +389,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         // Si estamos en la sección y la página donde se han añadido los datos:
         if (estado == CARTELERA && paginaCartelera == (mListaCartelera.size()-1)){
             try {
-                notifyItemChanged(getItemCount()-1);
+                notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
             }
         } else if (estado == HYPE && p.getHype()){
             try {
-                notifyItemChanged(getItemCount()-1);
+                notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
@@ -413,14 +413,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         if (estado == ESTRENOS && paginaEstrenos == (mListaEstrenos.size()-1)){
             try {
-                notifyItemChanged(getItemCount()-1);
+                notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
             }
         } else if (estado == HYPE && p.getHype()){
             try {
-                notifyItemChanged(getItemCount()-1);
+                notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
                 //Si estamos moviendo la view no se hace nada o peta.
                 Log.d(TAG, "Actualización de lista abortada por scroll.");
