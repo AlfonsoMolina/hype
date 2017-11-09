@@ -739,23 +739,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         if (estado == CARTELERA){
             mensaje = res.getString(R.string.share_cartelera,pelicula.getTitulo());
         } else if (estado == ESTRENOS){
-            //Se coge el día de hoy
-            String f = "09/09/2099";
-            if (f.matches(pelicula.getEstrenoFecha())){
+            SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            try {
+                Date date1 = myFormat.parse(pelicula.getEstrenoFecha());
+                Date date2 = new Date();
+                long diff = date1.getTime() - date2.getTime();
+                int dias = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1;
+                mensaje = res.getString(R.string.share_estreno,dias,pelicula.getTitulo());
+            } catch (ParseException e) {
+                e.printStackTrace();
                 mensaje = res.getString(R.string.share_estreno_ind,pelicula.getTitulo());;
-            } else {
-                SimpleDateFormat myFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH);
-
-                try {
-                    Date date1 = myFormat.parse(pelicula.getEstrenoFecha());
-                    Date date2 = new Date();
-                    long diff = date1.getTime() - date2.getTime();
-                    int dias = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-                    mensaje = res.getString(R.string.share_estreno,dias,pelicula.getTitulo());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    mensaje = res.getString(R.string.share_estreno_ind,pelicula.getTitulo());;
-                }
             }
         } else {
             mensaje = pelicula.getTitulo();
