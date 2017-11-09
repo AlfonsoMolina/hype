@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static com.clacksdepartment.hype.FeedReaderContract.SQL_CREATE_ENTRIES_ESTRENOS;
@@ -56,7 +57,7 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
         ArrayList<Pelicula> cartelera = new ArrayList<>();
 
         Calendar calendar = Calendar.getInstance();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         String today = dateFormat.format(calendar.getTime());
 
 
