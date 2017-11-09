@@ -131,7 +131,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
             animator.setRemoveDuration(0);
             animator.setAddDuration(0);
-            animator.setMoveDuration(0);
+            //animator.setMoveDuration(0);
             animator.setChangeDuration(0);
         }
 
@@ -773,9 +773,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     public void actualizarDatos() {
-        //mListaCartelera.clear();
-        //mListaEstrenos.clear();
-        //notifyDataSetChanged();
         HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase(),this);
         hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

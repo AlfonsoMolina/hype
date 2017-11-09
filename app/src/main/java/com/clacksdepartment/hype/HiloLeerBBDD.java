@@ -180,15 +180,17 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
         return null;
     }
 
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        lista.eliminarLista();
+    }
+
     //Se actualiza la IU y se oculta la barra de progreso.
     @Override
     protected void onPostExecute(Void v) {
         Log.d(TAG, "Lectura finalizada, actualizando interfaz");
-        //lista.notifyDataSetChanged();
         lista.actualizarInterfaz();
-
-        //Se comprueba si no hay películas (primera ejecución), para mostrar un emnsaje.
-   //     lista.noHayPelis();
     }
 
 }

@@ -87,7 +87,7 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
             animator.setRemoveDuration(0);
             animator.setAddDuration(0);
-            animator.setMoveDuration(0);
+            //animator.setMoveDuration(0);
             animator.setChangeDuration(0);
         }
 
