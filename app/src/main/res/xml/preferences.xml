@@ -18,9 +18,12 @@
             android:key="pref_adds"
             android:defaultValue="true"
             android:summaryOn=":D"
-            android:summaryOff=":'("
-            android:disableDependentsState="false"/>
+            android:summaryOff=":'("/>
 
-
+        <SwitchPreference android:title="@string/actus"
+            android:key="pref_act"
+            android:defaultValue="true"
+            android:summaryOn="@string/si"
+            android:summaryOff="@string/no"/>
         
 </PreferenceScreen>

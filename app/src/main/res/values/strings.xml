@@ -49,4 +49,7 @@
     <string name="sinopsis_list_structure"><i>%1$s</i>…</string>
     <string name="votes_structure"><i>%1$s</i> (<i>%2$s</i> votes) </string>
     <string name="watch_trailer">Check movie trailer on Youtube</string>
+    <string name="actus">Daily updates</string>
+    <string name="si">Yes</string>
+    <string name="no">No</string>
 </resources>

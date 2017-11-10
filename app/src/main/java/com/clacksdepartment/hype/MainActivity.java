@@ -92,21 +92,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        //Se actualiza una vez al día
-        int diaHoy = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-        //int semanaHoy = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
-        int diaGuardado = sharedPreferences.getInt("dia",0);
+        //Se actualiza una vez al día si está en las opciones
+        if (sharedPreferences.getBoolean("pref_act", true)){
+            int diaHoy = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+            //int semanaHoy = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
+            int diaGuardado = sharedPreferences.getInt("dia",0);
 
-        if (diaHoy > diaGuardado) {
-            //Se hace una actualización suave
-            mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
-                    ((LinearLayout) findViewById(R.id.carga_barra)));
-            mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
+            if (diaHoy != diaGuardado) {
+                //Se hace una actualización suave
+                mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
+                        ((LinearLayout) findViewById(R.id.carga_barra)));
+                mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
 
-            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-            sharedPreferencesEditor.putInt("iniciado", 1);
-            sharedPreferencesEditor.putInt("dia",diaHoy);
-            sharedPreferencesEditor.apply();
+                SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+                sharedPreferencesEditor.putInt("iniciado", 1);
+                sharedPreferencesEditor.putInt("dia",diaHoy);
+                sharedPreferencesEditor.apply();
+            }
         }
 
         mInterfaz = new Interfaz(this, mRecyclerViewAdapter);
