@@ -347,4 +347,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void verCines(View view){
         startActivity(mRecyclerViewAdapter.verCines());
     }
-}
+
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+
+        mRecyclerViewAdapter.actualizarPref();
+        mRecyclerViewAdapter.notifyDataSetChanged();
+    }}

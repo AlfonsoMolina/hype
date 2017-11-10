@@ -840,5 +840,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     }
 
+    public void actualizarPref(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mMainActivity.getApplicationContext());
 
+        flagAdds = sharedPreferences.getBoolean("pref_adds",true);
+    }
 }
