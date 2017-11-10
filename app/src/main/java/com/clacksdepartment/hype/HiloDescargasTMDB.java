@@ -82,14 +82,14 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
     @Override
     protected Void doInBackground(SQLiteDatabase... db) {
 
+        publishProgress(0);
+
         // Descargando!
         ArrayList<Pelicula> cartelera = getPeliculas(INDEX_CARTELERA);
         ArrayList<Pelicula> estrenos = getPeliculas(INDEX_ESTRENOS);
 
         // Ya no hace falta ordenar nada
         //cartelera = ordenaPelis(cartelera, true);      // true para descendente
-
-        publishProgress(0);
 
         if (cartelera == null || estrenos == null){
             return null;

@@ -175,7 +175,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                 mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
                         ((LinearLayout) findViewById(R.id.carga_barra)));
-                mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
+                mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                        mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
 
                 selectedItem.setEnabled(false);
                 selectedItem.setVisible(false);

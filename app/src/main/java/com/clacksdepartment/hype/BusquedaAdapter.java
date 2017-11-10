@@ -2,6 +2,7 @@ package com.clacksdepartment.hype;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -26,8 +27,13 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Usuario on 15/09/2017.
@@ -384,11 +390,32 @@ public class BusquedaAdapter extends  RecyclerView.Adapter<BusquedaAdapter.ViewH
 
         Log.d(TAG, "Pulsado botón \"Share\" en película " + pelicula.getTitulo());
 
+        String mensaje = "";
+        Resources res = mActivity.getResources();
+
+        SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        try {
+            Date date1 = myFormat.parse(pelicula.getEstrenoFecha());
+            Date date2 = new Date();
+            long diff = date1.getTime() - date2.getTime();
+            int dias = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1;
+            if (diff <= 0)
+                mensaje = res.getString(R.string.share_cartelera,pelicula.getTitulo());
+            else
+                mensaje = res.getString(R.string.share_estreno,dias,pelicula.getTitulo());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            mensaje = res.getString(R.string.share_estreno_ind,pelicula.getTitulo());
+        }
+
+        mensaje = mensaje + "\n" + pelicula.getEnlace();
+
         Intent intent = new Intent(android.content.Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "He compartido \"" + pelicula.getTitulo() + "\" a través de Hype!");
-        intent.putExtra(android.content.Intent.EXTRA_TEXT, pelicula.getEnlace());
-        mActivity.startActivity(Intent.createChooser(intent, "Compartir película: " + pelicula.getTitulo() + "."));
+
+        //intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "He compartido \"" + pelicula.getTitulo() + "\" a través de Hype!");
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, mensaje);
+        mActivity.startActivity(Intent.createChooser(intent,res.getString(R.string.share_mensaje,pelicula.getTitulo())));
 
     }
 
