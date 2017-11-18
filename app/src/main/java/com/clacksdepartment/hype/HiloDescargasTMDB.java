@@ -304,7 +304,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.desc&release_date.lte="+todayAsString+"&release_date.gte="+sixWeeksAgoAsString+"&with_release_type=3";
                 break;
             case INDEX_ESTRENOS:
-                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.asc&release_date.gte="+tomorrowAsString;
+                staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&sort_by=primary_release_date.asc&release_date.gte="+tomorrowAsString+"&with_release_type=2|3";
                 break;
             default:
                 return null;

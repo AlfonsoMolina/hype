@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -15,6 +16,7 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,7 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -74,11 +77,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private boolean flagTickets = false;
 
     private FragmentManager mFragmentManager;
-    LinearLayoutManager mLinearLayoutManager;
-    RecyclerView mRecyclerView;
+    private LinearLayoutManager mLinearLayoutManager;
+    private RecyclerView mRecyclerView;
 
     private int vistaParaExpandir;
     private int vistaParaContraer;
+
+    private boolean breakNextMoveAnimation;
+    private RecyclerView.ItemAnimator animator;
+    private long moveDurationBackup;
 
     private final int viewMeasureSpecHeight;
 
@@ -116,6 +123,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
 
+        setHasStableIds(true);
         flagAdds = sharedPreferences.getBoolean("pref_adds",true);
 
         if (sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("fa")){
@@ -123,16 +131,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.lista));
 
-        setHasStableIds(true);
+        breakNextMoveAnimation = false;
 
-        RecyclerView.ItemAnimator animator = mRecyclerView.getItemAnimator();
+        animator = mRecyclerView.getItemAnimator();
 
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
             animator.setRemoveDuration(0);
-            animator.setAddDuration(0);
-            //animator.setMoveDuration(0);
-            animator.setChangeDuration(0);
+            moveDurationBackup = animator.getMoveDuration();
         }
 
         mLinearLayoutManager = ((LinearLayoutManager) mRecyclerView.getLayoutManager());
@@ -157,7 +163,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return estado*1000 + getPagina()*100 + position;
     }
 
     // Create new views (invoked by the layout manager)
@@ -165,6 +171,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                              int viewType) {
         // create a new view
+
 
         RelativeLayout v;
         switch (viewType) {
@@ -182,8 +189,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 break;
         }
         // set the view's size, margins, paddings and layout parameters
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
+        return new ViewHolder(v);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -194,18 +200,37 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         View filaView = holder.mView;
 
+        if (breakNextMoveAnimation){
+            animator.setMoveDuration(0);
+            breakNextMoveAnimation = false;
+        }
+
         if (flagAdds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2)) {
             NativeExpressAdView mAdView = (NativeExpressAdView) filaView.findViewById(R.id.adView);
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
-            if (estado == HYPE ||
-                    (mLinearLayoutManager.findFirstVisibleItemPosition() == mLinearLayoutManager.findFirstCompletelyVisibleItemPosition()) &&
-                            ((mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() +2 - getItemCount()) >= 0)) {
-                filaView.setVisibility(View.GONE);
-            } else {
-                filaView.setVisibility(View.VISIBLE);
+
+            switch (estado){
+                case HYPE:
+                    filaView.setVisibility(View.GONE);
+                    filaView.getLayoutParams().height = 0;
+                    break;
+                default:
+                    if ((mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() + 2 - getItemCount()) > 0){
+                        filaView.setVisibility(View.GONE);
+                        filaView.getLayoutParams().height = 0;
+                    } else {
+                        filaView.setVisibility(View.VISIBLE);
+                        Resources resources = mMainActivity.getResources();
+                        DisplayMetrics metrics = resources.getDisplayMetrics();
+                        // El 70 debe coincidir con el height del footer...
+                        filaView.getLayoutParams().height = 70 * (metrics.densityDpi / 160);
+                        ((TextView) filaView.findViewById(R.id.num_pag)).setText(resources.getString(R.string.num_page,(getPagina()+1),getUltPagina()));
+                    }
+                    break;
             }
+
         } else {
             if (position == 0)
                 primerElemento = filaView;
@@ -238,6 +263,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
 
                 if (vistaParaExpandir == position) {
+                    animator.setMoveDuration(moveDurationBackup);
                     expand(avanzado);
                     vistaParaExpandir = -1;
                 }else{
@@ -674,11 +700,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         if (estado != HYPE) {
             notifyItemChanged(itemExpandido);
         }else{
-            notifyDataSetChanged();
-            itemExpandido = -1;
+            if (itemExpandido != 0){
+                notifyItemRemoved(itemExpandido);
+            }else{
+                breakNextMoveAnimation = true;
+                notifyDataSetChanged();
+            }
             if (getItemCount() == 1){
                 mInterfaz.actualizar();
             }
+            itemExpandido = -1;
         }
     }
 
@@ -791,7 +822,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     }
 
                     v.requestLayout();
-                    mRecyclerView.scrollToPosition(itemExpandido);
+
+                    mRecyclerView.smoothScrollToPosition(itemExpandido);
+
                 }
 
                 @Override

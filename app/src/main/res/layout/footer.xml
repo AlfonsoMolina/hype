@@ -5,6 +5,17 @@
     android:layout_width="match_parent"
     android:id="@+id/footer"
     android:layout_height="70dp"
-    android:background="@color/colorPrimary"
-    android:visibility="gone">
+    android:background="@color/colorPrimary">
+    <TextView
+        android:id="@+id/num_pag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:text=""
+        android:textAlignment="center"
+        android:layout_centerInParent="true"
+        android:textSize="16sp"
+        android:textColor="@color/colorAccent"
+        android:fontFamily="sans-serif-condensed"
+        />
 </RelativeLayout>

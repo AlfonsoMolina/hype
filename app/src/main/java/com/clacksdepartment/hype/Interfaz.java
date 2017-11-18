@@ -1,5 +1,6 @@
 package com.clacksdepartment.hype;
 
+import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -106,7 +107,10 @@ class Interfaz {
     }
 
     void animaListado(){
-        ((RecyclerView) mMainActivity.findViewById(R.id.lista)).setLayoutAnimation(layoutAnimationController);
+        RecyclerView recyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.lista));
+        recyclerView.setLayoutAnimation(layoutAnimationController);
+        mRecyclerViewAdapter.notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
     }
 
     void actualizar(){
