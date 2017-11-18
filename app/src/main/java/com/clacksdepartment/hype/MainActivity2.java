@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -12,6 +13,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -138,44 +140,56 @@ public class MainActivity2 extends FragmentActivity implements ActionBar.TabList
         SharedPreferences sharedPreferences;
 
         private RecyclerView mRecyclerView;
-        private static RecyclerViewAdapter2 mRecyclerViewAdapter;
+        private RecyclerViewAdapter2 mRecyclerViewAdapter;
         private RecyclerView.LayoutManager mLayoutManager;
+
+        private ViewGroup mContainer;
+
+        private int sec;
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            if (getArguments() != null) {
+                sec = getArguments().getInt(ARG_SECTION_NUMBER);
+            }
+
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_pelis, container, false);
+            mContainer = container;
+            return inflater.inflate(R.layout.fragment_pelis, container, false);
+        }
+
+        @Override
+        public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
 
             // Creamos el helper de la BBDD
             mFeedReaderDbHelper = new FeedReaderDbHelper(getActivity().getApplicationContext());
 
-
-            mRecyclerView = (RecyclerView) rootView.findViewById(R.id.lista);
+            mRecyclerView = (RecyclerView) mContainer.findViewById(R.id.lista);
 
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
             mRecyclerView.setHasFixedSize(true);
 
             // use a linear layout manager
-            mLayoutManager = new LinearLayoutManager(getActivity());
+            mLayoutManager = new LinearLayoutManager(getContext());
             mRecyclerView.setLayoutManager(mLayoutManager);
 
             // specify an adapter (see also next example)
-            mRecyclerViewAdapter = new RecyclerViewAdapter2(mFeedReaderDbHelper, getArguments().getInt(ARG_SECTION_NUMBER));
+            mRecyclerViewAdapter = new RecyclerViewAdapter2(mFeedReaderDbHelper, sec);
             mRecyclerView.setAdapter(mRecyclerViewAdapter);
-
-            return rootView;
-
-        }
-
-        public void mostrarAvanzado(View v){
-            mRecyclerViewAdapter.setItemExpandido(v);
         }
 
     }
 
     public void mostrarAvanzado(View v){
-        mAppSectionsPagerAdapter.getItem(mViewPager.getCurrentItem()).mostrarAvanzado(v);
+        ((RecyclerViewAdapter2) ((RecyclerView) mViewPager.findViewById(R.id.lista)).getAdapter()).setItemExpandido(v);
     }
 
 }

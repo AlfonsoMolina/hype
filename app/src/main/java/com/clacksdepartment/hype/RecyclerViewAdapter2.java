@@ -137,11 +137,6 @@ public class RecyclerViewAdapter2 extends RecyclerView.Adapter<RecyclerViewAdapt
             return 2;
     }
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
     // Create new views (invoked by the layout manager)
     @Override
     public RecyclerViewAdapter2.ViewHolder onCreateViewHolder(ViewGroup parent,
@@ -364,15 +359,12 @@ public class RecyclerViewAdapter2 extends RecyclerView.Adapter<RecyclerViewAdapt
         int posicionAntigua = itemExpandido;
         int posicion = 0;
 
-/*
         for (Pelicula p : mListaPeliculas.get(pagina)) {
            if (p.getTitulo().equals(titulo)) {
               break;
            }
               posicion++;
            }
-*/
-
 
         if (flagAdds && posicion >= NUM_ITEM_ADD){
             posicion++;
