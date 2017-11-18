@@ -38,14 +38,21 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
     private SQLiteDatabase dbr;
     private SQLiteDatabase dbw;
-    private RecyclerViewAdapter lista;
+    private RecyclerViewAdapter2 lista;
+    private int estado; //1 estrenos, 2 cartelera, 0 hype
+
+    public HiloLeerBBDD(SQLiteDatabase dbr, SQLiteDatabase dbw, RecyclerViewAdapter lista) {
+        Log.d(TAG, "Inicializando el hilo encargado de leer la BBDD");
+
+    }
 
     //El constructor necesita la bbdd, la mListaModificadaAdapter y la barra de progreso
-    public HiloLeerBBDD(SQLiteDatabase dbr, SQLiteDatabase dbw, RecyclerViewAdapter lista) {
+    public HiloLeerBBDD(SQLiteDatabase dbr, SQLiteDatabase dbw, RecyclerViewAdapter2 lista, int estado) {
         Log.d(TAG, "Inicializando el hilo encargado de leer la BBDD");
         this.dbr = dbr;
         this.dbw = dbw;
         this.lista = lista;
+        this.estado = estado;
     }
     @Override
     protected Void doInBackground(Void... v) {
@@ -53,8 +60,7 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
         Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
 
-        ArrayList<Pelicula> estrenos = new ArrayList<>();
-        ArrayList<Pelicula> cartelera = new ArrayList<>();
+        ArrayList<Pelicula> peliculas = new ArrayList<>();
 
         Calendar calendar = Calendar.getInstance();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -143,41 +149,38 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
 
             esCartelera = today.compareToIgnoreCase(estreno_fecha) >= 0;
 
-            if (tipo == 1) { //Si es de cartelera
-                cartelera.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
-                        estreno_letras, estreno_fecha, hype));
 
-
-            } else if (tipo == 2 && esCartelera) {  //Es de cartelera pero está mal catalogada
+            if (tipo == 2 && esCartelera) {  //Es de cartelera pero está mal catalogada
                 values.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_TIPO, 1);
 
                 dbw.update(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, values,
                         FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + "='" +
                                 enlace + "'", null);
-
-                cartelera.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
-                        estreno_letras, estreno_fecha, hype));
-
-            } else { //Es de estrenos
-                estrenos.add(new Pelicula(enlace,portada_bitmap, portada_enlace, titulo, sinopsis,
-                        estreno_letras, estreno_fecha, hype));
+                tipo = 1;
             }
 
-            values.clear();
-            Log.d(TAG, "Encontrada película: " + titulo + ".");
+            if (estado == tipo || (estado == 3 && hype)) {
+                peliculas.add(new Pelicula(enlace, portada_bitmap, portada_enlace, titulo, sinopsis,
+                        estreno_letras, estreno_fecha, hype));
+
+                values.clear();
+                Log.d(TAG, "Encontrada película: " + titulo + ".");
+            }
         }
 
         cursor.close();
 
-        Collections.sort(cartelera, new Comparator<Pelicula>() {
-            @Override
-            public int compare(Pelicula p1, Pelicula p2) {
-                return (p2.getEstrenoFecha()).compareToIgnoreCase(p1.getEstrenoFecha());
-            }
-        });
+        if(estado == 1) {
+            Collections.sort(peliculas, new Comparator<Pelicula>() {
+                @Override
+                public int compare(Pelicula p1, Pelicula p2) {
+                    return (p2.getEstrenoFecha()).compareToIgnoreCase(p1.getEstrenoFecha());
+                }
+            });
+        }
 
-        lista.addCartelera(cartelera);
-        lista.addEstrenos(estrenos);
+        lista.addPeliculas(peliculas);
+
         return null;
     }
 
@@ -190,8 +193,7 @@ class HiloLeerBBDD extends AsyncTask<Void, Integer, Void> {
     //Se actualiza la IU y se oculta la barra de progreso.
     @Override
     protected void onPostExecute(Void v) {
-        Log.d(TAG, "Lectura finalizada, actualizando interfaz");
-        lista.actualizarInterfaz();
+        Log.d(TAG, "Lectura finalizada");
     }
 
 }

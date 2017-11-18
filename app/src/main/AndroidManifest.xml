@@ -5,22 +5,20 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
+    <!--android:theme="@style/AppTheme"-->
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/popcorn_circulo"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
         android:hardwareAccelerated="true">
 
         <activity
             android:name="com.clacksdepartment.hype.MainActivity"
             android:label="Hype!"
             android:screenOrientation="portrait" >
-            >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -36,7 +34,17 @@
             </intent-filter>
 
         </activity>
+        <activity android:name=".CollectionDemoActivity" android:label="@string/demo_collection" />
 
+        <activity android:name="com.clacksdepartment.hype.MainActivity2" >
+            <!--Default Intent Filter-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.DEFAULT" />
+            </intent-filter>
+
+        </activity>
         <activity android:name=".SearchableActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />

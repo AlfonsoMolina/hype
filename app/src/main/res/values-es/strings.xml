@@ -50,7 +50,6 @@
     <string name="votes_structure"><i>%1$s</i> (<i>%2$s</i> votos) </string>
     <string name="watch_trailer">Ver trailer en Youtube</string>
     <string name="pref_provider_def">TMDB</string>
-    <string name="sinopsis_list_structure"><i>%1$s</i>…</string>
     <string name="actus">Actualizaciones diarias</string>
     <string name="si">Sí</string>
     <string name="no">No</string>
