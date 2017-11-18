@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -26,12 +25,10 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import java.text.ParseException;
@@ -79,6 +76,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private FragmentManager mFragmentManager;
     private LinearLayoutManager mLinearLayoutManager;
     private RecyclerView mRecyclerView;
+    private View footer;
 
     private int vistaParaExpandir;
     private int vistaParaContraer;
@@ -210,26 +208,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
-
-            switch (estado){
-                case HYPE:
-                    filaView.setVisibility(View.GONE);
-                    filaView.getLayoutParams().height = 0;
-                    break;
-                default:
-                    if ((mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() + 2 - getItemCount()) > 0){
-                        filaView.setVisibility(View.GONE);
-                        filaView.getLayoutParams().height = 0;
-                    } else {
-                        filaView.setVisibility(View.VISIBLE);
-                        Resources resources = mMainActivity.getResources();
-                        DisplayMetrics metrics = resources.getDisplayMetrics();
-                        // El 70 debe coincidir con el height del footer...
-                        filaView.getLayoutParams().height = 70 * (metrics.densityDpi / 160);
-                        ((TextView) filaView.findViewById(R.id.num_pag)).setText(resources.getString(R.string.num_page,(getPagina()+1),getUltPagina()));
-                    }
-                    break;
-            }
+            footer = filaView;
+            actualizarCortinilla();
 
         } else {
             if (position == 0)
@@ -803,7 +783,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     public void expand(final View v) {
-        //if (v.getVisibility() == View.GONE) {
             v.measure(View.MeasureSpec.makeMeasureSpec(((View) v.getParent()).getWidth(), View.MeasureSpec.EXACTLY), viewMeasureSpecHeight);
             final int targetHeight = v.getMeasuredHeight();
 
@@ -828,22 +807,45 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
 
                 @Override
+                public boolean hasEnded() {
+                    actualizarCortinilla();
+                    return super.hasEnded();
+                }
+
+                @Override
                 public boolean willChangeBounds() {
                     return true;
                 }
 
             };
 
-            // 1dp/ms
             a.setDuration((int) (2*targetHeight / v.getContext().getResources().getDisplayMetrics().density));
             a.setInterpolator(new AccelerateDecelerateInterpolator());
+
+            a.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    actualizarCortinilla();
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
             v.startAnimation(a);
-       // }
+
+
     }
 
     public void collapse(final View v) {
 
-        //if (v.getVisibility() == View.VISIBLE) {
             final int initialHeight = v.getMeasuredHeight();
 
             Animation a = new Animation() {
@@ -865,11 +867,27 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             };
 
-            // 1dp/ms
             a.setDuration((int) (2*initialHeight / v.getContext().getResources().getDisplayMetrics().density));
             a.setInterpolator(new AccelerateDecelerateInterpolator());
+
+            a.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    actualizarCortinilla();
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
             v.startAnimation(a);
-        //}
 
     }
 
@@ -878,4 +896,30 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         flagAdds = sharedPreferences.getBoolean("pref_adds",true);
     }
+
+    private void actualizarCortinilla(){
+        switch (estado){
+            case HYPE:
+                footer.setVisibility(View.GONE);
+                footer.getLayoutParams().height = 0;
+                break;
+            default:
+                if ((mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() + 2 - getItemCount()) > 0){
+                    footer.setVisibility(View.GONE);
+                    footer.getLayoutParams().height = 0;
+                } else if (mRecyclerView.canScrollVertically(-1)) {
+                    footer.setVisibility(View.VISIBLE);
+                    Resources resources = mMainActivity.getResources();
+                    DisplayMetrics metrics = resources.getDisplayMetrics();
+                    // El 70 debe coincidir con el height del footer...
+                    footer.getLayoutParams().height = 70 * (metrics.densityDpi / 160);
+                    ((TextView) footer.findViewById(R.id.num_pag)).setText(resources.getString(R.string.num_page,(getPagina()+1),getUltPagina()));
+                }else{
+                    footer.setVisibility(View.GONE);
+                    footer.getLayoutParams().height = 0;
+                }
+                break;
+        }
+    }
+
 }
