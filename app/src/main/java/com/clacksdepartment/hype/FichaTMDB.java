@@ -32,7 +32,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
     private static final String TAG = "FichaTMDB";
     private static final String apiKey = "8ac0d37839748f4647039ef00d859d13";
-    private static final String preImagen = "https://image.tmdb.org/t/p/w640";
+    private static final String preImagen = "https://image.tmdb.org/t/p/original";
     private static final String preYoutube = "https://www.youtube.com/watch?v=";
 
     // Valor de progreso resultante:

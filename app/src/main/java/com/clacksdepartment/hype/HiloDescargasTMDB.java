@@ -38,7 +38,7 @@ import static com.clacksdepartment.hype.FeedReaderContract.FeedEntryEstrenos;
 class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
     private static final String TAG = "HiloDescargasTMDB";
-    private static final String preImagen = "https://image.tmdb.org/t/p/w160";
+    private static final String preImagen = "https://image.tmdb.org/t/p/w154";
     private static final String preLink = "https://www.themoviedb.org/movie/";
     private static final String apiKey = "8ac0d37839748f4647039ef00d859d13";
 
@@ -56,10 +56,10 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
     private static final int INDEX_CARTELERA = 1;
     private static final int INDEX_ESTRENOS = 2;
 
-    private static final int MAX_RESULTS_PER_SECTION = 200;
+    private static final int MAX_RESULTS_PER_SECTION = 20;
 
     HiloDescargasTMDB(Context context, RecyclerViewAdapter lista, LinearLayout carga_barra) {
-        Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de Filmaffinity");
+        Log.d(TAG, "Inicializando el hilo encargado de descargar contenido de TMDB");
         this.lista = lista;
         this.carga_barra = carga_barra;
         this.sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
@@ -88,9 +88,6 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
         ArrayList<Pelicula> cartelera = getPeliculas(INDEX_CARTELERA);
         ArrayList<Pelicula> estrenos = getPeliculas(INDEX_ESTRENOS);
 
-        // Ya no hace falta ordenar nada
-        //cartelera = ordenaPelis(cartelera, true);      // true para descendente
-
         if (cartelera == null || estrenos == null){
             return null;
         }
@@ -103,7 +100,7 @@ class HiloDescargasTMDB extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         ArrayList<Pelicula> peliculasAtratar;
 
-        boolean estado = true; //Se hace dos veces, una con carteleray otra con estrenos
+        boolean estado = true; //Se hace dos veces, una con cartelera y otra con estrenos
 
         //Cambio el tipo a -1 de las peliculas en cartelera (1) y estrenos (2)
         values.put(FeedEntryEstrenos.COLUMN_TIPO, -1);
