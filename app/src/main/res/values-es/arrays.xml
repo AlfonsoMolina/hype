@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="pref_pais_nombres">
+    <string-array name="pref_country_names">
         <item>España</item>
         <item>Estados Unidos</item>
         <item>Reino Unido</item>
@@ -10,7 +10,7 @@
         <item>Chile</item>
         <item>Colombia</item>
     </string-array>
-    <string-array name="pref_pais_valores">
+    <string-array name="pref_country_values">
         <item>es</item>
         <item>us</item>
         <item>uk</item>

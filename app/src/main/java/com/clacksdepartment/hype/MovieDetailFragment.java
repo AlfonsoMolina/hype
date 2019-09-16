@@ -16,28 +16,28 @@ import android.widget.TextView;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FichaFragment.OnFragmentInteractionListener} interface
+ * {@link MovieDetailFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link FichaFragment#newInstance} factory method to
+ * Use the {@link MovieDetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FichaFragment extends Fragment {
+public class MovieDetailFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String TÍTULO = "Título";
+    private static final String TITLE = "Título";
     private static final String LINK = "Link";
-    private static final String SINOPSIS = "Sinopsis";
+    private static final String SYNOPSIS = "Sinopsis";
 
-    private static final String TAG = "FichaFragment";
+    private static final String TAG = "MovieDetailFragment";
 
-    private String titulo;
+    private String title;
     private String link;
-    private String sinopsis;
-    private FichaTMDB fichaTMDB;
-    private ViewGroup contenedor;
+    private String synopsis;
+    private MovieDetail movieDetail;
+    private ViewGroup container;
 
     private OnFragmentInteractionListener mListener;
 
-    public FichaFragment() {
+    public MovieDetailFragment() {
         // Required empty public constructor
     }
 
@@ -47,14 +47,14 @@ public class FichaFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment FichaFragment.
+     * @return A new instance of fragment MovieDetailFragment.
      */
-    public static FichaFragment newInstance(String param1, String param2, String param3) {
-        FichaFragment fragment = new FichaFragment();
+    public static MovieDetailFragment newInstance(String param1, String param2, String param3) {
+        MovieDetailFragment fragment = new MovieDetailFragment();
         Bundle args = new Bundle();
-        args.putString(TÍTULO, param1);
+        args.putString(TITLE, param1);
         args.putString(LINK, param2);
-        args.putString(SINOPSIS, param3);
+        args.putString(SYNOPSIS, param3);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,9 +63,9 @@ public class FichaFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            titulo = getArguments().getString(TÍTULO);
+            title = getArguments().getString(TITLE);
             link = getArguments().getString(LINK);
-            sinopsis = getArguments().getString(SINOPSIS);
+            synopsis = getArguments().getString(SYNOPSIS);
         }
     }
 
@@ -73,29 +73,29 @@ public class FichaFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Log.i(TAG, "FichaFragment abierta");
+        Log.i(TAG, "MovieDetailFragment open.");
 
-        contenedor = container;
-        contenedor.setVisibility(View.VISIBLE);
+        this.container = container;
+        this.container.setVisibility(View.VISIBLE);
 
-        return inflater.inflate(R.layout.fragment_ficha, container, false);
+        return inflater.inflate(R.layout.fragment_expanded_movie_data, container, false);
     }
 
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Fijamos el título, ya conocido, para ir rellenando algo la fichaFA...
-        ((TextView) view.findViewById(R.id.ficha_titulo)).setText(titulo);
-        if (sinopsis.length() > 0) {
-            ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText(sinopsis);
+        // We already know the title and synopsis, so it can be set now
+        ((TextView) view.findViewById(R.id.movie_detail_title)).setText(title);
+        if (synopsis.length() > 0) {
+            ((TextView) view.findViewById(R.id.movie_detail_synopsis)).setText(synopsis);
         }else{
-            ((TextView) view.findViewById(R.id.ficha_sinopsis)).setText("");
-            view.findViewById(R.id.ficha_sinopsis).setVisibility(View.GONE);
+            ((TextView) view.findViewById(R.id.movie_detail_synopsis)).setText("");
+            view.findViewById(R.id.movie_detail_synopsis).setVisibility(View.GONE);
         }
 
-        fichaTMDB = new FichaTMDB(link, view);
-        fichaTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        movieDetail = new MovieDetail(link, view);
+        movieDetail.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void onButtonPressed(Uri uri) {
@@ -125,7 +125,7 @@ public class FichaFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        contenedor.setVisibility(View.GONE);
+        container.setVisibility(View.GONE);
     }
 
     /**

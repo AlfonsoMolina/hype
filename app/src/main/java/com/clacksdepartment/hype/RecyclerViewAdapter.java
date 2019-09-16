@@ -39,54 +39,38 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by Usuario on 12/09/2017.
- */
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "RecyclerViewAdapter";
 
     static final int HYPE = 0;
-    static final int CARTELERA = 1;
-    static final int ESTRENOS = 2;
+    static final int THEATERS = 1;
+    static final int RELEASES = 2;
 
     private static final int NUM_ITEM_ADD = 9;
 
-    private ArrayList<ArrayList<Pelicula>> mListaEstrenos;  //Los elementos de la mListaEstrenos
-    private ArrayList<ArrayList<Pelicula>> mListaCartelera;  //Los elementos de la mListaEstrenos
-
-    private MainActivity mMainActivity;                          //Actividad, para cambiar la IU
-    private Interfaz mInterfaz;
-
-    private int paginaEstrenos = 0;                                 //La página que se está mostrando (empezando por 0)
-    private int paginaCartelera = 0;
-    private int numPeliculasPorPagina = 25;                     //Número de películas por página
-
-    private Pelicula peliculaFocus;                             //Posición del elemento itemExpandido
-    private int itemExpandido = -1;
-    private View primerElemento;
-
+    private ArrayList<ArrayList<Movie>> mReleasesList;
+    private ArrayList<ArrayList<Movie>> mTheatersList;
+    private MainActivity mMainActivity;                          //Activity, to change the IU
+    private GUIManager mGUIManager;
+    private int releasesPage = 0;              // Page that is being shown, starting at 0
+    private int theatersPage = 0;
+    private int numMoviesPerPage = 25;
+    private int expandedItem = -1;
     private FeedReaderDbHelper mFeedReaderDbHelper;
-
-    private int estado = CARTELERA;
-    private boolean flagAdds = true;
-    private boolean flagTickets = false;
-
+    private int section = THEATERS;
+    private boolean flagAds = true;
     private FragmentManager mFragmentManager;
     private LinearLayoutManager mLinearLayoutManager;
     private RecyclerView mRecyclerView;
     private View footer;
-
-    private int vistaParaExpandir;
-    private int vistaParaContraer;
-
+    private int movieToExpand;
+    private int movieToCollapse;
     private boolean breakNextMoveAnimation;
     private RecyclerView.ItemAnimator animator;
     private long moveDurationBackup;
-
     private final int viewMeasureSpecHeight;
-
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -94,40 +78,34 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public RelativeLayout mView;
-
         public ViewHolder(RelativeLayout v) {
             super(v);
             mView = v;
-
         }
-
         public void clearAnimation(){
             mView.clearAnimation();
         }
-
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public RecyclerViewAdapter(MainActivity mainActivity, FeedReaderDbHelper feedReaderDbHelper) {
-        mListaCartelera = new ArrayList<>();
-        mListaEstrenos = new ArrayList<>();
-        Log.d(TAG, "Construyendo el adaptador de la mListaEstrenos");
+        mTheatersList = new ArrayList<>();
+        mReleasesList = new ArrayList<>();
+        Log.d(TAG, "Building the adapter for mReleasesList");
         this.mMainActivity = mainActivity;
         mFragmentManager = mainActivity.getSupportFragmentManager();
         this.mFeedReaderDbHelper = feedReaderDbHelper;
-        HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(feedReaderDbHelper.getReadableDatabase(), feedReaderDbHelper.getWritableDatabase(),this);
-        hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        mInterfaz = new Interfaz(mainActivity, this);
+        ReadDBThread readDBThread = new ReadDBThread(feedReaderDbHelper.getReadableDatabase(),
+                feedReaderDbHelper.getWritableDatabase(),this);
+        readDBThread.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        mGUIManager = new GUIManager(mainActivity, this);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
 
         setHasStableIds(true);
-        flagAdds = sharedPreferences.getBoolean("pref_adds",true);
+        flagAds = sharedPref.getBoolean("pref_adds",true);
 
-        if (sharedPreferences.getString("provider", "TMDB").equalsIgnoreCase("fa")){
-            flagTickets = true;
-        }
-        mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.lista));
+        mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.movieList));
 
         breakNextMoveAnimation = false;
 
@@ -140,8 +118,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
         mLinearLayoutManager = ((LinearLayoutManager) mRecyclerView.getLayoutManager());
-        vistaParaExpandir = -1;
-        vistaParaContraer = -1;
+        movieToExpand = -1;
+        movieToCollapse = -1;
 
         viewMeasureSpecHeight = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 
@@ -151,7 +129,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         // Just as an example, return 0 or 2 depending on position
         // Note that unlike in ListView adapters, types don't have to be contiguous
 
-        if (flagAdds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2))
+        if (flagAds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2))
             return 0;
         else if (position == getItemCount()-1)
             return 1;
@@ -161,7 +139,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public long getItemId(int position) {
-        return estado*1000 + getPagina()*100 + position;
+        return section *1000 + getPage()*100 + position;
     }
 
     // Create new views (invoked by the layout manager)
@@ -169,13 +147,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                              int viewType) {
         // create a new view
-
-
         RelativeLayout v;
         switch (viewType) {
             case 0:
                 v = (RelativeLayout) LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.fila_add, parent, false);
+                        .inflate(R.layout.ad_row, parent, false);
                 break;
             case 1:
                 v = (RelativeLayout) LayoutInflater.from(parent.getContext())
@@ -183,10 +159,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 break;
             default:
                 v = (RelativeLayout) LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.fila, parent, false);
+                        .inflate(R.layout.movie_row, parent, false);
                 break;
         }
-        // set the view's size, margins, paddings and layout parameters
+        // set the view's size, margin, padding and layout parameters
         return new ViewHolder(v);
     }
 
@@ -196,69 +172,70 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
 
-        View filaView = holder.mView;
+        View rowView = holder.mView;
 
         if (breakNextMoveAnimation){
             animator.setMoveDuration(0);
             breakNextMoveAnimation = false;
         }
 
-        if (flagAdds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2)) {
-            NativeExpressAdView mAdView = (NativeExpressAdView) filaView.findViewById(R.id.adView);
+        if (flagAds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2)) {
+            NativeExpressAdView mAdView = (NativeExpressAdView) rowView.findViewById(R.id.adView);
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
-            footer = filaView;
-            actualizarCortinilla();
+            footer = rowView;
+            updateWall();
 
         } else {
-            if (position == 0)
-                primerElemento = filaView;
+            Movie movie = getMovie(position);
+            ((TextView) rowView.findViewById(R.id.title)).setText(movie.getTitle());
+            ((TextView) rowView.findViewById(R.id.releaseDate)).setText(movie.getReleaseDateString());
+            ((ImageView) rowView.findViewById(R.id.cover)).setImageBitmap(movie.getCover());
 
-            Pelicula pelicula = getPelicula(position);
-            ((TextView) filaView.findViewById(R.id.titulo)).setText(pelicula.getTitulo());
-            ((TextView) filaView.findViewById(R.id.estreno)).setText(pelicula.getEstrenoLetras());
-            ((ImageView) filaView.findViewById(R.id.portada)).setImageBitmap(pelicula.getPortada());
-
-            if (pelicula.getHype()) {
-                filaView.findViewById(R.id.hype_msg).setVisibility(View.VISIBLE);
+            if (movie.getHype()) {
+                rowView.findViewById(R.id.hype_msg).setVisibility(View.VISIBLE);
             } else
-                filaView.findViewById(R.id.hype_msg).setVisibility(View.GONE);
+                rowView.findViewById(R.id.hype_msg).setVisibility(View.GONE);
 
-            View avanzado = filaView.findViewById(R.id.avanzado);
+            View expanded = rowView.findViewById(R.id.expandedData);
 
-            if (position == itemExpandido) {
+            if (position == expandedItem) {
 
-                if (pelicula.getSinopsis().length() > 0){
-                    ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText( mMainActivity.getResources().getString(R.string.sinopsis_list_structure,pelicula.getSinopsis().substring(0, Math.min(pelicula.getSinopsis().length(), 200))));
+                if (movie.getSynopsis().length() > 0){
+                    ((TextView) expanded.findViewById(R.id.av_synopsis)).setText(
+                            mMainActivity.getResources().getString(R.string.synopsis_list_structure,
+                            movie.getSynopsis().substring(0, Math.min(movie.getSynopsis().length(),
+                            200))));
                 }else{
-                    ((TextView) avanzado.findViewById(R.id.av_sinopsis)).setText("");
-                    avanzado.findViewById(R.id.av_sinopsis).setVisibility(View.GONE);
+                    ((TextView) expanded.findViewById(R.id.av_synopsis)).setText("");
+                    expanded.findViewById(R.id.av_synopsis).setVisibility(View.GONE);
                 }
 
-                if (pelicula.getHype()) {
-                    ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_black_24dp);
-                } else {
-                    ((ImageButton) avanzado.findViewById(R.id.av_hype)).setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                }
+                if (movie.getHype())
+                    ((ImageButton) expanded.findViewById(R.id.av_hype)).setImageResource(
+                            R.drawable.ic_favorite_black_24dp);
+                else
+                    ((ImageButton) expanded.findViewById(R.id.av_hype)).setImageResource(
+                            R.drawable.ic_favorite_border_black_24dp);
 
-                if (vistaParaExpandir == position) {
+                if (movieToExpand == position) {
                     animator.setMoveDuration(moveDurationBackup);
-                    expand(avanzado);
-                    vistaParaExpandir = -1;
+                    expand(expanded);
+                    movieToExpand = -1;
                 }else{
-                    avanzado.setVisibility(View.VISIBLE);
+                    expanded.setVisibility(View.VISIBLE);
                 }
             } else {
-                if (vistaParaContraer == position) {
-                    collapse(avanzado);
-                    vistaParaContraer = -1;
+                if (movieToCollapse == position) {
+                    collapse(expanded);
+                    movieToCollapse = -1;
                 }else{
-                    avanzado.setVisibility(View.GONE);
+                    expanded.setVisibility(View.GONE);
                 }
             }
 
-            Log.v(TAG, "Añadiendo película " + pelicula.getTitulo() + " a la vista número " + position);
+            Log.v(TAG, "Adding movie " + movie.getTitle() + " to view number " + position);
         }
 
     }
@@ -269,517 +246,490 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         ((ViewHolder) holder).clearAnimation();
     }
 
-    private Pelicula getPelicula(int position) {
-
-        if (flagAdds && position > NUM_ITEM_ADD){
+    private Movie getMovie(int position) {
+        if (flagAds && position > NUM_ITEM_ADD){
             position--;
             if (position >= NUM_ITEM_ADD*2)
                 position--;
         }
-
-        if (estado == HYPE) {
-            for (int i = mListaCartelera.size() - 1; i >= 0; i--) {
-                for (int j = mListaCartelera.get(i).size() - 1; j >= 0; j--) {
-                    if (mListaCartelera.get(i).get(j).getHype()) {
+        if (section == HYPE) {
+            for (int i = mTheatersList.size() - 1; i >= 0; i--) {
+                for (int j = mTheatersList.get(i).size() - 1; j >= 0; j--) {
+                    if (mTheatersList.get(i).get(j).getHype()) {
                         if (position == 0)
-                            return mListaCartelera.get(i).get(j);
+                            return mTheatersList.get(i).get(j);
                         position--;
                     }
                 }
             }
 
-            for (int i = 0; i < mListaEstrenos.size(); i++) {
-                for (int j = 0; j < mListaEstrenos.get(i).size(); j++) {
-                    if (mListaEstrenos.get(i).get(j).getHype()) {
+            for (int i = 0; i < mReleasesList.size(); i++) {
+                for (int j = 0; j < mReleasesList.get(i).size(); j++) {
+                    if (mReleasesList.get(i).get(j).getHype()) {
                         if (position == 0)
-                            return mListaEstrenos.get(i).get(j);
+                            return mReleasesList.get(i).get(j);
                         position--;
                     }
                 }
             }
 
         } else {
-            int pagina = estado == CARTELERA ? paginaCartelera : paginaEstrenos;
-            return estado == CARTELERA ? mListaCartelera.get(pagina).get(position) : mListaEstrenos.get(pagina).get(position);
+            int page = section == THEATERS ? theatersPage : releasesPage;
+            return section == THEATERS ? mTheatersList.get(page).get(position) : mReleasesList.get(page).get(position);
         }
 
-        return mListaCartelera.get(0).get(0);
+        return mTheatersList.get(0).get(0);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        int cuenta = 0;
-        if (estado == HYPE){
-            int count = 0;
-            for (int i = 0; i < mListaCartelera.size(); i++){
-                for (int j = 0; j < mListaCartelera.get(i).size(); j++){
-                    if (mListaCartelera.get(i).get(j).getHype()){
+        int count = 0;
+        if (section == HYPE){
+            for (int i = 0; i < mTheatersList.size(); i++){
+                for (int j = 0; j < mTheatersList.get(i).size(); j++){
+                    if (mTheatersList.get(i).get(j).getHype()){
                         count++;
                     }
                 }
             }
 
-            for (int i = 0; i < mListaEstrenos.size(); i++){
-                for (int j = 0; j < mListaEstrenos.get(i).size(); j++){
-                    if (mListaEstrenos.get(i).get(j).getHype()){
+            for (int i = 0; i < mReleasesList.size(); i++){
+                for (int j = 0; j < mReleasesList.get(i).size(); j++){
+                    if (mReleasesList.get(i).get(j).getHype()){
                         count++;
                     }
                 }
             }
-            cuenta = count;
-         } else if (estado == CARTELERA) {
-            if (mListaCartelera.size() > 0) {
-                cuenta = mListaCartelera.get(paginaCartelera).size();
+         } else if (section == THEATERS) {
+            if (mTheatersList.size() > 0) {
+                count = mTheatersList.get(theatersPage).size();
             }else
-                cuenta = 0;
+                count = 0;
         } else {
-            if (mListaEstrenos.size() > 0) {
-                cuenta = mListaEstrenos.get(paginaEstrenos).size();
+            if (mReleasesList.size() > 0) {
+                count = mReleasesList.get(releasesPage).size();
             }else
-                cuenta = 0;
+                count = 0;
         }
 
-        if (flagAdds && cuenta > NUM_ITEM_ADD) {
-            cuenta++;
-            if (cuenta > NUM_ITEM_ADD*2)
-                cuenta++;
+        if (flagAds && count > NUM_ITEM_ADD) {
+            count++;
+            if (count > NUM_ITEM_ADD*2)
+                count++;
         }
 
-        cuenta ++; //Por el footer.
+        count ++; //Por el footer.
 
-        return cuenta;
+        return count;
     }
 
-    int getUltPagina() {
-        if (estado==CARTELERA)
-            return mListaCartelera.size();
-        else if (estado==ESTRENOS)
-            return mListaEstrenos.size();
+    int getLastPage() {
+        if (section == THEATERS)
+            return mTheatersList.size();
+        else if (section == RELEASES)
+            return mReleasesList.size();
         else
             return 0;
     }
 
-    void pasarPagina(int i){
-        if (estado == CARTELERA)
-            paginaCartelera = i;
-        else if (estado == ESTRENOS)
-            paginaEstrenos = i;
-        itemExpandido = -1;
-        actualizarInterfaz();
+    void turnPage(int i){
+        if (section == THEATERS)
+            theatersPage = i;
+        else if (section == RELEASES)
+            releasesPage = i;
+        expandedItem = -1;
+        updateInterface();
     }
 
-    void reiniciarPagina(){
-        paginaCartelera = 0;
-        paginaEstrenos = 0;
+    void restartPage(){
+        theatersPage = 0;
+        releasesPage = 0;
     }
 
-    int getPagina(){
-        if (estado == CARTELERA)
-            return paginaCartelera;
-        else if (estado == ESTRENOS)
-            return paginaEstrenos;
+    int getPage(){
+        if (section == THEATERS)
+            return theatersPage;
+        else if (section == RELEASES)
+            return releasesPage;
         else
             return 0;
     }
 
 
-    void addCartelera(Pelicula p){
-        int ultPagina = mListaCartelera.size() -1;
-        if (ultPagina >= 0 && mListaCartelera.get(ultPagina).size() < numPeliculasPorPagina)
-            mListaCartelera.get(ultPagina).add(p);
+    void addToTheatersList(Movie p){
+        int lastPage = mTheatersList.size() -1;
+        if (lastPage >= 0 && mTheatersList.get(lastPage).size() < numMoviesPerPage)
+            mTheatersList.get(lastPage).add(p);
         else {
-            mListaCartelera.add(new ArrayList<Pelicula>());
-            mListaCartelera.get(ultPagina+1).add(p);
+            mTheatersList.add(new ArrayList<Movie>());
+            mTheatersList.get(lastPage+1).add(p);
         }
-        // Si estamos en la sección y la página donde se han añadido los datos:
-        if (estado == CARTELERA && paginaCartelera == (mListaCartelera.size()-1)){
+        // If we are in the section and page where data has been added
+        if (section == THEATERS && theatersPage == (mTheatersList.size()-1)){
             try {
                 notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
-                //Si estamos moviendo la view no se hace nada o peta.
-                Log.d(TAG, "Actualización de lista abortada por scroll.");
+                // If we are moving the view, stop
+                Log.d(TAG, "Aborting the updating of the list because of scroll.");
             }
-        } else if (estado == HYPE && p.getHype()){
+        } else if (section == HYPE && p.getHype()){
             try {
                 notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
-                //Si estamos moviendo la view no se hace nada o peta.
-                Log.d(TAG, "Actualización de lista abortada por scroll.");
+                // If we are moving the view, stop
+                Log.d(TAG, "Aborting the updating of the list because of scroll.");
             }
         }
     }
-    void addEstrenos(Pelicula p){
-        int ultPagina = mListaEstrenos.size() -1;
-        if (ultPagina >= 0 &&  mListaEstrenos.get(ultPagina).size() < numPeliculasPorPagina)
-            mListaEstrenos.get(ultPagina).add(p);
+    void addToReleasesList(Movie p){
+        int lastPage = mReleasesList.size() -1;
+        if (lastPage >= 0 &&  mReleasesList.get(lastPage).size() < numMoviesPerPage)
+            mReleasesList.get(lastPage).add(p);
         else {
-            mListaEstrenos.add(new ArrayList<Pelicula>());
-            mListaEstrenos.get(ultPagina+1).add(p);
+            mReleasesList.add(new ArrayList<Movie>());
+            mReleasesList.get(lastPage+1).add(p);
         }
-        if (estado == ESTRENOS && paginaEstrenos == (mListaEstrenos.size()-1)){
+        if (section == RELEASES && releasesPage == (mReleasesList.size()-1)){
             try {
                 notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
-                //Si estamos moviendo la view no se hace nada o peta.
-                Log.d(TAG, "Actualización de lista abortada por scroll.");
+                // If we are moving the view, stop
+                Log.d(TAG, "Aborting the updating of the list because of scroll.");
             }
-        } else if (estado == HYPE && p.getHype()){
+        } else if (section == HYPE && p.getHype()){
             try {
                 notifyItemInserted(getItemCount()-1);
             }catch(Exception e){
-                //Si estamos moviendo la view no se hace nada o peta.
-                Log.d(TAG, "Actualización de lista abortada por scroll.");
+                // If we are moving the view, stop
+                Log.d(TAG, "Aborting the updating of the list because of scroll.");
             }
         }
     }
 
-    //Estos dos pueden ser más eficientes
-    void addCartelera(ArrayList<Pelicula> peliculas){
-        for (int i = 0; i < peliculas.size();i++) {
-            addCartelera(peliculas.get(i));
-
+    // More efficient methods, maybe
+    void addToTheatersList(ArrayList<Movie> movies){
+        for (int i = 0; i < movies.size(); i++) {
+            addToTheatersList(movies.get(i));
         }
     }
-    void addEstrenos(ArrayList<Pelicula> peliculas){
-        for (int i = 0; i < peliculas.size();i++) {
-            addEstrenos(peliculas.get(i));
+    void addToReleasesList(ArrayList<Movie> movies){
+        for (int i = 0; i < movies.size(); i++) {
+            addToReleasesList(movies.get(i));
         }
     }
 
-    //Si la mListaEstrenos está vacía, muestra el mensaje de que no hay películas.
-    void quitarX(){
+    // If mReleasesList is empty, show no movies message
+    void removeX(){
         if(mMainActivity.getMenu()!= null) {
-            mMainActivity.getMenu().findItem(R.id.actualizar).setEnabled(true);
-            mMainActivity.getMenu().findItem(R.id.actualizar).setVisible(true);
-            mMainActivity.getMenu().findItem(R.id.cancelar).setEnabled(false);
-            mMainActivity.getMenu().findItem(R.id.cancelar).setVisible(false);
+            mMainActivity.getMenu().findItem(R.id.update_button).setEnabled(true);
+            mMainActivity.getMenu().findItem(R.id.update_button).setVisible(true);
+            mMainActivity.getMenu().findItem(R.id.cancel_update_button).setEnabled(false);
+            mMainActivity.getMenu().findItem(R.id.cancel_update_button).setVisible(false);
         }
     }
 
-    void mostrarNoPelis(){
+    void showNoMoviesMessage(){
         if (getItemCount()==1) {
-            mInterfaz.mostrarNoHayPelis(true);
+            mGUIManager.showNoMoviesMessage(true);
         } else
-            mInterfaz.mostrarNoHayPelis(false);
+            mGUIManager.showNoMoviesMessage(false);
     }
 
-    void actualizarInterfaz(){
-        mInterfaz.actualizar();
+    void updateInterface(){
+        mGUIManager.update();
     }
 
-    void eliminarLista() {
-        mListaEstrenos.clear();
-        mListaCartelera.clear();
+    void removeList() {
+        mReleasesList.clear();
+        mTheatersList.clear();
     }
 
-    public int getEstado(){
-        return estado;
+    public int getSection(){
+        return section;
     }
 
-    boolean mostrarEstrenos(){
-        boolean haCambiado = false;
-        if (estado != ESTRENOS){
-            itemExpandido = -1;
-            estado = ESTRENOS;
-            haCambiado = true;
-            mInterfaz.actualizar();
+    boolean showReleasesSection(){
+        boolean hasChanged = false;
+        if (section != RELEASES){
+            expandedItem = -1;
+            section = RELEASES;
+            hasChanged = true;
+            mGUIManager.update();
         }
-        return haCambiado;
+        return hasChanged;
     }
 
-    boolean mostrarHype(){
-        boolean haCambiado = false;
-        if (estado != HYPE){
-            itemExpandido = -1;
-            estado = HYPE;
-            haCambiado = true;
-            mInterfaz.actualizar();
+    boolean showHypeSection(){
+        boolean hasChanged = false;
+        if (section != HYPE){
+            expandedItem = -1;
+            section = HYPE;
+            hasChanged = true;
+            mGUIManager.update();
         }
-        return haCambiado;
+        return hasChanged;
     }
 
-    boolean mostrarCartelera(){
-        boolean haCambiado = false;
-        if (estado != CARTELERA){
-            itemExpandido = -1;
-            estado = CARTELERA;
-            haCambiado = true;
-            mInterfaz.actualizar();
+    boolean showTheatersSection(){
+        boolean hasChanged = false;
+        if (section != THEATERS){
+            expandedItem = -1;
+            section = THEATERS;
+            hasChanged = true;
+            mGUIManager.update();
         }
-        return haCambiado;
+        return hasChanged;
     }
 
-    void  setItemExpandido(View view){
-        //Encontramos la posición del elemento.
-        String titulo = (String) ((TextView) view.findViewById(R.id.titulo)).getText();
-        int posicionAntigua = itemExpandido;
-        int posicion = 0;
+    void setExpandedItem(View view){
+        // Find the position.
+        String title = (String) ((TextView) view.findViewById(R.id.title)).getText();
+        int oldPosition = expandedItem;
+        int position = 0;
 
-        if (estado == HYPE){
-            Pelicula p;
-            Boolean flag = true;
-            for (int i =  mListaCartelera.size()-1; flag && i >=0; i--){
-                for (int j = mListaCartelera.get(i).size()-1; flag && j >=0 ; j--) {
-                    p = mListaCartelera.get(i).get(j);
+        if (section == HYPE){
+            Movie p;
+            boolean flag = true;
+            for (int i = mTheatersList.size()-1; flag && i >=0; i--){
+                for (int j = mTheatersList.get(i).size()-1; flag && j >=0 ; j--) {
+                    p = mTheatersList.get(i).get(j);
                     if (p.getHype()) {
-                        if (p.getTitulo().equals(titulo)) {
+                        if (p.getTitle().equals(title)) {
                             flag = false;
                         } else
-                            posicion++;
+                            position++;
                     }
                 }
             }
-            for (int i = 0; flag && i < mListaEstrenos.size(); i++){
-                for (int j = 0; flag && j < mListaEstrenos.get(i).size(); j++) {
-                    p = mListaEstrenos.get(i).get(j);
+            for (int i = 0; flag && i < mReleasesList.size(); i++){
+                for (int j = 0; flag && j < mReleasesList.get(i).size(); j++) {
+                    p = mReleasesList.get(i).get(j);
                     if (p.getHype()) {
-                        if (p.getTitulo().equals(titulo)) {
+                        if (p.getTitle().equals(title)) {
                             flag = false;
                         } else
-                            posicion++;
+                            position++;
                     }
                 }
             }
         }else {
-            for (Pelicula p : estado == CARTELERA ? mListaCartelera.get(paginaCartelera) : mListaEstrenos.get(paginaEstrenos)) {
-                if (p.getTitulo().equals(titulo)) {
+            for (Movie p : section == THEATERS ? mTheatersList.get(theatersPage) : mReleasesList.get(releasesPage)) {
+                if (p.getTitle().equals(title)) {
                     break;
                 }
-                posicion++;
+                position++;
             }
-
         }
 
-        if (flagAdds && posicion >= NUM_ITEM_ADD){
-            posicion++;
-            if (posicion >= NUM_ITEM_ADD*2)
-                posicion++;
+        if (flagAds && position >= NUM_ITEM_ADD){
+            position++;
+            if (position >= NUM_ITEM_ADD*2)
+                position++;
         }
 
-        if (itemExpandido == posicion){
-            itemExpandido = -1;
-            Log.d(TAG, "Contrayendo  elemento " + posicion);
-            vistaParaContraer = posicion;
+        if (expandedItem == position){
+            expandedItem = -1;
+            Log.d(TAG, "Building element " + position);
+            movieToCollapse = position;
         } else {
-
-            // El siguiente If habilita la posibilidad de comprimir y expandir a la vez, diferentes animaciones.
-            /*if (itemExpandido != -1){
-                Log.d(TAG, "Contrayendo  elemento " + itemExpandido);
-                vistaParaContraer = itemExpandido;
-            }*/
-
-            itemExpandido = posicion;
-            Log.d(TAG, "Expandiendo  elemento " + posicion);
-            vistaParaExpandir = posicion;
+            expandedItem = position;
+            Log.d(TAG, "Expanding element " + position);
+            movieToExpand = position;
         }
 
-        if(posicionAntigua != -1)
-            notifyItemChanged(posicionAntigua);
-        notifyItemChanged(itemExpandido);
-        if (itemExpandido != -1) {
-            ((RecyclerView) mMainActivity.findViewById(R.id.lista)).smoothScrollToPosition(itemExpandido);
+        if(oldPosition != -1)
+            notifyItemChanged(oldPosition);
+        notifyItemChanged(expandedItem);
+        if (expandedItem != -1) {
+            ((RecyclerView) mMainActivity.findViewById(R.id.movieList)).smoothScrollToPosition(expandedItem);
         }
 
-        String [] fecha = getPelicula(posicion).getEstrenoFecha().split("-");
+        //TODO: this is stupid. Change for a function
+        String [] date = getMovie(position).getReleaseDate().split("-");
 
-        int difAno = Integer.parseInt(fecha[0]) - Calendar.getInstance().get(Calendar.YEAR);
-        int difMes = Integer.parseInt(fecha[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
-        int difDia = Integer.parseInt(fecha[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        int difYear = Integer.parseInt(date[0]) - Calendar.getInstance().get(Calendar.YEAR);
+        int difMonth = Integer.parseInt(date[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
+        int difDay = Integer.parseInt(date[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 
-        boolean futuro = false;
+        boolean isTheFuture = false;
 
-        if (difAno == 0){
-            if (difMes == 0){
-                if (difDia > 0){
-                    futuro = true;
+        if (difYear == 0){
+            if (difMonth == 0){
+                if (difDay > 0){
+                    isTheFuture = true;
                 }
-            }else if (difMes > 0){
-                futuro = true;
+            }else if (difMonth > 0){
+                isTheFuture = true;
             }
-        }else if (difAno > 0){
-            futuro = true;
+        }else if (difYear > 0){
+            isTheFuture = true;
         }
 
-        if (!futuro){
-            if (flagTickets) {
-                view.findViewById(R.id.av_cines).setVisibility(View.VISIBLE);
-            }else{
-                view.findViewById(R.id.av_cines).setVisibility(View.GONE);
-            }
-            view.findViewById(R.id.av_fecha).setVisibility(View.GONE);
+        if (!isTheFuture){
+            //if (flagTickets) {
+           //     view.findViewById(R.id.av_theaters).setVisibility(View.VISIBLE);
+          //  }else{
+                view.findViewById(R.id.av_theaters).setVisibility(View.GONE);
+           // }
+            view.findViewById(R.id.av_date).setVisibility(View.GONE);
         }else{
-            view.findViewById(R.id.av_cines).setVisibility(View.GONE);
-            view.findViewById(R.id.av_fecha).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.av_theaters).setVisibility(View.GONE);
+            view.findViewById(R.id.av_date).setVisibility(View.VISIBLE);
         }
     }
 
 
-    public void abrirFicha(){
-        Log.i(TAG, "Pulsado botón de abrir fichaFragment");
-        Pelicula pelicula = getPelicula(itemExpandido);
-        FichaFragment fichaFragment = FichaFragment.newInstance(pelicula.getTitulo(), pelicula.getEnlace(), pelicula.getSinopsis());
+    public void openMovieDetail(){
+        Log.i(TAG, "Button touched to open movieDetailFragment");
+        Movie movie = getMovie(expandedItem);
+        MovieDetailFragment movieDetailFragment = MovieDetailFragment.newInstance(movie.getTitle(), movie.getLink(), movie.getSynopsis());
 
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.abrir_ficha, R.anim.cerrar_ficha, R.anim.abrir_ficha, R.anim.cerrar_ficha);
-        fragmentTransaction.replace(R.id.ficha_container, fichaFragment).addToBackStack(null).commit();
+        fragmentTransaction.setCustomAnimations(R.anim.open_movie_detail, R.anim.close_movie_detail, R.anim.open_movie_detail, R.anim.close_movie_detail);
+        fragmentTransaction.replace(R.id.movie_detail_container, movieDetailFragment).addToBackStack(null).commit();
     }
 
 
-    //Envía la película al calendario en forma de evento
-    public Intent abrirCalendario(){
-            Pelicula pelicula = getPelicula(itemExpandido);
+    public Intent sendToCalendar(){
+            Movie movie = getMovie(expandedItem);
 
             Calendar beginTime = Calendar.getInstance();
-            String [] f = pelicula.getEstrenoFecha().split("-");
-            int[] fecha = {Integer.parseInt(f[0]), Integer.parseInt(f[1]),Integer.parseInt(f[2])};
-            beginTime.set(fecha[0], fecha[1]-1, fecha[2], 0, 0);
-            // Primero comprobar si puedo editar el evento.
+            String [] f = movie.getReleaseDate().split("-");
+            int[] date = {Integer.parseInt(f[0]), Integer.parseInt(f[1]),Integer.parseInt(f[2])};
+            beginTime.set(date[0], date[1]-1, date[2], 0, 0);
+            // Check if the event can be edited.
             Intent intent = new Intent(Intent.ACTION_INSERT)
                     .setData(CalendarContract.Events.CONTENT_URI)
                     .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
                     .putExtra("allDay", true)
-                    .putExtra(CalendarContract.Events.TITLE, pelicula.getTitulo())
-                    .putExtra(CalendarContract.Events.DESCRIPTION, pelicula.getSinopsis());
+                    .putExtra(CalendarContract.Events.TITLE, movie.getTitle())
+                    .putExtra(CalendarContract.Events.DESCRIPTION, movie.getSynopsis());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            Log.d(TAG, "Solicitando al calendario almacenar la película " + pelicula.getTitulo());
+            Log.d(TAG, "Asking the calendar to store the movie " + movie.getTitle());
 
             return intent;
         }
 
-    //Guarda la película
-    public void marcarHype (View v) {
-
-        Pelicula pelicula = getPelicula(itemExpandido);
-
-        Log.d(TAG, "Pulsado botón \"Hype\" en película " + pelicula.getTitulo());
+    public void flagHype(View v) {
+        Movie movie = getMovie(expandedItem);
+        Log.d(TAG, "Button \"Hype\" touched on movie " + movie.getTitle());
 
         SQLiteDatabase dbw = mFeedReaderDbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        pelicula.setHype(!pelicula.getHype());
+        movie.setHype(!movie.getHype());
 
-        if (pelicula.getHype()) {
+        if (movie.getHype()) {
             ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_black_24dp);
         } else {
             ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
 
-            contentValues.put(FeedReaderContract.FeedEntryEstrenos.COLUMN_HYPE, pelicula.getHype()?1:0);
+            contentValues.put(FeedReaderContract.FeedEntryReleases.COLUMN_HYPE, movie.getHype()?1:0);
 
-            String selection = FeedReaderContract.FeedEntryEstrenos.COLUMN_REF + " LIKE ?";
-            String[] selectionArgs = {pelicula.getEnlace()};
+            String selection = FeedReaderContract.FeedEntryReleases.COLUMN_REF + " LIKE ?";
+            String[] selectionArgs = {movie.getLink()};
 
             dbw.update(
-                    FeedReaderContract.FeedEntryEstrenos.TABLE_NAME,
+                    FeedReaderContract.FeedEntryReleases.TABLE_NAME,
                     contentValues,
                     selection,
                     selectionArgs);
 
-        if (estado != HYPE) {
-            notifyItemChanged(itemExpandido);
+        if (section != HYPE) {
+            notifyItemChanged(expandedItem);
         }else{
-            if (itemExpandido != 0){
-                notifyItemRemoved(itemExpandido);
+            if (expandedItem != 0){
+                notifyItemRemoved(expandedItem);
             }else{
                 breakNextMoveAnimation = true;
                 notifyDataSetChanged();
             }
             if (getItemCount() == 1){
-                mInterfaz.actualizar();
+                mGUIManager.update();
             }
-            itemExpandido = -1;
+            expandedItem = -1;
         }
     }
 
-    /*
-     * Método llamado al pedir más info en una peli seleccionada.
-     */
-    public Intent abrirWeb () {
-        Pelicula pelicula = getPelicula(itemExpandido);
-
-        Log.d(TAG, "Pulsado botón \"Info\" en película " + pelicula.getTitulo());
-
-        // Instanciamos el intent de navegador
+    public Intent openIntoWeb() {
+        Movie movie = getMovie(expandedItem);
+        Log.d(TAG, "Button \"Web\" touched on movie " + movie.getTitle());
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        // Se le pasa la web parseada
-        intent.setData(Uri.parse(pelicula.getEnlace()));
+        intent.setData(Uri.parse(movie.getLink()));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
         return intent;
     }
 
-    public Intent verCines(){
-        Pelicula pelicula = getPelicula(itemExpandido);
+    public Intent showCinemas(){
+        Movie movie = getMovie(expandedItem);
 
-        Log.d(TAG, "Pulsado botón \"Cines\" en película " + pelicula.getTitulo());
-
-        // Instanciamos el intent de navegador
+        Log.d(TAG, "Button \"Theaters\" on movie " + movie.getTitle());
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        // Se le pasa la web parseada
-        intent.setData(Uri.parse(pelicula.getEnlace().replace("movie","movie-showtimes")));
+        intent.setData(Uri.parse(movie.getLink().replace("movie","movie-showtimes")));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
         return intent;
     }
 
-    public void abrirMenuCompartir() {
-        Pelicula pelicula = getPelicula(itemExpandido);
+    public void openShareMenu() {
+        Movie movie = getMovie(expandedItem);
 
-        Log.d(TAG, "Pulsado botón \"Share\" en película " + pelicula.getTitulo());
+        Log.d(TAG, "Button \"Share\" touched on movie " + movie.getTitle());
 
-        String mensaje = "";
+        String message = "";
 
-        int estado = this.estado;
+        int section = this.section;
 
-        if (estado == HYPE) {
+        if (section == HYPE) {
 
-            for (ArrayList<Pelicula> pp : mListaCartelera) {
-                if (pp.contains(pelicula))
-                    estado = CARTELERA;
+            for (ArrayList<Movie> pp : mTheatersList) {
+                if (pp.contains(movie))
+                    section = THEATERS;
             }
-            for (ArrayList<Pelicula> pp : mListaEstrenos) {
-                if (pp.contains(pelicula))
-                    estado = ESTRENOS;
+            for (ArrayList<Movie> pp : mReleasesList) {
+                if (pp.contains(movie))
+                    section = RELEASES;
             }
         }
 
         Resources res = mMainActivity.getResources();
 
-        if (estado == CARTELERA){
-            mensaje = res.getString(R.string.share_cartelera,pelicula.getTitulo());
-        } else if (estado == ESTRENOS){
+        if (section == THEATERS){
+            message = res.getString(R.string.share_theaters,movie.getTitle());
+        } else if (section == RELEASES){
             SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
             try {
-                Date date1 = myFormat.parse(pelicula.getEstrenoFecha());
+                Date date1 = myFormat.parse(movie.getReleaseDate());
                 Date date2 = new Date();
                 long diff = date1.getTime() - date2.getTime();
-                int dias = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1;
-                mensaje = res.getString(R.string.share_estreno,dias,pelicula.getTitulo());
+                int numDays = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1;
+                message = res.getString(R.string.share_release,numDays,movie.getTitle());
             } catch (ParseException e) {
                 e.printStackTrace();
-                mensaje = res.getString(R.string.share_estreno_ind,pelicula.getTitulo());;
+                message = res.getString(R.string.share_release_ind,movie.getTitle());;
             }
         } else {
-            mensaje = pelicula.getTitulo();
+            message = movie.getTitle();
         }
 
-        mensaje = mensaje + "\n" + pelicula.getEnlace();
+        // TODO: add language to link
+        message = message + "\n" + movie.getLink();
 
         Intent intent = new Intent(android.content.Intent.ACTION_SEND);
         intent.setType("text/plain");
 
-        //intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "He compartido \"" + pelicula.getTitulo() + "\" a través de Hype!");
-        intent.putExtra(android.content.Intent.EXTRA_TEXT, mensaje);
-        mMainActivity.startActivity(Intent.createChooser(intent,res.getString(R.string.share_mensaje,pelicula.getTitulo())));
+        //intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "He compartido \"" + movie.getTitle() + "\" a través de Hype!");
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, message);
+        mMainActivity.startActivity(Intent.createChooser(intent,res.getString(R.string.share_msg,movie.getTitle())));
 
     }
 
-    public void actualizarDatos() {
-        HiloLeerBBDD hiloLeerBBDD = new HiloLeerBBDD(mFeedReaderDbHelper.getReadableDatabase(),
+    public void updateData() {
+        ReadDBThread readDBThread = new ReadDBThread(mFeedReaderDbHelper.getReadableDatabase(),
                 mFeedReaderDbHelper.getWritableDatabase(),this);
-        hiloLeerBBDD.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        readDBThread.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void expand(final View v) {
@@ -793,22 +743,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             Animation a = new Animation() {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
-
                     if (interpolatedTime == 1){
                         v.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
                     }else{
                         v.getLayoutParams().height = (int) (targetHeight * interpolatedTime);
                     }
-
                     v.requestLayout();
-
-                    mRecyclerView.smoothScrollToPosition(itemExpandido);
-
+                    mRecyclerView.smoothScrollToPosition(expandedItem);
                 }
 
                 @Override
                 public boolean hasEnded() {
-                    actualizarCortinilla();
+                    updateWall();
                     return super.hasEnded();
                 }
 
@@ -821,16 +767,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             a.setDuration((int) (2*targetHeight / v.getContext().getResources().getDisplayMetrics().density));
             a.setInterpolator(new AccelerateDecelerateInterpolator());
-
             a.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-
                 }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    actualizarCortinilla();
+                    updateWall();
                 }
 
                 @Override
@@ -838,16 +782,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
                 }
             });
-
             v.startAnimation(a);
-
-
     }
 
     public void collapse(final View v) {
-
             final int initialHeight = v.getMeasuredHeight();
-
             Animation a = new Animation() {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
@@ -857,9 +796,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         v.getLayoutParams().height = initialHeight - (int) (initialHeight * interpolatedTime);
                         v.requestLayout();
                     }
-
                 }
-
                 @Override
                 public boolean willChangeBounds() {
                     return true;
@@ -869,36 +806,29 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             a.setDuration((int) (2*initialHeight / v.getContext().getResources().getDisplayMetrics().density));
             a.setInterpolator(new AccelerateDecelerateInterpolator());
-
             a.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-
                 }
-
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    actualizarCortinilla();
+                    updateWall();
                 }
-
                 @Override
                 public void onAnimationRepeat(Animation animation) {
-
                 }
             });
-
             v.startAnimation(a);
-
     }
 
-    public void actualizarPref(){
+    public void updatePref(){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mMainActivity.getApplicationContext());
 
-        flagAdds = sharedPreferences.getBoolean("pref_adds",true);
+        flagAds = sharedPreferences.getBoolean("pref_adds",true);
     }
 
-    private void actualizarCortinilla(){
-        switch (estado){
+    private void updateWall(){
+        switch (section){
             case HYPE:
                 footer.setVisibility(View.GONE);
                 footer.getLayoutParams().height = 0;
@@ -911,9 +841,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     footer.setVisibility(View.VISIBLE);
                     Resources resources = mMainActivity.getResources();
                     DisplayMetrics metrics = resources.getDisplayMetrics();
-                    // El 70 debe coincidir con el height del footer...
+                    // 70 must be the height of the footer
                     footer.getLayoutParams().height = 70 * (metrics.densityDpi / 160);
-                    ((TextView) footer.findViewById(R.id.num_pag)).setText(resources.getString(R.string.num_page,(getPagina()+1),getUltPagina()));
+                    ((TextView) footer.findViewById(R.id.num_pag)).setText(resources.getString(R.string.num_page,(getPage()+1), getLastPage()));
                 }else{
                     footer.setVisibility(View.GONE);
                     footer.getLayoutParams().height = 0;

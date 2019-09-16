@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,330 +27,306 @@ import com.google.android.gms.ads.MobileAds;
 
 import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, FichaFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        MovieDetailFragment.OnFragmentInteractionListener{
 
-    /*
-     * Declaración de variables
-     */
     private static final String TAG = "MainActivity";
-
     private static final String MY_ADMOB_APP_ID = "ca-app-pub-6428634425759083~8703294528";
 
-   // private ListaModificadaAdapter mRecyclerViewAdapter;
     private FeedReaderDbHelper mFeedReaderDbHelper;
-    private HiloDescargasTMDB mHiloDescargasTMDB;
-    private Interfaz mInterfaz;
+    private DownloadTMDBThread mDownloadTMDBThread;
+    private GUIManager mGUIManager;
     private Menu mMenu;
-
-    SharedPreferences sharedPreferences;
-
-    private RecyclerView mRecyclerView;
+    RecyclerView mRecyclerView;
+    RecyclerView.LayoutManager mLayoutManager;
     private RecyclerViewAdapter mRecyclerViewAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
-    /*
-     * Métodos override
-     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "Actividad principal creada");
+
+        Log.d(TAG, "Main activity created.");
+
         MobileAds.initialize(this, MY_ADMOB_APP_ID);
-
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-
-        // Fijamos el layout a usar
         setContentView(R.layout.activity_main);
 
-        // Hook y setup del Toolbar
+        // Hook and setup the Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
-
-        //noinspection ConstantConditions
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        // Creamos el helper de la BBDD
         mFeedReaderDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.lista);
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
+        //Set up the list variable, using RecyclerView and a linear layout manager
+        mRecyclerView = (RecyclerView) findViewById(R.id.movieList);
+        mRecyclerView.setHasFixedSize(true);    //Increase performance
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-        // specify an adapter (see also next example)
         mRecyclerViewAdapter = new RecyclerViewAdapter(this, mFeedReaderDbHelper);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        //Configure Shared Preferences for configuration
+        SharedPreferences sharedPref;
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
 
-        //Se actualiza una vez al día si está en las opciones
-        if (sharedPreferences.getBoolean("pref_act", true)){
-            int diaHoy = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-            //int semanaHoy = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
-            int diaGuardado = sharedPreferences.getInt("dia",0);
+        //Update the database. Once per day (if configured)
+        if (sharedPref.getBoolean("pref_update", true)){
+            //Compare today with the last day that the database was updated
+            int lastUpdatedDay = sharedPref.getInt("day",0);
+            int today = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+            if (today != lastUpdatedDay) {
+                //Soft update.
+                mDownloadTMDBThread = new DownloadTMDBThread(this, mRecyclerViewAdapter,
+                        ((LinearLayout) findViewById(R.id.load_bar)));
+                mDownloadTMDBThread.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                        mFeedReaderDbHelper.getReadableDatabase(),
+                        mFeedReaderDbHelper.getWritableDatabase());
 
-            if (diaHoy != diaGuardado) {
-                //Se hace una actualización suave
-                mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
-                        ((LinearLayout) findViewById(R.id.carga_barra)));
-                mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
-
-                SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-                sharedPreferencesEditor.putInt("iniciado", 1);
-                sharedPreferencesEditor.putInt("dia",diaHoy);
+                SharedPreferences.Editor sharedPreferencesEditor = sharedPref.edit();
+                sharedPreferencesEditor.putInt("initialized", 1);
+                sharedPreferencesEditor.putInt("day",today);
                 sharedPreferencesEditor.apply();
             }
         }
 
-        mInterfaz = new Interfaz(this, mRecyclerViewAdapter);
-        mInterfaz.seleccionaBotonCartelera();
-        mostrarCartelera(findViewById(R.id.cartelera));
+        //Select the "In Theaters" view as the default one
+        mGUIManager = new GUIManager(this, mRecyclerViewAdapter);
+        mGUIManager.selectInTheatersSection();
+        showTheatersSection(findViewById(R.id.theaters));
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "Menú de opciones creado");
-        // Expande el mMenu, añade las opciones
+        Log.d(TAG, "Options menu created");
         this.mMenu = menu;
+
+        // Add options to the menu and configure them
         getMenuInflater().inflate(R.menu.menu, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        // Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(
+                new ComponentName(this.getApplicationContext(),SearchableActivity.class)));
+        searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
 
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.busqueda).getActionView();
-            searchView.setMaxWidth(Integer.MAX_VALUE);
-            // Assumes current activity is the searchable activity
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this.getApplicationContext(),SearchableActivity.class)));
-            searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
-
-        // Para dar color a los botones de la ActionBar
+        // Add color to the buttons
         for(int i = 0; i < mMenu.size(); i++){
             Drawable drawable = mMenu.getItem(i).getIcon();
             if(drawable != null) {
                 drawable.mutate();
-                //noinspection deprecation
-                drawable.setColorFilter(getResources().getColor(R.color.colorAppText), PorterDuff.Mode.SRC_ATOP);
+                drawable.setColorFilter(getResources().getColor(R.color.colorAppText),
+                        PorterDuff.Mode.SRC_ATOP);
             }
         }
 
-        //Y si es la primera ejecución y ahora mismo se están descargando cosas:
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        if (sharedPreferences.getInt("iniciado",0)<2) {
-            mMenu.findItem(R.id.actualizar).setEnabled(false);
-            mMenu.findItem(R.id.actualizar).setVisible(false);
-            mMenu.findItem(R.id.cancelar).setEnabled(true);
-            mMenu.findItem(R.id.cancelar).setVisible(true);
-            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-            sharedPreferencesEditor.putInt("iniciado", 2);
+        // If it is the first execution and it is still downloading (initialized 1),
+        // change the update button to cancel
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
+        if (sharedPref.getInt("initialized",0)<2) {
+            mMenu.findItem(R.id.update_button).setEnabled(false);
+            mMenu.findItem(R.id.update_button).setVisible(false);
+            mMenu.findItem(R.id.cancel_update_button).setEnabled(true);
+            mMenu.findItem(R.id.cancel_update_button).setVisible(true);
+            SharedPreferences.Editor sharedPreferencesEditor = sharedPref.edit();
+            sharedPreferencesEditor.putInt("initialized", 2);
             sharedPreferencesEditor.apply();
         }
-
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem selectedItem) {
-        Log.d(TAG, "Opción seleccionada " + selectedItem.toString());
+        Log.d(TAG, "Option selected: " + selectedItem.toString());
 
-        // Interpretamos lo seleccionado en el mMenu
         switch (selectedItem.getItemId()) {
 
-            //Mostrar las opciones (pendiente)
+            // Show options
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
 
-            //Actualiza las películas guardadas..
-            case R.id.actualizar:
+            // Update movies
+            case R.id.update_button:
+                mDownloadTMDBThread = new DownloadTMDBThread(this, mRecyclerViewAdapter,
+                        ((LinearLayout) findViewById(R.id.load_bar)));
+                mDownloadTMDBThread.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                        mFeedReaderDbHelper.getReadableDatabase(),
+                        mFeedReaderDbHelper.getWritableDatabase());
 
-                mHiloDescargasTMDB = new HiloDescargasTMDB(this, mRecyclerViewAdapter,
-                        ((LinearLayout) findViewById(R.id.carga_barra)));
-                mHiloDescargasTMDB.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                        mFeedReaderDbHelper.getReadableDatabase(), mFeedReaderDbHelper.getWritableDatabase());
-
+                // Change the update button for the cancel button
                 selectedItem.setEnabled(false);
                 selectedItem.setVisible(false);
-                mMenu.findItem(R.id.cancelar).setEnabled(true);
-                mMenu.findItem(R.id.cancelar).setVisible(true);
-
-                //mRecyclerViewAdapter.reiniciarPagina();
-                //mInterfaz.mostrarPaginador(false);
+                mMenu.findItem(R.id.cancel_update_button).setEnabled(true);
+                mMenu.findItem(R.id.cancel_update_button).setVisible(true);
                 return true;
 
-            case R.id.cancelar:
-
-                mHiloDescargasTMDB.cancel(true);
+            // Cancel update
+            case R.id.cancel_update_button:
+                mDownloadTMDBThread.cancel(true);
+                // Change the cancel button for the update button
                 selectedItem.setEnabled(false);
                 selectedItem.setVisible(false);
-                mMenu.findItem(R.id.actualizar).setEnabled(true);
-                mMenu.findItem(R.id.actualizar).setVisible(true);
+                mMenu.findItem(R.id.update_button).setEnabled(true);
+                mMenu.findItem(R.id.update_button).setVisible(true);
                 return true;
 
-            case R.id.busqueda:
+            // Open search box
+            case R.id.search:
                 SearchView searchView = (SearchView) selectedItem.getActionView();
                 searchView.setMaxWidth(Integer.MAX_VALUE);
                 searchView.setIconifiedByDefault(false);
                 return true;
+
             default:
                 return super.onOptionsItemSelected(selectedItem);
-
         }
     }
 
     /*
-     * Métodos custom
+     * Custom methods
      */
 
-    public void retrocederPagina(View view) {
-        int pagina = mRecyclerViewAdapter.getPagina();
-        if (pagina > 0) {
-            Log.d(TAG, "Retrocediendo a la página " + pagina);
-            mRecyclerViewAdapter.pasarPagina(pagina - 1);
-            ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina));
-            //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
-            //Así que hay que restarle uno, porque se ha ido a la págin aanterior, y se suma uno
-            //porque se ha cogido del adaptador. Así que, se queda igual.
-            mInterfaz.enfocaPrimerElementoBrusco();
+    public void turnBackPage(View view) {
+        // Internal current page value in the adapter, starting with 0
+        int currPage = mRecyclerViewAdapter.getPage();
+        if (currPage > 0) {
+            // The page variable in the adapter starts in 0, but the text in the app starts in 1
+            // We go to currPage - 1 (one page earlier) + 1 (because of the array start point)
+            Log.d(TAG, "Going back to page: " + currPage);
+            mRecyclerViewAdapter.turnPage(currPage - 1);
+            ((TextView) findViewById(R.id.currentPage)).setText(String.valueOf(currPage));
+            mGUIManager.hardFocusOnFirstElement();
             mRecyclerViewAdapter.notifyDataSetChanged();
         }
     }
 
-    public void avanzarPagina(View view) {
-        int pagina = mRecyclerViewAdapter.getPagina();
-        if (pagina < mRecyclerViewAdapter.getUltPagina()-1) {
-            Log.d(TAG, "Avanzando a la página " + (pagina+2));
-            mRecyclerViewAdapter.pasarPagina(pagina + 1);
-            ((TextView) findViewById(R.id.paginaActual)).setText(String.valueOf(pagina+2));
-            //La pagina en el adaptador va de 0 a la que sea, en el texto que sale empieza por uno.
-            //Así que hay que sumarle uno, porque se ha ido a la págin siguiente, y otro más
-            //porque se ha cogido del adaptador.
-            mInterfaz.enfocaPrimerElementoBrusco();
+    public void turnPage(View view) {
+        int currPage = mRecyclerViewAdapter.getPage();
+        if (currPage < mRecyclerViewAdapter.getLastPage()-1) {
+            // The page variable in the adapter starts in 0, but the text in the app starts in 1
+            // We go to currPage + 1 (one page forward) + 1 (because of the array start point)
+            Log.d(TAG, "Going forward to page: " + (currPage+2));
+            mRecyclerViewAdapter.turnPage(currPage + 1);
+            ((TextView) findViewById(R.id.currentPage)).setText(String.valueOf(currPage+2));
+            mGUIManager.hardFocusOnFirstElement();
             mRecyclerViewAdapter.notifyDataSetChanged();
         }
     }
 
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String clave) {
-        if(clave.equalsIgnoreCase("pref_db")){
-            mRecyclerViewAdapter.eliminarLista();
+    public void onSharedPreferenceChanged(SharedPreferences sharedPref, String key) {
+        // Remove all data in the database
+        if(key.equalsIgnoreCase("pref_db")){
+            mRecyclerViewAdapter.removeList();
             mRecyclerViewAdapter.notifyDataSetChanged();
-            mRecyclerViewAdapter.actualizarInterfaz();
-            mRecyclerViewAdapter.mostrarNoPelis();
-        } else if (clave.equalsIgnoreCase("pref_pais")){
-            //Cuando cambia el país se borra la mRecyclerViewAdapter anterior
-            mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
-            mRecyclerViewAdapter.eliminarLista();
+            mRecyclerViewAdapter.updateInterface();
+            mRecyclerViewAdapter.showNoMoviesMessage();
+
+        // Delete everything and download movies for the new country
+        } else if (key.equalsIgnoreCase("pref_country")){
+            mFeedReaderDbHelper.getWritableDatabase().delete(FeedReaderContract.FeedEntryReleases.TABLE_NAME, null, null);
+            mRecyclerViewAdapter.removeList();
             mRecyclerViewAdapter.notifyDataSetChanged();
-            mRecyclerViewAdapter.actualizarInterfaz();
-            mRecyclerViewAdapter.mostrarNoPelis();
+            mRecyclerViewAdapter.updateInterface();
+            mRecyclerViewAdapter.showNoMoviesMessage();
         }
     }
 
     protected void onDestroy() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref.unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
     }
 
-    public Menu getMenu(){ return mMenu;}
+    public Menu getMenu(){
+        return mMenu;
+    }
 
     @Override
     public void onFragmentInteraction(Uri uri) {
-
     }
 
-    public void mostrarHype(View view){
-
-        Log.d(TAG, "Mostrando películas hypeadas");
-
-        if (mRecyclerViewAdapter.getEstado() != RecyclerViewAdapter.HYPE){
-            mInterfaz.animaListado();
-            mRecyclerViewAdapter.mostrarHype();
-            mInterfaz.seleccionaBotonHype();
+    public void showHypeSection(View view){
+        Log.d(TAG, "Displaying Hype view.");
+        if (mRecyclerViewAdapter.getSection() != RecyclerViewAdapter.HYPE){
+            mGUIManager.animateList();
+            mRecyclerViewAdapter.showHypeSection();
+            mGUIManager.selectHypeSection();
             mRecyclerViewAdapter.notifyDataSetChanged();
-            mInterfaz.enfocaPrimerElementoBrusco();
-            ((RecyclerView) findViewById(R.id.lista)).smoothScrollToPosition(0);
-            mRecyclerViewAdapter.mostrarNoPelis();
+            mGUIManager.hardFocusOnFirstElement();
+            ((RecyclerView) findViewById(R.id.movieList)).smoothScrollToPosition(0);
+            mRecyclerViewAdapter.showNoMoviesMessage();
         }else{
-            mInterfaz.enfocaPrimerElementoSuave();
-        }
-
-
-
-    }
-
-    public void mostrarCartelera(View view){
-
-        Log.d(TAG, "Mostrando películas de estreno");
-
-        if (mRecyclerViewAdapter.getEstado() != RecyclerViewAdapter.CARTELERA) {
-            mInterfaz.animaListado();
-            mRecyclerViewAdapter.mostrarCartelera();
-            mInterfaz.seleccionaBotonCartelera();
-            mRecyclerViewAdapter.notifyDataSetChanged();
-            mInterfaz.enfocaPrimerElementoBrusco();
-            mRecyclerViewAdapter.mostrarNoPelis();
-        }else{
-            mInterfaz.enfocaPrimerElementoSuave();
+            mGUIManager.smoothFocusOnFirstElement();
         }
     }
 
-    public void mostrarEstrenos(View view){
-
-        Log.d(TAG, "Mostrando películas de estreno");
-
-        if (mRecyclerViewAdapter.getEstado() != RecyclerViewAdapter.ESTRENOS) {
-            mInterfaz.animaListado();
-            mRecyclerViewAdapter.mostrarEstrenos();
-            mInterfaz.seleccionaBotonEstrenos();
+    public void showTheatersSection(View view){
+        Log.d(TAG, "Displaying In theaters view.");
+        if (mRecyclerViewAdapter.getSection() != RecyclerViewAdapter.THEATERS) {
+            mGUIManager.animateList();
+            mRecyclerViewAdapter.showTheatersSection();
+            mGUIManager.selectInTheatersSection();
             mRecyclerViewAdapter.notifyDataSetChanged();
-            mInterfaz.enfocaPrimerElementoBrusco();
-            mRecyclerViewAdapter.mostrarNoPelis();
+            mGUIManager.hardFocusOnFirstElement();
+            mRecyclerViewAdapter.showNoMoviesMessage();
         }else{
-            mInterfaz.enfocaPrimerElementoSuave();
+            mGUIManager.smoothFocusOnFirstElement();
         }
     }
 
-
-    public void mostrarAvanzado(View view){
-        mRecyclerViewAdapter.setItemExpandido(view);
+    public void showReleasesSection(View view){
+        Log.d(TAG, "Displaying Releases view");
+        if (mRecyclerViewAdapter.getSection() != RecyclerViewAdapter.RELEASES) {
+            mGUIManager.animateList();
+            mRecyclerViewAdapter.showReleasesSection();
+            mGUIManager.selectReleasesSection();
+            mRecyclerViewAdapter.notifyDataSetChanged();
+            mGUIManager.hardFocusOnFirstElement();
+            mRecyclerViewAdapter.showNoMoviesMessage();
+        }else{
+            mGUIManager.smoothFocusOnFirstElement();
+        }
     }
-    public void marcarHype(View view){
-        mRecyclerViewAdapter.marcarHype(view);
+
+    public void showExpandedMovieData(View view){
+        mRecyclerViewAdapter.setExpandedItem(view);
+    }
+
+    public void flagHype(View view){
+        mRecyclerViewAdapter.flagHype(view);
      }
 
-    public void enviarCalendario(View view) {
-        startActivity(mRecyclerViewAdapter.abrirCalendario());
+    public void sendToCalendar(View view) {
+        startActivity(mRecyclerViewAdapter.sendToCalendar());
     }
 
-    public void abrirFicha(View view) {
-        mRecyclerViewAdapter.abrirFicha();
+    public void openMovieDetail(View view) {
+        mRecyclerViewAdapter.openMovieDetail();
     }
 
-    public void abrirWeb(View view) {
-        startActivity(mRecyclerViewAdapter.abrirWeb());
+    public void openIntoWeb(View view) {
+        startActivity(mRecyclerViewAdapter.openIntoWeb());
     }
 
-    public void abrirMenuCompartir(View view) {
-        mRecyclerViewAdapter.abrirMenuCompartir();
+    public void openShareMenu(View view) {
+        mRecyclerViewAdapter.openShareMenu();
     }
 
-    public void verCines(View view){
-        startActivity(mRecyclerViewAdapter.verCines());
+    public void showCinemas(View view){
+        startActivity(mRecyclerViewAdapter.showCinemas());
     }
 
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
 
-        mRecyclerViewAdapter.actualizarPref();
+        mRecyclerViewAdapter.updatePref();
         mRecyclerViewAdapter.notifyDataSetChanged();
     }}

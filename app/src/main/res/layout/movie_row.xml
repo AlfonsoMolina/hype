@@ -7,37 +7,37 @@
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
     android:padding="5dip"
-    android:id="@+id/contenedor"
-    android:onClick="mostrarAvanzado">
+    android:id="@+id/container"
+    android:onClick="showExpandedMovieData">
 
     <LinearLayout
-        android:id="@+id/basico"
+        android:id="@+id/basicRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentTop="true">
 
         <ImageView
-            android:id="@+id/portada"
+            android:id="@+id/cover"
             android:layout_width="50dip"
             android:layout_height="80dip"
             android:layout_marginEnd="5dip"
-            android:contentDescription="@string/descripcion_portada"
+            android:contentDescription="@string/cover_desc"
             android:padding="3dip" />
 
         <LinearLayout
-            android:id="@+id/info_basico"
+            android:id="@+id/info_basic"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/titulo"
+                android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:paddingBottom="5dp"
-                android:text="@string/ficha_titulo_default"
+                android:text="@string/label_title"
                 android:textSize="17sp" />
 
             <LinearLayout
@@ -46,12 +46,12 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/estreno"
+                    android:id="@+id/releaseDate"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif"
-                    android:text="@string/fecha_default"
+                    android:text="@string/date_default"
                     android:textAllCaps="true"
                     android:textColor="?attr/colorAccent"
                     android:textSize="14sp" />
@@ -63,16 +63,16 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/avanzado"
+        android:id="@+id/expandedData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
-        android:layout_below="@id/basico"
+        android:layout_below="@id/basicRow"
         >
 
         <TextView
-            android:id="@+id/av_sinopsis"
+            android:id="@+id/av_synopsis"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
@@ -82,14 +82,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/botonera"
+            android:id="@+id/buttons"
             android:orientation="horizontal"
             android:layout_gravity="center"
             android:descendantFocusability="blocksDescendants"
             >
 
             <ImageButton
-                android:id="@+id/av_cines"
+                android:id="@+id/av_theaters"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -100,11 +100,11 @@
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:gravity="center"
-                android:onClick="verCines"
+                android:onClick="showCinemas"
                 />
 
             <ImageButton
-                android:id="@+id/av_fecha"
+                android:id="@+id/av_date"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -114,11 +114,11 @@
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:gravity="center"
-                android:onClick="enviarCalendario"
+                android:onClick="sendToCalendar"
                 />
 
             <ImageButton
-                android:id="@+id/av_ficha"
+                android:id="@+id/av_movie_detail"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -128,7 +128,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
-                android:onClick="abrirFicha"
+                android:onClick="openMovieDetail"
                 />
 
             <ImageButton
@@ -142,11 +142,11 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
-                android:onClick="marcarHype"
+                android:onClick="flagHype"
                 />
 
             <ImageButton
-                android:id="@+id/av_enlace"
+                android:id="@+id/av_link"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 style="@style/Widget.AppCompat.Button.Borderless"
@@ -156,11 +156,11 @@
                 android:src="@drawable/ic_open_in_browser_black_24dp"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
-                android:onClick="abrirWeb"
+                android:onClick="openIntoWeb"
                 />
 
             <ImageButton
-                android:id="@+id/av_compartir"
+                android:id="@+id/av_share"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 style="@style/Widget.AppCompat.Button.Borderless"
@@ -170,7 +170,7 @@
                 android:src="@drawable/ic_share_black_24dp"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
-                android:onClick="abrirMenuCompartir"
+                android:onClick="openShareMenu"
                 />
         </LinearLayout>
 

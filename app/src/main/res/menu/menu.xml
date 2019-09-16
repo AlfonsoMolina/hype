@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/busqueda"
+        android:id="@+id/search"
         android:icon="@drawable/ic_search_black_24dp"
-        android:title="@string/menu_buscar"
+        android:title="@string/search_menu_but"
         app:showAsAction="ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView"
         />
     <item
-        android:id="@+id/actualizar"
+        android:id="@+id/update_button"
         android:icon="@drawable/ic_refresh_black_24dp"
-        android:title="@string/recargar"
+        android:title="@string/update_but"
         app:showAsAction="ifRoom"
         />
 
     <item
-        android:id="@+id/cancelar"
+        android:id="@+id/cancel_update_button"
         android:icon="@drawable/ic_cancel_black_24dp"
-        android:title="@string/cancelar"
+        android:title="@string/cancel_but"
         app:showAsAction="ifRoom"
         android:enabled="false"
         android:visible="false"
@@ -28,7 +28,7 @@
 
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"
-        android:title="@string/opciones"
+        android:title="@string/options_but"
         app:showAsAction="never"/>
 
 </menu>

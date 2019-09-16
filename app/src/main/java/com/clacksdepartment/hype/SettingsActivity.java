@@ -3,10 +3,6 @@ package com.clacksdepartment.hype;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-/**
- * Created by Usuario on 31/07/2017.
- */
-
 public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,7 +10,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         getFragmentManager().beginTransaction()
-                .replace(R.id.fragmento, new SettingsFragment())
+                .replace(R.id.fragment, new SettingsFragment())
                 .commit();
 
 

@@ -7,10 +7,6 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-/**
- * Created by Usuario on 31/07/2017.
- */
-
 public class SettingsFragment extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -22,15 +18,15 @@ public class SettingsFragment extends PreferenceFragment {
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                //Se vacía la bbdd
+                // Drop DB
                 SQLiteDatabase db = (new FeedReaderDbHelper(getActivity().getApplicationContext())).getWritableDatabase();
-                db.delete(FeedReaderContract.FeedEntryEstrenos.TABLE_NAME, null, null);
+                db.delete(FeedReaderContract.FeedEntryReleases.TABLE_NAME, null, null);
 
-                //Se cambia el valor para notificar a la mListaModificadaAdapter
+                // Change pref_db to notify mModifiedListAdapter
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-                Boolean valor = prefs.getBoolean("pref_db",false);
+                boolean value = prefs.getBoolean("pref_db",false);
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("pref_db", !valor);
+                editor.putBoolean("pref_db", !value);
                 editor.apply();
 
                 return true;

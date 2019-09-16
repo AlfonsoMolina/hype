@@ -1,16 +1,9 @@
 package com.clacksdepartment.hype;
 
 import android.app.SearchManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,16 +15,12 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
-/**
- * Created by Usuario on 15/09/2017.
- */
 
-public class SearchableActivity extends AppCompatActivity implements FichaFragment.OnFragmentInteractionListener{
+public class SearchableActivity extends AppCompatActivity implements MovieDetailFragment.OnFragmentInteractionListener{
 
     private RecyclerView mRecyclerView;
-    private BusquedaAdapter mBusquedaAdapter;
+    private SearchAdapter mSearchAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private String query;
 
@@ -48,7 +37,7 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
 
         FeedReaderDbHelper feedReaderDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.lista);
+        mRecyclerView = (RecyclerView) findViewById(R.id.movieList);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -59,8 +48,8 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mBusquedaAdapter= new BusquedaAdapter(this,R.layout.fila, feedReaderDbHelper);
-        mRecyclerView.setAdapter(mBusquedaAdapter);
+        mSearchAdapter = new SearchAdapter(this,R.layout.movie_row, feedReaderDbHelper);
+        mRecyclerView.setAdapter(mSearchAdapter);
 
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
@@ -76,12 +65,12 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "Menú de opciones creado");
-        // Expande el mMenu, añade las opciones
+        Log.d(TAG, "Options menu created.");
+        // Expand mMenu and add options
         getMenuInflater().inflate(R.menu.menu, menu);
 
      //   SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.busqueda).getActionView();
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
         // Assumes current activity is the searchable activity
      //   searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -106,17 +95,17 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
        return true;
     }
     void doMySearch(String query){
-        LayoutAnimationController layoutAnimationController = AnimationUtils.loadLayoutAnimation(this,R.anim.rellenar_lista);
-        ((RecyclerView) findViewById(R.id.lista)).setLayoutAnimation(layoutAnimationController);
-        mBusquedaAdapter.buscar(query);
+        LayoutAnimationController layoutAnimationController = AnimationUtils.loadLayoutAnimation(this,R.anim.fill_movie_list);
+        ((RecyclerView) findViewById(R.id.movieList)).setLayoutAnimation(layoutAnimationController);
+        mSearchAdapter.search(query);
 
     }
 
     @Override
     public void onBackPressed(){
-        FrameLayout fragmento = (FrameLayout) findViewById(R.id.ficha_container);
+        FrameLayout fragment = (FrameLayout) findViewById(R.id.movie_detail_container);
 
-        if (fragmento != null && fragmento.getVisibility()==View.VISIBLE) {
+        if (fragment != null && fragment.getVisibility()==View.VISIBLE) {
             super.onBackPressed();
         }
         else {
@@ -126,30 +115,28 @@ public class SearchableActivity extends AppCompatActivity implements FichaFragme
     }
 
 
-
-    public void mostrarAvanzado(View view){
-        mBusquedaAdapter.setItemExpandido(view);
+    public void showExpandedMovieData(View view){
+        mSearchAdapter.setExpandedItem(view);
     }
-    public void marcarHype(View view){
-        mBusquedaAdapter.marcarHype(view);
-    }
-
-    public void enviarCalendario(View view) {
-        startActivity(mBusquedaAdapter.abrirCalendario());
+    public void flagHype(View view){
+        mSearchAdapter.flagHype(view);
     }
 
-    public void abrirFicha(View view) {
-        mBusquedaAdapter.abrirFicha();
+    public void sendToCalendar(View view) {
+        startActivity(mSearchAdapter.sendToCalendar());
     }
 
-    public void abrirWeb(View view) {
-        startActivity(mBusquedaAdapter.abrirWeb());
+    public void openMovieDetail(View view) {
+        mSearchAdapter.openMovieDetail();
     }
 
-    public void abrirMenuCompartir(View view) {
-        mBusquedaAdapter.abrirMenuCompartir();
+    public void openIntoWeb(View view) {
+        startActivity(mSearchAdapter.openIntoWeb());
     }
 
+    public void openShareMenu(View view) {
+        mSearchAdapter.openShareMenu();
+    }
 
 
     @Override

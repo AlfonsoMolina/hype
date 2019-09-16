@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,48 +27,45 @@ import java.util.List;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
 
-public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
+public class MovieDetail extends AsyncTask<Void,Integer,Void> {
 
-    private static final String TAG = "FichaTMDB";
+    private static final String TAG = "MovieDetail";
     private static final String apiKey = "8ac0d37839748f4647039ef00d859d13";
-    private static final String preImagen = "https://image.tmdb.org/t/p/original";
+    private static final String preImage = "https://image.tmdb.org/t/p/original";
     private static final String preYoutube = "https://www.youtube.com/watch?v=";
 
-    // Valor de progreso resultante:
-    private static final int progreso_POSTER = 0;
-    private static final int progreso_ANO = 2;
-    private static final int progreso_DURACION = 3;
-    private static final int progreso_DIRECTORES = 4;
-    private static final int progreso_REPARTO = 5;
-    private static final int progreso_GENERO = 6;
-    private static final int progreso_NOTA = 7;
-    private static final int progreso_VIDEO = 8;
+    // Value of result progress
+    private static final int progress_COVER = 0;
+    private static final int progress_YEAR = 2;
+    private static final int progress_DURATION = 3;
+    private static final int progress_DIRECTOR = 4;
+    private static final int progress_CAST = 5;
+    private static final int progress_GENRE = 6;
+    private static final int progress_RATING = 7;
+    private static final int progress_trailer = 8;
 
-    // Atributos
     private String id;
-    private String ano;
-    private String duracion;
-    private Drawable portada;
+    private String year;
+    private String duration;
+    private Drawable cover;
     private List<String> director;
-    private List <String> reparto;
-    private List <String> genero;
-    private String nota;
-    private String votos;
+    private List <String> cast;
+    private List <String> genre;
+    private String rating;
+    private String votes;
     private String videoProvider;
     private String videoLink;
 
-    // Vista a modificar
+    // View to be updated
     private final View mView;
 
-    FichaTMDB(String url, View view){
+    MovieDetail(String url, View view){
         String [] urlSplit = url.split("/");
         this.id = urlSplit[urlSplit.length-1];
         mView = view;
-
         director = new ArrayList<>();
-        reparto = new ArrayList<>();
-        genero = new ArrayList<>();
-
+        cast = new ArrayList<>();
+        genre = new ArrayList<>();
     }
 
     @Override
@@ -78,41 +74,41 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
 
-            // Leo el HTML
-            String pais = PreferenceManager.getDefaultSharedPreferences(mView.getContext()).getString("pref_pais", "");
-            String idioma = "es-ES";
-            if (pais.equalsIgnoreCase("uk") || pais.equalsIgnoreCase("us") || pais.equalsIgnoreCase("fr"))
-                idioma = "en-US";
-            String basico = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+"&language=" + idioma + "&append_to_response=videos,credits");
+            // Read HTML
+            String country = PreferenceManager.getDefaultSharedPreferences(mView.getContext()).getString("pref_country", "");
+            String language = "es-ES";
+            if (country.equalsIgnoreCase("uk") || country.equalsIgnoreCase("us") || country.equalsIgnoreCase("fr"))
+                language = "en-US";
+            String result = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+"&language=" + language + "&append_to_response=videos,credits");
 
-            // Aquí el parseo:
+            // Parse:
             JSONObject jObject;
             JSONArray jArray;
 
-            jObject = new JSONObject(basico);
+            jObject = new JSONObject(result);
 
-            String portadaUrl = preImagen + jObject.getString("poster_path");
-            Log.d(TAG, portadaUrl);
-            portada = loadImageFromURL(portadaUrl, portadaUrl);
+            String coverUrl = preImage + jObject.getString("poster_path");
+            Log.d(TAG, coverUrl);
+            cover = loadImageFromURL(coverUrl, coverUrl);
 
-            publishProgress(progreso_POSTER);
+            publishProgress(progress_COVER);
 
-            duracion = jObject.getString("runtime") + " min";
-            Log.d(TAG, duracion);
+            duration = jObject.getString("runtime") + " min";
+            Log.d(TAG, duration);
 
-            publishProgress(progreso_DURACION);
+            publishProgress(progress_DURATION);
 
-            ano = jObject.getString("release_date").split("-")[0];
-            Log.d(TAG, ano);
+            year = jObject.getString("release_date").split("-")[0];
+            Log.d(TAG, year);
 
-            publishProgress(progreso_ANO);
+            publishProgress(progress_YEAR);
 
-            nota = jObject.getString("vote_average");
-            Log.d(TAG, nota);
-            votos = jObject.getString("vote_count");
-            Log.d(TAG, votos);
+            rating = jObject.getString("vote_average");
+            Log.d(TAG, rating);
+            votes = jObject.getString("vote_count");
+            Log.d(TAG, votes);
 
-            publishProgress(progreso_NOTA);
+            publishProgress(progress_RATING);
 
             jArray = jObject.getJSONArray("genres");
 
@@ -121,14 +117,14 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             while (mustContinue){
                 try{
-                    genero.add(jArray.getJSONObject(cont).getString("name"));
+                    genre.add(jArray.getJSONObject(cont).getString("name"));
                     cont++;
                 }catch (Exception e){
                     mustContinue = false;
                 }
             }
 
-            publishProgress(progreso_GENERO);
+            publishProgress(progress_GENRE);
 
             jArray = jObject.getJSONObject("credits").getJSONArray("cast");
 
@@ -137,14 +133,14 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
             while (mustContinue){
                 try{
-                    reparto.add(jArray.getJSONObject(cont).getString("name"));
+                    cast.add(jArray.getJSONObject(cont).getString("name"));
                     cont++;
                 }catch (Exception e){
                     mustContinue = false;
                 }
             }
 
-            publishProgress(progreso_REPARTO);
+            publishProgress(progress_CAST);
 
             jArray = jObject.getJSONObject("credits").getJSONArray("crew");
 
@@ -155,14 +151,14 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                 try{
                     if (jArray.getJSONObject(cont).getString("job").equalsIgnoreCase("director")) {
                         director.add(jArray.getJSONObject(cont).getString("name"));
-                        Log.d(TAG, "Director encontrado: " + director.get(director.size()-1));
+                        Log.d(TAG, "Director found: " + director.get(director.size()-1));
                     }
                     cont++;
                 }catch (Exception e){
                     mustContinue = false;
                 }
             }
-            publishProgress(progreso_DIRECTORES);
+            publishProgress(progress_DIRECTOR);
 
             jArray = jObject.getJSONObject("videos").getJSONArray("results");
             videoProvider = jArray.getJSONObject(0).getString("site");
@@ -171,7 +167,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
             }
             Log.d(TAG, videoLink);
 
-            publishProgress(progreso_VIDEO);
+            publishProgress(progress_trailer);
         }catch (Exception e){
             Log.e(TAG, e.toString());
         }
@@ -187,47 +183,47 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        // se supone que la ficha ya está completa!
+        // Movie detail completed!
     }
 
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
         switch (values[0]){
-            case progreso_POSTER:
-                if (portada != null)
-                    ((ImageView) mView.findViewById(R.id.ficha_poster)).setImageDrawable(portada);
+            case progress_COVER:
+                if (cover != null)
+                    ((ImageView) mView.findViewById(R.id.movie_detail_cover)).setImageDrawable(cover);
                 break;
-            case progreso_ANO:
-                if (!ano.equalsIgnoreCase("null"))
-                    ((TextView) mView.findViewById(R.id.ficha_year)).setText(ano);
+            case progress_YEAR:
+                if (!year.equalsIgnoreCase("null"))
+                    ((TextView) mView.findViewById(R.id.movie_detail_year)).setText(year);
                 else
-                    ((TextView) mView.findViewById(R.id.ficha_year)).setText("N/A");
+                    ((TextView) mView.findViewById(R.id.movie_detail_year)).setText("N/A");
                 break;
-            case progreso_DURACION:
-                if (!duracion.equalsIgnoreCase("0 min") && !duracion.equalsIgnoreCase("null min"))
-                    ((TextView) mView.findViewById(R.id.ficha_duracion)).setText(duracion);
+            case progress_DURATION:
+                if (!duration.equalsIgnoreCase("0 min") && !duration.equalsIgnoreCase("null min"))
+                    ((TextView) mView.findViewById(R.id.movie_detail_duration)).setText(duration);
                 else
-                    ((TextView) mView.findViewById(R.id.ficha_duracion)).setText("N/A");
+                    ((TextView) mView.findViewById(R.id.movie_detail_duration)).setText("N/A");
                 break;
-            case progreso_DIRECTORES:
-                ((TextView) mView.findViewById(R.id.ficha_directores)).setText(director.toString().replace("[", "").replace("]", ""));
+            case progress_DIRECTOR:
+                ((TextView) mView.findViewById(R.id.movie_detail_director)).setText(director.toString().replace("[", "").replace("]", ""));
                 break;
-            case progreso_REPARTO:
-                ((TextView) mView.findViewById(R.id.ficha_reparto)).setText(reparto.toString().replace("[", "").replace("]", ""));
+            case progress_CAST:
+                ((TextView) mView.findViewById(R.id.movie_detail_cast)).setText(cast.toString().replace("[", "").replace("]", ""));
                 break;
-            case progreso_GENERO:
-                ((TextView) mView.findViewById(R.id.ficha_genero)).setText(genero.toString().replace("[", "").replace("]", ""));
+            case progress_GENRE:
+                ((TextView) mView.findViewById(R.id.movie_detail_genre)).setText(genre.toString().replace("[", "").replace("]", ""));
                 break;
-            case progreso_NOTA:
-                if (nota != null && !votos.equalsIgnoreCase("0")) {
-                    ((TextView) mView.findViewById(R.id.ficha_nota)).setText(mView.getResources().getString(R.string.votes_structure, nota, votos));
+            case progress_RATING:
+                if (rating != null && !votes.equalsIgnoreCase("0")) {
+                    ((TextView) mView.findViewById(R.id.movie_detail_rating)).setText(mView.getResources().getString(R.string.votes_structure, rating, votes));
                 }else {
-                    ((TextView) mView.findViewById(R.id.ficha_nota)).setText("N/A");
+                    ((TextView) mView.findViewById(R.id.movie_detail_rating)).setText("N/A");
                 }
                 break;
-            case progreso_VIDEO:
-                mView.findViewById(R.id.ficha_video).setOnClickListener(new View.OnClickListener() {
+            case progress_trailer:
+                mView.findViewById(R.id.movie_detail_trailer).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -236,7 +232,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
                         mView.getContext().startActivity(intent);
                     }
                 });
-                mView.findViewById(R.id.ficha_video_container).setVisibility(View.VISIBLE);
+                mView.findViewById(R.id.movie_detail_trailer_container).setVisibility(View.VISIBLE);
                 break;
             default:
                 break;
@@ -255,7 +251,7 @@ public class FichaTMDB extends AsyncTask<Void,Integer,Void> {
 
     @NonNull
     private String getHTML(String url) throws IOException {
-        Log.d(TAG, "Obteniendo contenido HTML desde " + url);
+        Log.d(TAG, "Obtaining HTML from " + url);
         // Build and set timeout values for the request.
         URLConnection connection = (new URL(url)).openConnection();
         connection.setConnectTimeout(5000);

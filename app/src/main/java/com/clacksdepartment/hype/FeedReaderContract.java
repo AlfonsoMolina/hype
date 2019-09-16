@@ -2,50 +2,42 @@ package com.clacksdepartment.hype;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by Usuario on 11/07/2017.
- */
-
 public final class FeedReaderContract {
-
-    /*
-     * Declaración de variables
-     */
 
     // To prevent someone from accidentally instantiating the contract class,
     // make the constructor private.
     private FeedReaderContract() {}
 
     /* Inner class that defines the table contents */
-    public static class FeedEntryEstrenos implements BaseColumns {
-        public static final String TABLE_NAME = "ESTRENOS";
+    public static class FeedEntryReleases implements BaseColumns {
+        public static final String TABLE_NAME = "RELEASES";
         public static final String COLUMN_REF = "Ref";
-        public static final String COLUMN_TITULO = "Titulo";
-        public static final String COLUMN_PORTADA = "Portada";
-        public static final String COLUMN_PORTADA_ENLACE = "Portada_Enlace";
-        public static final String COLUMN_SINOPSIS = "Sinopsis";
+        public static final String COLUMN_TITLE = "Title";
+        public static final String COLUMN_COVER = "Cover";
+        public static final String COLUMN_COVER_LINK = "Cover_link";
+        public static final String COLUMN_SYNOPSIS = "Synopsis";
         public static final String COLUMN_TRAILER = "Trailer";
-        public static final String COLUMN_ESTRENO_LETRAS = "Estreno_Letras";
-        public static final String COLUMN_ESTRENO_FECHA = "Estreno_Fecha";
-        public static final String COLUMN_HYPE = "Guardado";
-        public static final String COLUMN_TIPO = "Tipo";
+        public static final String COLUMN_RELEASE_DATE_STRING = "Release_date_string";
+        public static final String COLUMN_RELEASE_DATE = "Release_date";
+        public static final String COLUMN_HYPE = "Hyped";
+        public static final String COLUMN_TYPE = "Type";
     }
 
-    public static final String SQL_CREATE_ENTRIES_ESTRENOS =
-            "CREATE TABLE " + FeedEntryEstrenos.TABLE_NAME + " (" +
-                    FeedEntryEstrenos._ID + " INTEGER PRIMARY KEY," +
-                    FeedEntryEstrenos.COLUMN_REF + " TEXT," +
-                    FeedEntryEstrenos.COLUMN_TITULO + " TEXT," +
-                    FeedEntryEstrenos.COLUMN_PORTADA + " BLOB," +
-                    FeedEntryEstrenos.COLUMN_PORTADA_ENLACE+ " TEXT," +
-                    FeedEntryEstrenos.COLUMN_SINOPSIS + " TEXT," +
-                    FeedEntryEstrenos.COLUMN_TRAILER + " TEXT," +
-                    FeedEntryEstrenos.COLUMN_ESTRENO_LETRAS + " TEXT," +
-                    FeedEntryEstrenos.COLUMN_ESTRENO_FECHA + " DATE," +
-                    FeedEntryEstrenos.COLUMN_HYPE + " INTEGER," +
-                    FeedEntryEstrenos.COLUMN_TIPO + " INTEGER)";
+    public static final String SQL_CREATE_ENTRIES_RELEASES =
+            "CREATE TABLE " + FeedEntryReleases.TABLE_NAME + " (" +
+                    FeedEntryReleases._ID + " INTEGER PRIMARY KEY," +
+                    FeedEntryReleases.COLUMN_REF + " TEXT," +
+                    FeedEntryReleases.COLUMN_TITLE + " TEXT," +
+                    FeedEntryReleases.COLUMN_COVER + " BLOB," +
+                    FeedEntryReleases.COLUMN_COVER_LINK + " TEXT," +
+                    FeedEntryReleases.COLUMN_SYNOPSIS + " TEXT," +
+                    FeedEntryReleases.COLUMN_TRAILER + " TEXT," +
+                    FeedEntryReleases.COLUMN_RELEASE_DATE_STRING + " TEXT," +
+                    FeedEntryReleases.COLUMN_RELEASE_DATE + " DATE," +
+                    FeedEntryReleases.COLUMN_HYPE + " INTEGER," +
+                    FeedEntryReleases.COLUMN_TYPE + " INTEGER)";
 
-    public static final String SQL_DELETE_ENTRIES_ESTRENOS =
-            "DROP TABLE IF EXISTS " + FeedEntryEstrenos.TABLE_NAME;
+    public static final String SQL_DELETE_ENTRIES_RELEASES =
+            "DROP TABLE IF EXISTS " + FeedEntryReleases.TABLE_NAME;
 
 }

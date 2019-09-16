@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
         <ListPreference
-            android:dependency="pref_pais"
-            android:key="pref_pais"
-            android:title="@string/pref_pais"
+            android:dependency="pref_country"
+            android:key="pref_country"
+            android:title="@string/pref_country"
             android:summary="%s"
-            android:dialogTitle="@string/pref_pais"
-            android:entries="@array/pref_pais_nombres"
-            android:entryValues="@array/pref_pais_valores"
-            android:defaultValue="@string/pref_pais_def" />
+            android:dialogTitle="@string/pref_country"
+            android:entries="@array/pref_country_names"
+            android:entryValues="@array/pref_country_values"
+            android:defaultValue="@string/pref_country_def" />
 
-        <Preference android:title="@string/pref_bbdd"
+        <Preference android:title="@string/pref_db"
             android:key="pref_db"
             android:defaultValue="0"/>
 
-        <SwitchPreference android:title="@string/anuncios"
+        <SwitchPreference android:title="@string/adds"
             android:key="pref_adds"
             android:defaultValue="true"
             android:summaryOn=":D"
             android:summaryOff=":'("/>
 
-        <SwitchPreference android:title="@string/actus"
+        <SwitchPreference android:title="@string/daily_updates"
             android:key="pref_act"
             android:defaultValue="true"
-            android:summaryOn="@string/si"
+            android:summaryOn="@string/yes"
             android:summaryOff="@string/no"/>
         
 </PreferenceScreen>

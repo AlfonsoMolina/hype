@@ -6,10 +6,10 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/popcorn_byn_peque"
+        android:src="@drawable/popcorn_baw_small"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:contentDescription="@string/logo_dscr"
+        android:contentDescription="@string/logo_des"
         android:alpha="0.2"/>
 
 
@@ -23,7 +23,7 @@
         android:backgroundTint="?attr/colorPrimary"
         >
         <TextView
-            android:id="@+id/seccion"
+            android:id="@+id/section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/app_name"
@@ -34,7 +34,7 @@
     </android.support.v7.widget.Toolbar>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/lista"
+        android:id="@+id/movieList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="20dp"
@@ -43,12 +43,12 @@
         android:paddingBottom="20dp"
         android:clipToPadding="false"
         android:backgroundTint="@color/colorPrimary"
-        android:layoutAnimation="@anim/rellenar_lista"
+        android:layoutAnimation="@anim/fill_movie_list"
         android:layout_below="@id/my_toolbar"
         />
 
     <FrameLayout
-        android:id="@+id/ficha_container"
+        android:id="@+id/movie_detail_container"
         android:elevation="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
