@@ -22,9 +22,9 @@ import android.widget.TextView;
  */
 public class MovieDetailFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String TITLE = "Título";
+    private static final String TITLE = "Title";
     private static final String LINK = "Link";
-    private static final String SYNOPSIS = "Sinopsis";
+    private static final String SYNOPSIS = "Synopsis";
 
     private static final String TAG = "MovieDetailFragment";
 
@@ -41,16 +41,17 @@ public class MovieDetailFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param title Title of the movie.
+     * @param link Link to download extra data.
+     * @param synopsis Synopsis to be shown.
      * @return A new instance of fragment MovieDetailFragment.
      */
-    static MovieDetailFragment newInstance(String param1, String param2, String param3) {
+    static MovieDetailFragment newInstance(String title, String link, String synopsis) {
         MovieDetailFragment fragment = new MovieDetailFragment();
         Bundle args = new Bundle();
-        args.putString(TITLE, param1);
-        args.putString(LINK, param2);
-        args.putString(SYNOPSIS, param3);
+        args.putString(TITLE, title);
+        args.putString(LINK, link);
+        args.putString(SYNOPSIS, synopsis);
         fragment.setArguments(args);
         return fragment;
     }

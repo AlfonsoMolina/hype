@@ -1,6 +1,12 @@
 package com.clacksdepartment.hype;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -16,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,6 +52,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     private static final int progress_RATING = 7;
     private static final int progress_trailer = 8;
 
+    private String link;
     private String id;
     private String year;
     private String duration;
@@ -56,6 +64,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     private String votes;
     private String videoLink;
     private String country;
+    private FeedReaderDbHelper mFeedReaderDbHelper;
 
     // View to be updated
     // WeakReference to avoid leaking the context
@@ -64,10 +73,12 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     MovieDetail(String url, View view){
         String [] urlSplit = url.split("/");
         this.id = urlSplit[urlSplit.length-1];
+        link = url;
         mView = new WeakReference<>(view);
         director = new ArrayList<>();
         cast = new ArrayList<>();
         genre = new ArrayList<>();
+        mFeedReaderDbHelper = new FeedReaderDbHelper(mView.get().getContext());
 
         country = PreferenceManager.getDefaultSharedPreferences(mView.get().getContext()).getString("pref_country", "");
     }
@@ -75,7 +86,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         try {
-
+            
             Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
 
             // Read HTML
@@ -92,7 +103,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
 
             String coverUrl = preImage + jObject.getString("poster_path");
             Log.d(TAG, coverUrl);
-            cover = loadImageFromURL(coverUrl, coverUrl);
+            cover = loadImageFromURL(coverUrl);
 
             publishProgress(progress_COVER);
 
@@ -274,13 +285,70 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
         return html.toString();
     }
 
-    private Drawable loadImageFromURL(String url, String name) {
-        try {
-            InputStream is = (InputStream) new URL(url).getContent();
-            return Drawable.createFromStream(is, name);
-        } catch (Exception e) {
-            return null;
+    private Drawable loadImageFromURL(String url) {
+        SQLiteDatabase dbr = mFeedReaderDbHelper.getReadableDatabase();
+        SQLiteDatabase dbw = mFeedReaderDbHelper.getWritableDatabase();
+
+        // BIG COVER not null and ref = link
+        String whereClauseColumns = FeedReaderContract.FeedEntryReleases.COLUMN_BIG_COVER +
+                " NOT NULL AND " + FeedReaderContract.FeedEntryReleases.COLUMN_REF + " = ?";
+        String[] whereClauseValues = new String[1];
+        whereClauseValues[0] = link;
+        String[] projection = {
+                FeedReaderContract.FeedEntryReleases.COLUMN_BIG_COVER
+        };
+
+        Cursor cursor = dbr.query(
+                FeedReaderContract.FeedEntryReleases.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                whereClauseColumns,                                // The columns for the WHERE clause
+                whereClauseValues,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                      // The sort order
+        );
+
+        // If it is not stored, we add it
+        if (cursor.getCount() == 0) {
+            Log.d(TAG,"Downloading cover.");
+            cursor.close();
+            try {
+                InputStream is = (InputStream) new URL(url).getContent();
+
+                // Get bitmap and store it into the database
+                Bitmap bitmap = BitmapFactory.decodeStream(is);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] coverByte = stream.toByteArray();
+
+                ContentValues values = new ContentValues();
+                values.put(FeedReaderContract.FeedEntryReleases.COLUMN_BIG_COVER, coverByte);
+                dbw.update(FeedReaderContract.FeedEntryReleases.TABLE_NAME, values,
+                        FeedReaderContract.FeedEntryReleases.COLUMN_REF + "='" +
+                                link + "'", null);
+                values.clear();
+
+                // Return a drawable
+                return new BitmapDrawable(mView.get().getResources(),bitmap);
+            } catch (Exception e) {
+                if (e.getMessage() != null)
+                    Log.e(TAG,e.getMessage());
+                else
+                    Log.e(TAG,"Error downloading the big cover.");
+                return null;
+            }
+
+            // If it is stored, retrieve it.
+        }else {
+            Log.d(TAG,"Retrieving cover from database.");
+            cursor.moveToFirst();
+            byte[] coverByte = cursor.getBlob(cursor.getColumnIndexOrThrow(
+                    FeedReaderContract.FeedEntryReleases.COLUMN_BIG_COVER));
+            cursor.close();
+            Bitmap coverBitmap = BitmapFactory.decodeByteArray(coverByte, 0, coverByte.length);
+            return new BitmapDrawable(mView.get().getResources(),coverBitmap);
         }
+
     }
 
 

@@ -14,6 +14,7 @@ final class FeedReaderContract {
         static final String COLUMN_REF = "Ref";
         static final String COLUMN_TITLE = "Title";
         static final String COLUMN_COVER = "Cover";
+        static final String COLUMN_BIG_COVER = "Big_Cover";
         static final String COLUMN_COVER_LINK = "Cover_link";
         static final String COLUMN_SYNOPSIS = "Synopsis";
         static final String COLUMN_TRAILER = "Trailer";
@@ -29,6 +30,7 @@ final class FeedReaderContract {
                     FeedEntryReleases.COLUMN_REF + " TEXT," +
                     FeedEntryReleases.COLUMN_TITLE + " TEXT," +
                     FeedEntryReleases.COLUMN_COVER + " BLOB," +
+                    FeedEntryReleases.COLUMN_BIG_COVER + " BLOB," +
                     FeedEntryReleases.COLUMN_COVER_LINK + " TEXT," +
                     FeedEntryReleases.COLUMN_SYNOPSIS + " TEXT," +
                     FeedEntryReleases.COLUMN_TRAILER + " TEXT," +
