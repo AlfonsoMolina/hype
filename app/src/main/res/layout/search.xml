@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/popcorn_baw_small"
+        app:srcCompat="@drawable/popcorn_baw_small"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:contentDescription="@string/logo_des"
         android:alpha="0.2"/>
 
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -31,15 +32,15 @@
             android:textSize="20sp"
             />
 
-    </android.support.v7.widget.Toolbar>
+    </androidx.appcompat.widget.Toolbar>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/movieList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="20dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="00dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="00dp"
         android:paddingBottom="20dp"
         android:clipToPadding="false"
         android:backgroundTint="@color/colorPrimary"
@@ -53,6 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
+        android:focusable="true"
         android:visibility="gone"
         >
     </FrameLayout>

@@ -1,11 +1,10 @@
 package com.clacksdepartment.hype;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,10 +31,7 @@ public class MovieDetailFragment extends Fragment {
     private String title;
     private String link;
     private String synopsis;
-    private MovieDetail movieDetail;
     private ViewGroup container;
-
-    private OnFragmentInteractionListener mListener;
 
     public MovieDetailFragment() {
         // Required empty public constructor
@@ -49,7 +45,7 @@ public class MovieDetailFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment MovieDetailFragment.
      */
-    public static MovieDetailFragment newInstance(String param1, String param2, String param3) {
+    static MovieDetailFragment newInstance(String param1, String param2, String param3) {
         MovieDetailFragment fragment = new MovieDetailFragment();
         Bundle args = new Bundle();
         args.putString(TITLE, param1);
@@ -82,7 +78,7 @@ public class MovieDetailFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // We already know the title and synopsis, so it can be set now
@@ -94,32 +90,13 @@ public class MovieDetailFragment extends Fragment {
             view.findViewById(R.id.movie_detail_synopsis).setVisibility(View.GONE);
         }
 
-        movieDetail = new MovieDetail(link, view);
+        MovieDetail movieDetail = new MovieDetail(link, view);
         movieDetail.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
-
     }
 
     @Override
@@ -138,7 +115,7 @@ public class MovieDetailFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+    interface OnFragmentInteractionListener {
+
     }
 }

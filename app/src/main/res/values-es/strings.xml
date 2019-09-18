@@ -53,5 +53,15 @@
     <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="num_page">Página %1$d de %2$d</string>
+    <string name="releases_but">Ver próximos estrenos</string>
+    <string name="theaters_but">Ver películas en cartelera</string>
+    <string name="hype_but">Ver películas guardadas</string>
+    <string name="av_detail_but">Abrir información de la pelicula</string>
+    <string name="av_theaters_but">Comprar entradas</string>
+    <string name="av_calendar_but">Enviar al calendario</string>
+    <string name="av_hype_but">Guardar película</string>
+    <string name="av_link_but">Abrir en la web</string>
+    <string name="av_share_but">Compratir</string>
+    <string name="trailer_but">Abrir trailer en youtube</string>
 
 </resources>

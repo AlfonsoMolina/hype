@@ -19,10 +19,9 @@ public class Movie {
     private String title;
     private Bitmap cover;
     private String synopsis;
-    private String releaseDateString;       //Viernes, 4 de febrero
+    private String releaseDateString;       //Friday, 4 of February
     private String releaseDate;             //2018/02/04
     private String link;
-    private int type;
     private String coverLink;
     private boolean hype;
     private int id;
@@ -61,10 +60,10 @@ public class Movie {
     public String getTitle() {
         return title;
     }
-    public String getCoverLink() {
+    String getCoverLink() {
         return coverLink;
     }
-    public Bitmap getCover() {
+    Bitmap getCover() {
         if (cover == null && coverLink != null){
             Bitmap p_bitmap;
             try {
@@ -87,19 +86,19 @@ public class Movie {
         return cover;
     }
 
-    public String getSynopsis() {
+    String getSynopsis() {
         return synopsis;
     }
 
-    public String getReleaseDateString() {
+    String getReleaseDateString() {
         return releaseDateString;
     }
 
-    public String getLink() {
+    String getLink() {
         return link;
     }
 
-    public String getReleaseDate() {
+    String getReleaseDate() {
         return releaseDate;
     }
 

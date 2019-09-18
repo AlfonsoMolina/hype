@@ -7,14 +7,16 @@ import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
+
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import android.provider.CalendarContract;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.AppCompatImageButton;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,7 +62,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private int expandedItem = -1;
     private FeedReaderDbHelper mFeedReaderDbHelper;
     private int section = THEATERS;
-    private boolean flagAds = true;
+    private boolean flagAds;
     private FragmentManager mFragmentManager;
     private LinearLayoutManager mLinearLayoutManager;
     private RecyclerView mRecyclerView;
@@ -75,20 +77,20 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public RelativeLayout mView;
-        public ViewHolder(RelativeLayout v) {
+        RelativeLayout mView;
+        ViewHolder(RelativeLayout v) {
             super(v);
             mView = v;
         }
-        public void clearAnimation(){
+        void clearAnimation(){
             mView.clearAnimation();
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public RecyclerViewAdapter(MainActivity mainActivity, FeedReaderDbHelper feedReaderDbHelper) {
+    RecyclerViewAdapter(MainActivity mainActivity, FeedReaderDbHelper feedReaderDbHelper) {
         mTheatersList = new ArrayList<>();
         mReleasesList = new ArrayList<>();
         Log.d(TAG, "Building the adapter for mReleasesList");
@@ -105,7 +107,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         setHasStableIds(true);
         flagAds = sharedPref.getBoolean("pref_adds",true);
 
-        mRecyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.movieList));
+        mRecyclerView = mMainActivity.findViewById(R.id.movieList);
 
         breakNextMoveAnimation = false;
 
@@ -144,7 +146,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     // Create new views (invoked by the layout manager)
     @Override
-    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+    @NonNull
+    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                              int viewType) {
         // create a new view
         RelativeLayout v;
@@ -180,7 +183,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
         if (flagAds && (position == NUM_ITEM_ADD || position == NUM_ITEM_ADD*2)) {
-            NativeExpressAdView mAdView = (NativeExpressAdView) rowView.findViewById(R.id.adView);
+            NativeExpressAdView mAdView = rowView.findViewById(R.id.adView);
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else if (position == getItemCount() -1) {
@@ -241,9 +244,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     @Override
-    public void onViewDetachedFromWindow(ViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
-        ((ViewHolder) holder).clearAnimation();
+        holder.clearAnimation();
     }
 
     private Movie getMovie(int position) {
@@ -301,16 +304,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     }
                 }
             }
-         } else if (section == THEATERS) {
-            if (mTheatersList.size() > 0) {
+        } else if (section == THEATERS) {
+            if (mTheatersList.size() > 0)
                 count = mTheatersList.get(theatersPage).size();
-            }else
-                count = 0;
         } else {
-            if (mReleasesList.size() > 0) {
+            if (mReleasesList.size() > 0)
                 count = mReleasesList.get(releasesPage).size();
-            }else
-                count = 0;
         }
 
         if (flagAds && count > NUM_ITEM_ADD) {
@@ -342,11 +341,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         updateInterface();
     }
 
-    void restartPage(){
-        theatersPage = 0;
-        releasesPage = 0;
-    }
-
     int getPage(){
         if (section == THEATERS)
             return theatersPage;
@@ -357,7 +351,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
-    void addToTheatersList(Movie p){
+    private void addToTheatersList(Movie p){
         int lastPage = mTheatersList.size() -1;
         if (lastPage >= 0 && mTheatersList.get(lastPage).size() < numMoviesPerPage)
             mTheatersList.get(lastPage).add(p);
@@ -382,7 +376,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             }
         }
     }
-    void addToReleasesList(Movie p){
+    private void addToReleasesList(Movie p){
         int lastPage = mReleasesList.size() -1;
         if (lastPage >= 0 &&  mReleasesList.get(lastPage).size() < numMoviesPerPage)
             mReleasesList.get(lastPage).add(p);
@@ -445,41 +439,32 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         mTheatersList.clear();
     }
 
-    public int getSection(){
+    int getSection(){
         return section;
     }
 
-    boolean showReleasesSection(){
-        boolean hasChanged = false;
+    void showReleasesSection(){
         if (section != RELEASES){
             expandedItem = -1;
             section = RELEASES;
-            hasChanged = true;
             mGUIManager.update();
         }
-        return hasChanged;
     }
 
-    boolean showHypeSection(){
-        boolean hasChanged = false;
+    void showHypeSection(){
         if (section != HYPE){
             expandedItem = -1;
             section = HYPE;
-            hasChanged = true;
             mGUIManager.update();
         }
-        return hasChanged;
     }
 
-    boolean showTheatersSection(){
-        boolean hasChanged = false;
+    void showTheatersSection(){
         if (section != THEATERS){
             expandedItem = -1;
             section = THEATERS;
-            hasChanged = true;
             mGUIManager.update();
         }
-        return hasChanged;
     }
 
     void setExpandedItem(View view){
@@ -580,7 +565,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
-    public void openMovieDetail(){
+    void openMovieDetail(){
         Log.i(TAG, "Button touched to open movieDetailFragment");
         Movie movie = getMovie(expandedItem);
         MovieDetailFragment movieDetailFragment = MovieDetailFragment.newInstance(movie.getTitle(), movie.getLink(), movie.getSynopsis());
@@ -591,7 +576,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
-    public Intent sendToCalendar(){
+    Intent sendToCalendar(){
             Movie movie = getMovie(expandedItem);
 
             Calendar beginTime = Calendar.getInstance();
@@ -602,7 +587,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             Intent intent = new Intent(Intent.ACTION_INSERT)
                     .setData(CalendarContract.Events.CONTENT_URI)
                     .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
-                    .putExtra("allDay", true)
+                    .putExtra("allDay", true) //TODO: not working
                     .putExtra(CalendarContract.Events.TITLE, movie.getTitle())
                     .putExtra(CalendarContract.Events.DESCRIPTION, movie.getSynopsis());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -612,7 +597,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             return intent;
         }
 
-    public void flagHype(View v) {
+    void flagHype(View v) {
         Movie movie = getMovie(expandedItem);
         Log.d(TAG, "Button \"Hype\" touched on movie " + movie.getTitle());
 
@@ -654,7 +639,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
-    public Intent openIntoWeb() {
+    Intent openIntoWeb() {
         Movie movie = getMovie(expandedItem);
         Log.d(TAG, "Button \"Web\" touched on movie " + movie.getTitle());
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -663,7 +648,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return intent;
     }
 
-    public Intent showCinemas(){
+    Intent showCinemas(){
         Movie movie = getMovie(expandedItem);
 
         Log.d(TAG, "Button \"Theaters\" on movie " + movie.getTitle());
@@ -673,12 +658,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return intent;
     }
 
-    public void openShareMenu() {
+    void openShareMenu() {
         Movie movie = getMovie(expandedItem);
 
         Log.d(TAG, "Button \"Share\" touched on movie " + movie.getTitle());
 
-        String message = "";
+        String message;
 
         int section = this.section;
 
@@ -702,13 +687,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
             try {
                 Date date1 = myFormat.parse(movie.getReleaseDate());
+                if (date1 == null)
+                    date1 = new Date();
                 Date date2 = new Date();
                 long diff = date1.getTime() - date2.getTime();
                 int numDays = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1;
                 message = res.getString(R.string.share_release,numDays,movie.getTitle());
             } catch (ParseException e) {
                 e.printStackTrace();
-                message = res.getString(R.string.share_release_ind,movie.getTitle());;
+                message = res.getString(R.string.share_release_ind,movie.getTitle());
             }
         } else {
             message = movie.getTitle();
@@ -726,13 +713,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     }
 
-    public void updateData() {
+    void updateData() {
         ReadDBThread readDBThread = new ReadDBThread(mFeedReaderDbHelper.getReadableDatabase(),
                 mFeedReaderDbHelper.getWritableDatabase(),this);
         readDBThread.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public void expand(final View v) {
+    private void expand(final View v) {
             v.measure(View.MeasureSpec.makeMeasureSpec(((View) v.getParent()).getWidth(), View.MeasureSpec.EXACTLY), viewMeasureSpecHeight);
             final int targetHeight = v.getMeasuredHeight();
 
@@ -785,7 +772,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             v.startAnimation(a);
     }
 
-    public void collapse(final View v) {
+    private void collapse(final View v) {
             final int initialHeight = v.getMeasuredHeight();
             Animation a = new Animation() {
                 @Override
@@ -821,34 +808,31 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             v.startAnimation(a);
     }
 
-    public void updatePref(){
+    void updatePref(){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mMainActivity.getApplicationContext());
 
         flagAds = sharedPreferences.getBoolean("pref_adds",true);
     }
 
     private void updateWall(){
-        switch (section){
-            case HYPE:
+        if (section == HYPE) {
+            footer.setVisibility(View.GONE);
+            footer.getLayoutParams().height = 0;
+        } else {
+            if ((mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() + 2 - getItemCount()) > 0){
                 footer.setVisibility(View.GONE);
                 footer.getLayoutParams().height = 0;
-                break;
-            default:
-                if ((mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() + 2 - getItemCount()) > 0){
-                    footer.setVisibility(View.GONE);
-                    footer.getLayoutParams().height = 0;
-                } else if (mRecyclerView.canScrollVertically(-1)) {
-                    footer.setVisibility(View.VISIBLE);
-                    Resources resources = mMainActivity.getResources();
-                    DisplayMetrics metrics = resources.getDisplayMetrics();
-                    // 70 must be the height of the footer
-                    footer.getLayoutParams().height = 70 * (metrics.densityDpi / 160);
-                    ((TextView) footer.findViewById(R.id.num_pag)).setText(resources.getString(R.string.num_page,(getPage()+1), getLastPage()));
-                }else{
-                    footer.setVisibility(View.GONE);
-                    footer.getLayoutParams().height = 0;
-                }
-                break;
+            } else if (mRecyclerView.canScrollVertically(-1)) {
+                footer.setVisibility(View.VISIBLE);
+                Resources resources = mMainActivity.getResources();
+                DisplayMetrics metrics = resources.getDisplayMetrics();
+                // 70 must be the height of the footer
+                footer.getLayoutParams().height = 70 * (metrics.densityDpi / 160);
+                ((TextView) footer.findViewById(R.id.num_pag)).setText(resources.getString(R.string.num_page,(getPage()+1), getLastPage()));
+            }else{
+                footer.setVisibility(View.GONE);
+                footer.getLayoutParams().height = 0;
+            }
         }
     }
 

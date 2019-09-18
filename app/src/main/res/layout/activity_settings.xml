@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -14,12 +14,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hype!"
+        android:text="@string/hype_section_text"
         android:id="@+id/toolbar_title"
         android:fontFamily="sans-serif-medium"
         android:textSize="20sp"
         />
-    </android.support.v7.widget.Toolbar>
+    </androidx.appcompat.widget.Toolbar>
     <fragment android:name="com.clacksdepartment.hype.SettingsFragment"
         android:id="@+id/fragment"
         android:layout_weight="1"
@@ -37,7 +37,7 @@
         android:fontFamily="sans-serif-condensed"
         android:textSize="14sp" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="wrap_content"
         android:layout_height="80dp"
         android:src="@drawable/poweredbytmdb"/>

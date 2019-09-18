@@ -2,15 +2,16 @@ package com.clacksdepartment.hype;
 
 import android.app.SearchManager;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
@@ -19,9 +20,7 @@ import android.widget.FrameLayout;
 
 public class SearchableActivity extends AppCompatActivity implements MovieDetailFragment.OnFragmentInteractionListener{
 
-    private RecyclerView mRecyclerView;
     private SearchAdapter mSearchAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     private String query;
 
     private static final String TAG = "SearchableActivity";
@@ -32,23 +31,23 @@ public class SearchableActivity extends AppCompatActivity implements MovieDetail
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
         FeedReaderDbHelper feedReaderDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.movieList);
+        RecyclerView mRecyclerView = findViewById(R.id.movieList);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mSearchAdapter = new SearchAdapter(this,R.layout.movie_row, feedReaderDbHelper);
+        mSearchAdapter = new SearchAdapter(this, feedReaderDbHelper);
         mRecyclerView.setAdapter(mSearchAdapter);
 
         // Get the intent, verify the action and get the query
@@ -70,7 +69,8 @@ public class SearchableActivity extends AppCompatActivity implements MovieDetail
         getMenuInflater().inflate(R.menu.menu, menu);
 
      //   SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        MenuItem menuItem = menu.findItem((R.id.search));
+        SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
         // Assumes current activity is the searchable activity
      //   searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -103,7 +103,7 @@ public class SearchableActivity extends AppCompatActivity implements MovieDetail
 
     @Override
     public void onBackPressed(){
-        FrameLayout fragment = (FrameLayout) findViewById(R.id.movie_detail_container);
+        FrameLayout fragment = findViewById(R.id.movie_detail_container);
 
         if (fragment != null && fragment.getVisibility()==View.VISIBLE) {
             super.onBackPressed();
@@ -138,9 +138,4 @@ public class SearchableActivity extends AppCompatActivity implements MovieDetail
         mSearchAdapter.openShareMenu();
     }
 
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
 }

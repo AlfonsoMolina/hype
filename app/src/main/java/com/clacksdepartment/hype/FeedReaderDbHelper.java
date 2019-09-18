@@ -13,10 +13,10 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "FeedReaderDbHelper";
 
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "HypeMovies.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "HypeMovies.db";
 
-    public FeedReaderDbHelper(Context context) {
+    FeedReaderDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         Log.d(TAG, "FeedReaderDbHelper");
     }

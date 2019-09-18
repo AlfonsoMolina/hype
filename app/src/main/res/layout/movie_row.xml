@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
     android:padding="5dip"
@@ -90,13 +90,14 @@
 
             <ImageButton
                 android:id="@+id/av_theaters"
+                android:contentDescription="@string/av_theaters_but"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:visibility="gone"
-                android:src="@drawable/ic_theaters_black_24dp"
+                app:srcCompat="@drawable/ic_theaters_black_24dp"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="?android:attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:gravity="center"
@@ -105,12 +106,13 @@
 
             <ImageButton
                 android:id="@+id/av_date"
+                android:contentDescription="@string/av_calendar_but"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/ic_event_black_24dp"
+                app:srcCompat="@drawable/ic_event_black_24dp"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="?android:attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:gravity="center"
@@ -119,13 +121,14 @@
 
             <ImageButton
                 android:id="@+id/av_movie_detail"
+                android:contentDescription="@string/av_detail_but"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:src="@drawable/ic_info_outline_black_24dp"
+                app:srcCompat="@drawable/ic_info_outline_black_24dp"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="?android:attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:onClick="openMovieDetail"
@@ -133,13 +136,14 @@
 
             <ImageButton
                 android:id="@+id/av_hype"
+                android:contentDescription="@string/av_hype_but"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:src="@drawable/ic_favorite_border_black_24dp"
+                app:srcCompat="@drawable/ic_favorite_border_black_24dp"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="?android:attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:onClick="flagHype"
@@ -147,13 +151,14 @@
 
             <ImageButton
                 android:id="@+id/av_link"
+                android:contentDescription="@string/av_link_but"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="?android:attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:src="@drawable/ic_open_in_browser_black_24dp"
+                app:srcCompat="@drawable/ic_open_in_browser_black_24dp"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:onClick="openIntoWeb"
@@ -161,13 +166,14 @@
 
             <ImageButton
                 android:id="@+id/av_share"
+                android:contentDescription="@string/av_share_but"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="?android:attr/selectableItemBackground"
+                android:background="?attr/selectableItemBackground"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:src="@drawable/ic_share_black_24dp"
+                app:srcCompat="@drawable/ic_share_black_24dp"
                 android:tint="@color/colorAppText"
                 android:backgroundTint="@color/colorWindowBackground"
                 android:onClick="openShareMenu"
@@ -184,7 +190,7 @@
         android:contentDescription="@string/get_hype"
         android:layout_marginEnd="5dp"
         android:layout_marginTop="5dp"
-        android:src="@drawable/hype_mark"
+        app:srcCompat="@drawable/hype_mark"
         android:tint="@color/colorAccent"
         android:visibility="invisible" />
 

@@ -9,11 +9,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.AppCompatImageButton;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +41,6 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
     private static final String TAG = "SearchAdapter";
 
     private final SearchableActivity mActivity;
-    private int resourceID;
     private ArrayList<Movie> mSearchResults;
     private FeedReaderDbHelper mDB;
     private FragmentManager mFragmentManager;
@@ -50,28 +51,27 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
     private final int viewMeasureSpecHeight;
 
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public RelativeLayout mView;
+        RelativeLayout mView;
 
-        public ViewHolder(RelativeLayout v) {
+        ViewHolder(RelativeLayout v) {
             super(v);
             mView = v;
         }
-        public void clearAnimation(){
+        void clearAnimation(){
             mView.clearAnimation();
         }
     }
 
-    public SearchAdapter(SearchableActivity searchableActivity,
-                         int resourceID, FeedReaderDbHelper db) {
+    SearchAdapter(SearchableActivity searchableActivity,
+                  FeedReaderDbHelper db) {
 
         mSearchResults = new ArrayList<>();
-        this.resourceID = resourceID;
         this.mActivity = searchableActivity;
         mFragmentManager = searchableActivity.getSupportFragmentManager();
         this.mDB = db;
-        mRecyclerView = ((RecyclerView) mActivity.findViewById(R.id.movieList));
+        mRecyclerView = mActivity.findViewById(R.id.movieList);
         setHasStableIds(true);
         RecyclerView.ItemAnimator animator = mRecyclerView.getItemAnimator();
 
@@ -86,13 +86,13 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
     }
 
     @Override
+    @NonNull
     public SearchAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         RelativeLayout v = (RelativeLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.movie_row, parent, false);
         // set the view's size, margins, padding and layout parameters
-        SearchAdapter.ViewHolder vh = new SearchAdapter.ViewHolder(v);
-        return vh;
+        return new SearchAdapter.ViewHolder(v);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -167,7 +167,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
         return mSearchResults.size();
     }
 
-    public void search(String query){
+    void search(String query){
 
         mSearchResults.clear();
         String title, coverLink, link, synopsis, releaseDateString, releaseDate;
@@ -290,7 +290,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
         }
     }
 
-    public void openMovieDetail(){
+    void openMovieDetail(){
         Log.i(TAG, "Button touched to open movieDetailFragment");
         Movie movie = mSearchResults.get(expandedItem);
         MovieDetailFragment movieDetailFragment = MovieDetailFragment.newInstance(movie.getTitle(), movie.getLink(), movie.getSynopsis());
@@ -299,7 +299,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
         fragmentTransaction.replace(R.id.movie_detail_container, movieDetailFragment).addToBackStack(null).commit();
     }
 
-    public Intent sendToCalendar(){
+    Intent sendToCalendar(){
         Movie movie = mSearchResults.get(expandedItem);
 
         Calendar beginTime = Calendar.getInstance();
@@ -320,8 +320,8 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
         return intent;
     }
 
-    //Guarda la película
-    public void flagHype(View v) {
+    // Save the movie as a favorite
+    void flagHype(View v) {
 
         Movie movie = mSearchResults.get(expandedItem);
 
@@ -353,10 +353,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
         notifyItemChanged(expandedItem);
     }
 
-    /*
-     * Método llamado al pedir más info en una peli seleccionada.
-     */
-    public Intent openIntoWeb() {
+    Intent openIntoWeb() {
         Movie movie = mSearchResults.get(expandedItem);
         Log.d(TAG, "Button \"Web\" touched on movie " + movie.getTitle());
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -365,17 +362,19 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
         return intent;
     }
 
-    public void openShareMenu() {
+    void openShareMenu() {
         Movie movie = mSearchResults.get(expandedItem);
 
         Log.d(TAG, "Button \"Share\" touched on movie " + movie.getTitle());
 
-        String mensaje = "";
+        String mensaje;
         Resources res = mActivity.getResources();
 
         SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         try {
             Date date1 = myFormat.parse(movie.getReleaseDate());
+            if (date1 == null)
+                date1 = new Date();
             Date date2 = new Date();
             long diff = date1.getTime() - date2.getTime();
             int numDays = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) + 1;
@@ -398,7 +397,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
     }
 
 
-    public void expand(final View v) {
+    private void expand(final View v) {
         v.measure(View.MeasureSpec.makeMeasureSpec(((View) v.getParent()).getWidth(),
                 View.MeasureSpec.EXACTLY), viewMeasureSpecHeight);
         final int targetHeight = v.getMeasuredHeight();
@@ -434,7 +433,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
         v.startAnimation(a);
     }
 
-    public void collapse(final View v) {
+    private void collapse(final View v) {
         final int initialHeight = v.getMeasuredHeight();
         Animation a = new Animation() {
             @Override
@@ -459,7 +458,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
     }
 
     @Override
-    public void onViewDetachedFromWindow(ViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         holder.clearAnimation();
     }

@@ -8,8 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
+import androidx.preference.PreferenceManager;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
@@ -48,7 +49,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
     // List to stare the movies
     private RecyclerViewAdapter movieList;
 
-    private LinearLayout loadBar;
+    private WeakReference<LinearLayout> loadBar;
     private static final int INDEX_THEATER = 1;
     private static final int INDEX_RELEASES = 2;
 
@@ -57,7 +58,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
     DownloadTMDBThread(Context context, RecyclerViewAdapter movieList, LinearLayout loadBar) {
         Log.d(TAG, "Starting thread to download TMDB content.");
         this.movieList = movieList;
-        this.loadBar = loadBar;
+        this.loadBar = new WeakReference<>(loadBar);
         this.sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
@@ -357,7 +358,10 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
                 page++;
             } while ((page <= numPages) && (totalResults < MAX_RESULTS_PER_SECTION));
         }catch (Exception e){
-            Log.e(TAG, e.getMessage());
+            if (e.getMessage() != null)
+                Log.e(TAG, e.getMessage());
+            else
+                Log.e(TAG, "Something failed during parsing the JSON response.");
         }
         return movieList;
     }
@@ -392,7 +396,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
         movieList.updateData();
         movieList.updateInterface();
         movieList.removeX(); // Extra method to remove the X button.
-        loadBar.setVisibility(View.GONE);
+        loadBar.get().setVisibility(View.GONE);
     }
 
     @Override
@@ -402,13 +406,13 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
         movieList.updateInterface();
         movieList.removeX(); // Extra method to remove the X button.
         movieList.updateData();
-        loadBar.setVisibility(View.GONE);
+        loadBar.get().setVisibility(View.GONE);
     }
 
     private boolean isItReleased(String date){
         Calendar calendar = Calendar.getInstance();
         Date today = calendar.getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return dateFormat.format(today).compareToIgnoreCase(date) >= 0;
     }
 
@@ -419,11 +423,11 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
             movieList.showNoMoviesMessage();
         else if (i[0] == 0){
             for(int j = 0; j < 10; j++)
-                loadBar.getChildAt(j).setBackgroundColor(Color.parseColor("#455a64"));
-            loadBar.setVisibility(View.VISIBLE);
-            loadBar.getChildAt(0).setBackgroundColor(Color.parseColor("#37474f"));
+                loadBar.get().getChildAt(j).setBackgroundColor(Color.parseColor("#455a64"));
+            loadBar.get().setVisibility(View.VISIBLE);
+            loadBar.get().getChildAt(0).setBackgroundColor(Color.parseColor("#37474f"));
         } else if(i[0]<10) {
-            loadBar.getChildAt(i[0]).setBackgroundColor(Color.parseColor("#37474f"));
+            loadBar.get().getChildAt(i[0]).setBackgroundColor(Color.parseColor("#37474f"));
         }
     }
 

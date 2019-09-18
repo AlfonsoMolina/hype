@@ -53,4 +53,14 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="num_page">Page %1$d of %2$d</string>
+    <string name="releases_but">Go to next releases</string>
+    <string name="theaters_but">Go to in theaters</string>
+    <string name="hype_but">Go to hyped movies</string>
+    <string name="av_theaters_but">Buy tickets</string>
+    <string name="av_calendar_but">Send to the calendar</string>
+    <string name="av_detail_but">Open movie detail</string>
+    <string name="av_hype_but">Save the movie</string>
+    <string name="av_link_but">Open in website</string>
+    <string name="av_share_but">Share</string>
+    <string name="trailer_but">Open trailer in youtube</string>
 </resources>

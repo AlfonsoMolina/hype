@@ -7,23 +7,23 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.preference.PreferenceManager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.support.v7.widget.SearchView;
 import android.widget.TextView;
-
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 import java.util.Calendar;
 
@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements
         MovieDetailFragment.OnFragmentInteractionListener{
 
     private static final String TAG = "MainActivity";
-    private static final String MY_ADMOB_APP_ID = "ca-app-pub-6428634425759083~8703294528";
 
     private FeedReaderDbHelper mFeedReaderDbHelper;
     private DownloadTMDBThread mDownloadTMDBThread;
@@ -48,19 +47,24 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d(TAG, "Main activity created.");
 
-        MobileAds.initialize(this, MY_ADMOB_APP_ID);
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
 
         // Hook and setup the Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mFeedReaderDbHelper = new FeedReaderDbHelper(getApplicationContext());
 
         //Set up the list variable, using RecyclerView and a linear layout manager
-        mRecyclerView = (RecyclerView) findViewById(R.id.movieList);
+        mRecyclerView = findViewById(R.id.movieList);
         mRecyclerView.setHasFixedSize(true);    //Increase performance
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -107,18 +111,23 @@ public class MainActivity extends AppCompatActivity implements
         // Add options to the menu and configure them
         getMenuInflater().inflate(R.menu.menu, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        MenuItem menuItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
         // Assumes current activity is the searchable activity
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(
-                new ComponentName(this.getApplicationContext(),SearchableActivity.class)));
-        searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
-
+        if (searchManager != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(
+                    new ComponentName(this.getApplicationContext(), SearchableActivity.class)));
+            searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
+        }
         // Add color to the buttons
         for(int i = 0; i < mMenu.size(); i++){
             Drawable drawable = mMenu.getItem(i).getIcon();
             if(drawable != null) {
                 drawable.mutate();
+                // It can be changed for this, but it only works on API 29
+                // drawable.setColorFilter(new BlendModeColorFilter(
+                //        getResources().getColor(R.color.colorAppText), BlendMode.SRC_ATOP));
                 drawable.setColorFilter(getResources().getColor(R.color.colorAppText),
                         PorterDuff.Mode.SRC_ATOP);
             }
@@ -246,10 +255,6 @@ public class MainActivity extends AppCompatActivity implements
 
     public Menu getMenu(){
         return mMenu;
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
     }
 
     public void showHypeSection(View view){

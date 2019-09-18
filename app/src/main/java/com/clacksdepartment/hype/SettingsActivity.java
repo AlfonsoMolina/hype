@@ -1,7 +1,7 @@
 package com.clacksdepartment.hype;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity {
     @Override
@@ -9,7 +9,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment, new SettingsFragment())
                 .commit();
 

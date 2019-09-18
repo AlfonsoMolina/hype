@@ -1,7 +1,7 @@
 package com.clacksdepartment.hype;
 
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -46,7 +46,7 @@ class GUIManager {
         ((TextView) mMainActivity.findViewById(R.id.section)).setText(R.string.releases_section_text);
     }
 
-    void showPager(Boolean show){
+    private void showPager(Boolean show){
         if (show){
             // Update page number
             String txt = "" + (mRecyclerViewAdapter.getPage()+1);
@@ -104,7 +104,7 @@ class GUIManager {
     }
 
     void animateList(){
-        RecyclerView recyclerView = ((RecyclerView) mMainActivity.findViewById(R.id.movieList));
+        RecyclerView recyclerView = mMainActivity.findViewById(R.id.movieList);
         recyclerView.setLayoutAnimation(layoutAnimationController);
         mRecyclerViewAdapter.notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
@@ -130,13 +130,6 @@ class GUIManager {
                 showNoMoviesMessage(false);
             }
         }
-    }
-
-    void showHeader(Boolean show){
-        if (show){
-            mMainActivity.findViewById(R.id.navigation).setVisibility(View.VISIBLE);
-        } else
-            mMainActivity.findViewById(R.id.navigation).setVisibility(View.GONE);
     }
 
     private void animateButton(final View v, Boolean show){

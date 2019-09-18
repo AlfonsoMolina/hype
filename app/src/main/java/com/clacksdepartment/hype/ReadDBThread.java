@@ -30,7 +30,7 @@ class ReadDBThread extends AsyncTask<Void, Integer, Void> {
     private RecyclerViewAdapter movieList;
 
     // It needs the DB, the mModifiedListAdapter and the load bar
-    public ReadDBThread(SQLiteDatabase dbr, SQLiteDatabase dbw, RecyclerViewAdapter movieList) {
+    ReadDBThread(SQLiteDatabase dbr, SQLiteDatabase dbw, RecyclerViewAdapter movieList) {
         Log.d(TAG, "Initializing the thread that will read the DB");
         this.dbr = dbr;
         this.dbw = dbw;

@@ -5,8 +5,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Process;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
+import androidx.preference.PreferenceManager;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -53,19 +54,22 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     private List <String> genre;
     private String rating;
     private String votes;
-    private String videoProvider;
     private String videoLink;
+    private String country;
 
     // View to be updated
-    private final View mView;
+    // WeakReference to avoid leaking the context
+    private final WeakReference<View> mView;
 
     MovieDetail(String url, View view){
         String [] urlSplit = url.split("/");
         this.id = urlSplit[urlSplit.length-1];
-        mView = view;
+        mView = new WeakReference<>(view);
         director = new ArrayList<>();
         cast = new ArrayList<>();
         genre = new ArrayList<>();
+
+        country = PreferenceManager.getDefaultSharedPreferences(mView.get().getContext()).getString("pref_country", "");
     }
 
     @Override
@@ -75,7 +79,6 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
             Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
 
             // Read HTML
-            String country = PreferenceManager.getDefaultSharedPreferences(mView.getContext()).getString("pref_country", "");
             String language = "es-ES";
             if (country.equalsIgnoreCase("uk") || country.equalsIgnoreCase("us") || country.equalsIgnoreCase("fr"))
                 language = "en-US";
@@ -161,7 +164,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
             publishProgress(progress_DIRECTOR);
 
             jArray = jObject.getJSONObject("videos").getJSONArray("results");
-            videoProvider = jArray.getJSONObject(0).getString("site");
+            String videoProvider = jArray.getJSONObject(0).getString("site");
             if (videoProvider.equalsIgnoreCase("youtube")) {
                 videoLink = preYoutube + jArray.getJSONObject(0).getString("key");
             }
@@ -192,47 +195,48 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
         switch (values[0]){
             case progress_COVER:
                 if (cover != null)
-                    ((ImageView) mView.findViewById(R.id.movie_detail_cover)).setImageDrawable(cover);
+                    ((ImageView) mView.get().findViewById(R.id.movie_detail_cover)).setImageDrawable(cover);
                 break;
             case progress_YEAR:
                 if (!year.equalsIgnoreCase("null"))
-                    ((TextView) mView.findViewById(R.id.movie_detail_year)).setText(year);
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_year)).setText(year);
                 else
-                    ((TextView) mView.findViewById(R.id.movie_detail_year)).setText("N/A");
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_year)).setText("N/A");
                 break;
             case progress_DURATION:
                 if (!duration.equalsIgnoreCase("0 min") && !duration.equalsIgnoreCase("null min"))
-                    ((TextView) mView.findViewById(R.id.movie_detail_duration)).setText(duration);
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_duration)).setText(duration);
                 else
-                    ((TextView) mView.findViewById(R.id.movie_detail_duration)).setText("N/A");
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_duration)).setText("N/A");
                 break;
             case progress_DIRECTOR:
-                ((TextView) mView.findViewById(R.id.movie_detail_director)).setText(director.toString().replace("[", "").replace("]", ""));
+                ((TextView) mView.get().findViewById(R.id.movie_detail_director)).setText(director.toString().replace("[", "").replace("]", ""));
                 break;
             case progress_CAST:
-                ((TextView) mView.findViewById(R.id.movie_detail_cast)).setText(cast.toString().replace("[", "").replace("]", ""));
+                ((TextView) mView.get().findViewById(R.id.movie_detail_cast)).setText(cast.toString().replace("[", "").replace("]", ""));
                 break;
             case progress_GENRE:
-                ((TextView) mView.findViewById(R.id.movie_detail_genre)).setText(genre.toString().replace("[", "").replace("]", ""));
+                ((TextView) mView.get().findViewById(R.id.movie_detail_genre)).setText(genre.toString().replace("[", "").replace("]", ""));
                 break;
             case progress_RATING:
                 if (rating != null && !votes.equalsIgnoreCase("0")) {
-                    ((TextView) mView.findViewById(R.id.movie_detail_rating)).setText(mView.getResources().getString(R.string.votes_structure, rating, votes));
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_rating)).setText(
+                            mView.get().getResources().getString(R.string.votes_structure, rating, votes));
                 }else {
-                    ((TextView) mView.findViewById(R.id.movie_detail_rating)).setText("N/A");
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_rating)).setText("N/A");
                 }
                 break;
             case progress_trailer:
-                mView.findViewById(R.id.movie_detail_trailer).setOnClickListener(new View.OnClickListener() {
+                mView.get().findViewById(R.id.movie_detail_trailer).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(videoLink));
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mView.getContext().startActivity(intent);
+                        mView.get().getContext().startActivity(intent);
                     }
                 });
-                mView.findViewById(R.id.movie_detail_trailer_container).setVisibility(View.VISIBLE);
+                mView.get().findViewById(R.id.movie_detail_trailer_container).setVisibility(View.VISIBLE);
                 break;
             default:
                 break;

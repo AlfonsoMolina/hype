@@ -7,7 +7,7 @@
         android:icon="@drawable/ic_search_black_24dp"
         android:title="@string/search_menu_but"
         app:showAsAction="ifRoom"
-        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
         />
     <item
         android:id="@+id/update_button"
