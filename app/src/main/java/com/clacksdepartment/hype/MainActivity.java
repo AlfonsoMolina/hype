@@ -316,6 +316,10 @@ public class MainActivity extends AppCompatActivity implements
         mRecyclerViewAdapter.openMovieDetail();
     }
 
+    public void setExpandedItemAndOpenMovieDetail(View view) {
+        mRecyclerViewAdapter.setExpandedItemAndOpenMovieDetail((View) view.getParent().getParent());
+    }
+
     public void openIntoWeb(View view) {
         startActivity(mRecyclerViewAdapter.openIntoWeb());
     }

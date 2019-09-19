@@ -130,6 +130,10 @@ public class SearchableActivity extends AppCompatActivity implements MovieDetail
         mSearchAdapter.openMovieDetail();
     }
 
+    public void setExpandedItemAndOpenMovieDetail(View view) {
+        mSearchAdapter.setExpandedItemAndOpenMovieDetail((View) view.getParent().getParent());
+    }
+
     public void openIntoWeb(View view) {
         startActivity(mSearchAdapter.openIntoWeb());
     }

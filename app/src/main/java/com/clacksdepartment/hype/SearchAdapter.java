@@ -285,6 +285,11 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
         fragmentTransaction.replace(R.id.movie_detail_container, movieDetailFragment).addToBackStack(null).commit();
     }
 
+    void setExpandedItemAndOpenMovieDetail(View view){
+        setExpandedItem(view);
+        openMovieDetail();
+    }
+
     Intent sendToCalendar(){
         Movie movie = mSearchResults.get(expandedItem);
 

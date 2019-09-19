@@ -558,6 +558,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         fragmentTransaction.replace(R.id.movie_detail_container, movieDetailFragment).addToBackStack(null).commit();
     }
 
+    void setExpandedItemAndOpenMovieDetail(View view){
+        setExpandedItem(view);
+        openMovieDetail();
+    }
 
     Intent sendToCalendar(){
             Movie movie = getMovie(expandedItem);
