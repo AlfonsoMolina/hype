@@ -351,7 +351,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             return 0;
     }
 
-
     private void addToTheatersList(Movie p){
         int lastPage = mTheatersList.size() -1;
         if (lastPage >= 0 && mTheatersList.get(lastPage).size() < numMoviesPerPage)
@@ -468,7 +467,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
-    void setExpandedItem(View view){
+    // If the item has been expanded because of a click on the cover, it should never be collapsed.
+    void setExpandedItem(View view, boolean isCoverTouched){
         // Find the position.
         String title = (String) ((TextView) view.findViewById(R.id.title)).getText();
         int oldPosition = expandedItem;
@@ -514,11 +514,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 position++;
         }
 
-        if (expandedItem == position){
+        // If the cover of an expanded item has been touched, do not collapse.
+        if (expandedItem == position && !isCoverTouched){
             expandedItem = -1;
             Log.d(TAG, "Building element " + position);
             movieToCollapse = position;
-        } else {
+        } else if (expandedItem != position){
             expandedItem = position;
             Log.d(TAG, "Expanding element " + position);
             movieToExpand = position;
@@ -532,7 +533,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
         // Check if we need to add the Calendar button. It can be sorted by section, but in Hype
-        // they are mixed up.S
+        // they are mixed up.
         String date = getMovie(position).getReleaseDate();
         Calendar calendar = Calendar.getInstance();
         Date today = calendar.getTime();
@@ -547,7 +548,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
-
     void openMovieDetail(){
         Log.i(TAG, "Button touched to open movieDetailFragment");
         Movie movie = getMovie(expandedItem);
@@ -559,7 +559,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     void setExpandedItemAndOpenMovieDetail(View view){
-        setExpandedItem(view);
+        setExpandedItem(view, true);
         openMovieDetail();
     }
 
@@ -574,7 +574,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             Intent intent = new Intent(Intent.ACTION_INSERT)
                     .setData(CalendarContract.Events.CONTENT_URI)
                     .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
-                    .putExtra("allDay", true) //TODO: not working
                     .putExtra(CalendarContract.Events.TITLE, movie.getTitle())
                     .putExtra(CalendarContract.Events.DESCRIPTION, movie.getSynopsis());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

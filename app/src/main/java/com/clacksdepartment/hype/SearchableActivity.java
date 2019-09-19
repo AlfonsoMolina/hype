@@ -85,7 +85,6 @@ public class SearchableActivity extends AppCompatActivity implements MovieDetail
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // TODO Auto-generated method stub
                 return false;
             }
         });
@@ -116,7 +115,7 @@ public class SearchableActivity extends AppCompatActivity implements MovieDetail
 
 
     public void showExpandedMovieData(View view){
-        mSearchAdapter.setExpandedItem(view);
+        mSearchAdapter.setExpandedItem(view, false);
     }
     public void flagHype(View view){
         mSearchAdapter.flagHype(view);

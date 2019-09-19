@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void showExpandedMovieData(View view){
-        mRecyclerViewAdapter.setExpandedItem(view);
+        mRecyclerViewAdapter.setExpandedItem(view, false);
     }
 
     public void flagHype(View view){

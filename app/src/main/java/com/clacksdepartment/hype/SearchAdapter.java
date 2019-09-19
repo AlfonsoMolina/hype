@@ -230,7 +230,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
         notifyDataSetChanged();
     }
 
-    void  setExpandedItem(View view){
+    void  setExpandedItem(View view, boolean isCoverTouched){
         Log.d(TAG, "Movie touched!");
         // Find the position.
         String title = (String) ((TextView) view.findViewById(R.id.title)).getText();
@@ -244,7 +244,8 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
             position++;
         }
 
-        if (expandedItem == position){
+        // If the cover of an expanded item has been touched, do not collapse.
+        if (expandedItem == position && !isCoverTouched){
             expandedItem = -1;
             Log.d(TAG, "Building element " + position);
             itemToCollapse = position;
@@ -286,7 +287,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
     }
 
     void setExpandedItemAndOpenMovieDetail(View view){
-        setExpandedItem(view);
+        setExpandedItem(view, true);
         openMovieDetail();
     }
 
