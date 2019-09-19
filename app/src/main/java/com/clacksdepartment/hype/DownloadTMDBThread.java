@@ -86,7 +86,9 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
         ArrayList<Movie> theaters = getMovies(INDEX_THEATER);
         ArrayList<Movie> releases = getMovies(INDEX_RELEASES);
 
-        if (theaters == null || releases == null){
+        // Skip if the download failed.
+        if (theaters == null || releases == null || theaters.size() < 10 || releases.size() < 10){
+            Log.w(TAG,"Download failed.");
             return null;
         }
 
@@ -227,7 +229,6 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         // Any movie that was on the database but was not retrieved on the download is removed,
         // because it is no longer relevant.
-        // TODO: except if the download failed
         String selection2 = FeedEntryReleases.COLUMN_TYPE + "<'0'";
         if (!isCancelled())
             db[0].delete(FeedReaderContract.FeedEntryReleases.TABLE_NAME, selection2, null);
