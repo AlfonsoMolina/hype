@@ -50,7 +50,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     private static final int progress_CAST = 5;
     private static final int progress_GENRE = 6;
     private static final int progress_RATING = 7;
-    private static final int progress_trailer = 8;
+    private static final int progress_TRAILER = 8;
 
     private String link;
     private String id;
@@ -86,7 +86,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         try {
-            
+
             Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
 
             // Read HTML
@@ -100,12 +100,6 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
             JSONArray jArray;
 
             jObject = new JSONObject(result);
-
-            String coverUrl = preImage + jObject.getString("poster_path");
-            Log.d(TAG, coverUrl);
-            cover = loadImageFromURL(coverUrl);
-
-            publishProgress(progress_COVER);
 
             duration = jObject.getString("runtime") + " min";
             Log.d(TAG, duration);
@@ -134,6 +128,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
                     genre.add(jArray.getJSONObject(cont).getString("name"));
                     cont++;
                 }catch (Exception e){
+                    genre=null;
                     mustContinue = false;
                 }
             }
@@ -150,6 +145,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
                     cast.add(jArray.getJSONObject(cont).getString("name"));
                     cont++;
                 }catch (Exception e){
+                    cast = null;
                     mustContinue = false;
                 }
             }
@@ -169,19 +165,33 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
                     }
                     cont++;
                 }catch (Exception e){
+                    director = null;
                     mustContinue = false;
                 }
             }
             publishProgress(progress_DIRECTOR);
 
-            jArray = jObject.getJSONObject("videos").getJSONArray("results");
-            String videoProvider = jArray.getJSONObject(0).getString("site");
-            if (videoProvider.equalsIgnoreCase("youtube")) {
-                videoLink = preYoutube + jArray.getJSONObject(0).getString("key");
+            try {
+                jArray = jObject.getJSONObject("videos").getJSONArray("results");
+                String videoProvider = jArray.getJSONObject(0).getString("site");
+                if (videoProvider.equalsIgnoreCase("youtube")) {
+                    videoLink = preYoutube + jArray.getJSONObject(0).getString("key");
+                } else {
+                    videoLink = "";
+                }
+            }catch (Exception e){
+                videoLink = "";
             }
+
             Log.d(TAG, videoLink);
 
-            publishProgress(progress_trailer);
+            publishProgress(progress_TRAILER);
+
+            String coverUrl = preImage + jObject.getString("poster_path");
+            Log.d(TAG, coverUrl);
+            cover = loadImageFromURL(coverUrl);
+
+            publishProgress(progress_COVER);
         }catch (Exception e){
             Log.e(TAG, e.toString());
         }
@@ -221,33 +231,43 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
                     ((TextView) mView.get().findViewById(R.id.movie_detail_duration)).setText("N/A");
                 break;
             case progress_DIRECTOR:
-                ((TextView) mView.get().findViewById(R.id.movie_detail_director)).setText(director.toString().replace("[", "").replace("]", ""));
+                if (director != null)
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_director)).setText(director.toString().replace("[", "").replace("]", ""));
+                else
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_director)).setText("N/A");
                 break;
             case progress_CAST:
-                ((TextView) mView.get().findViewById(R.id.movie_detail_cast)).setText(cast.toString().replace("[", "").replace("]", ""));
+                if(cast != null)
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_cast)).setText(cast.toString().replace("[", "").replace("]", ""));
+                else
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_cast)).setText("N/A");
                 break;
             case progress_GENRE:
-                ((TextView) mView.get().findViewById(R.id.movie_detail_genre)).setText(genre.toString().replace("[", "").replace("]", ""));
+                if (genre != null)
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_genre)).setText(genre.toString().replace("[", "").replace("]", ""));
+                else
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_genre)).setText("N/A");
                 break;
             case progress_RATING:
-                if (rating != null && !votes.equalsIgnoreCase("0")) {
+                if (rating != null && !votes.equalsIgnoreCase("0"))
                     ((TextView) mView.get().findViewById(R.id.movie_detail_rating)).setText(
                             mView.get().getResources().getString(R.string.votes_structure, rating, votes));
-                }else {
+                else
                     ((TextView) mView.get().findViewById(R.id.movie_detail_rating)).setText("N/A");
-                }
                 break;
-            case progress_trailer:
-                mView.get().findViewById(R.id.movie_detail_trailer).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(videoLink));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mView.get().getContext().startActivity(intent);
-                    }
-                });
-                mView.get().findViewById(R.id.movie_detail_trailer_container).setVisibility(View.VISIBLE);
+            case progress_TRAILER:
+                if (!videoLink.equals("")) {
+                    mView.get().findViewById(R.id.movie_detail_trailer).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse(videoLink));
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mView.get().getContext().startActivity(intent);
+                        }
+                    });
+                    mView.get().findViewById(R.id.movie_detail_trailer_container).setVisibility(View.VISIBLE);
+                }
                 break;
             default:
                 break;
@@ -287,7 +307,6 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
 
     private Drawable loadImageFromURL(String url) {
         SQLiteDatabase dbr = mFeedReaderDbHelper.getReadableDatabase();
-        SQLiteDatabase dbw = mFeedReaderDbHelper.getWritableDatabase();
 
         // BIG COVER not null and ref = link
         String whereClauseColumns = FeedReaderContract.FeedEntryReleases.COLUMN_BIG_COVER +
@@ -312,6 +331,8 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
         if (cursor.getCount() == 0) {
             Log.d(TAG,"Downloading cover.");
             cursor.close();
+            dbr.close();
+
             try {
                 InputStream is = (InputStream) new URL(url).getContent();
 
@@ -321,13 +342,15 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] coverByte = stream.toByteArray();
 
+                SQLiteDatabase dbw = mFeedReaderDbHelper.getWritableDatabase();
+
                 ContentValues values = new ContentValues();
                 values.put(FeedReaderContract.FeedEntryReleases.COLUMN_BIG_COVER, coverByte);
                 dbw.update(FeedReaderContract.FeedEntryReleases.TABLE_NAME, values,
                         FeedReaderContract.FeedEntryReleases.COLUMN_REF + "='" +
                                 link + "'", null);
                 values.clear();
-
+                dbw.close();
                 // Return a drawable
                 return new BitmapDrawable(mView.get().getResources(),bitmap);
             } catch (Exception e) {
@@ -337,14 +360,14 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
                     Log.e(TAG,"Error downloading the big cover.");
                 return null;
             }
-
-            // If it is stored, retrieve it.
+        // If it is stored, retrieve it.
         }else {
             Log.d(TAG,"Retrieving cover from database.");
             cursor.moveToFirst();
             byte[] coverByte = cursor.getBlob(cursor.getColumnIndexOrThrow(
                     FeedReaderContract.FeedEntryReleases.COLUMN_BIG_COVER));
             cursor.close();
+            dbr.close();
             Bitmap coverBitmap = BitmapFactory.decodeByteArray(coverByte, 0, coverByte.length);
             return new BitmapDrawable(mView.get().getResources(),coverBitmap);
         }
