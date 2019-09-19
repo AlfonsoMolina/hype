@@ -33,6 +33,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.NativeExpressAdView;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -530,33 +531,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             ((RecyclerView) mMainActivity.findViewById(R.id.movieList)).smoothScrollToPosition(expandedItem);
         }
 
-        //TODO: this is stupid. Change for a function
-        String [] date = getMovie(position).getReleaseDate().split("-");
-
-        int difYear = Integer.parseInt(date[0]) - Calendar.getInstance().get(Calendar.YEAR);
-        int difMonth = Integer.parseInt(date[1]) - Calendar.getInstance().get(Calendar.MONTH) - 1;
-        int difDay = Integer.parseInt(date[2]) - Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-
-        boolean isTheFuture = false;
-
-        if (difYear == 0){
-            if (difMonth == 0){
-                if (difDay > 0){
-                    isTheFuture = true;
-                }
-            }else if (difMonth > 0){
-                isTheFuture = true;
-            }
-        }else if (difYear > 0){
-            isTheFuture = true;
-        }
-
-        if (!isTheFuture){
-            //if (flagTickets) {
-           //     view.findViewById(R.id.av_theaters).setVisibility(View.VISIBLE);
-          //  }else{
-                view.findViewById(R.id.av_theaters).setVisibility(View.GONE);
-           // }
+        // Check if we need to add the Calendar button. It can be sorted by section, but in Hype
+        // they are mixed up.S
+        String date = getMovie(position).getReleaseDate();
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        boolean isItReleased = dateFormat.format(today).compareToIgnoreCase(date) >= 0;
+        if (isItReleased){
+            view.findViewById(R.id.av_theaters).setVisibility(View.GONE);
             view.findViewById(R.id.av_date).setVisibility(View.GONE);
         }else{
             view.findViewById(R.id.av_theaters).setVisibility(View.GONE);
