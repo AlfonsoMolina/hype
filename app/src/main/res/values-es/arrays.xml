@@ -5,19 +5,25 @@
         <item>Estados Unidos</item>
         <item>Reino Unido</item>
         <item>Francia</item>
+        <item>Italia</item>
+        <item>Alemania</item>
         <item>México</item>
         <item>Argentina</item>
         <item>Chile</item>
         <item>Colombia</item>
+        <item>India</item>
     </string-array>
     <string-array name="pref_country_values">
-        <item>es</item>
-        <item>us</item>
-        <item>uk</item>
-        <item>fr</item>
-        <item>mx</item>
-        <item>ar</item>
-        <item>cl</item>
-        <item>co</item>
+        <item>ES</item>
+        <item>US</item>
+        <item>UK</item>
+        <item>FR</item>
+        <item>IT</item>
+        <item>DE</item>
+        <item>MX</item>
+        <item>AR</item>
+        <item>CL</item>
+        <item>CO</item>
+        <item>IN</item>
     </string-array>
 </resources>

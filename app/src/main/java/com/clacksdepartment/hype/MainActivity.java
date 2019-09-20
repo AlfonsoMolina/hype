@@ -26,6 +26,9 @@ import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 import java.util.Calendar;
+import java.util.Locale;
+
+//TODO: adaptative icons
 
 public class MainActivity extends AppCompatActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener,
@@ -76,6 +79,11 @@ public class MainActivity extends AppCompatActivity implements
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref.registerOnSharedPreferenceChangeListener(this);
 
+        //Set default country
+        SharedPreferences.Editor sharedPreferencesEditor = sharedPref.edit();
+        sharedPreferencesEditor.putString("pref_country",Locale.getDefault().getCountry());
+        Log.d(TAG,"Country is "+Locale.getDefault().getCountry());
+
         //Update the database. Once per day (if configured)
         if (sharedPref.getBoolean("pref_update", true)){
             //Compare today with the last day that the database was updated
@@ -89,12 +97,13 @@ public class MainActivity extends AppCompatActivity implements
                         mFeedReaderDbHelper.getReadableDatabase(),
                         mFeedReaderDbHelper.getWritableDatabase());
 
-                SharedPreferences.Editor sharedPreferencesEditor = sharedPref.edit();
                 sharedPreferencesEditor.putInt("initialized", 1);
                 sharedPreferencesEditor.putInt("day",today);
-                sharedPreferencesEditor.apply();
             }
         }
+
+        sharedPreferencesEditor.apply();
+
 
         //Select the "In Theaters" view as the default one
         mGUIManager = new GUIManager(this, mRecyclerViewAdapter);

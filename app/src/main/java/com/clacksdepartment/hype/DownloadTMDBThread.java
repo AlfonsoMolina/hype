@@ -43,8 +43,8 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
     private static final String preLink = "https://www.themoviedb.org/movie/";
     private static final String apiKey = "8ac0d37839748f4647039ef00d859d13";
 
-    private String language = "es-ES";  // Language for title and synopsis
-    private String country = "ES";      // Country for theaters and releases
+    private String language;        // Language for title and synopsis
+    private String country;         // Country for theaters and releases
 
     private SharedPreferences sharedPref;
 
@@ -68,7 +68,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
     @Override
     protected void onPreExecute (){
         Log.d(TAG, "Updating UI before executing the thread.");
-        country = sharedPref.getString("pref_country", "");
+        country = sharedPref.getString("pref_country", "ES");
         country = country.toUpperCase();
 
         // Get phone language
