@@ -42,9 +42,13 @@
     <string name="label_rating">Nota</string>
     <string name="votes">votos</string>
     <string name="rights_msg">Este producto utiliza la API de TMDb pero no está respaldado ni certificado por TMDb</string>
-    <string name="share_theaters">¡<i>%1$s</i> ya está en cines!</string>
     <string name="share_release_ind">Mira la película <i>%1$s</i>.</string>
-    <string name="share_release">¡Quedan %1$d días para el estreno de <i>%2$s</i>!</string>
+    <string name="share_theaters">¡<i>%1$s</i> ya está en cines!</string>
+    <plurals name="share_release">
+        <item quantity="one">¡Mañana estrenan <i>%2$s</i>!</item>
+        <item quantity="other">¡Quedan %1$d días para el estreno de <i>%2$s</i>!</item>
+    </plurals>
+    <string name="share_ad">Hype!</string>
     <string name="synopsis_list_structure"><i>%1$s</i>…</string>
     <string name="share_msg">Compartir la película <i>%1$s</i>.</string>
     <string name="votes_structure"><i>%1$s</i> (<i>%2$s</i> votos) </string>
@@ -56,7 +60,7 @@
     <string name="releases_but">Ver próximos estrenos</string>
     <string name="theaters_but">Ver películas en cartelera</string>
     <string name="hype_but">Ver películas guardadas</string>
-    <string name="av_detail_but">Abrir información de la pelicula</string>
+    <string name="av_detail_but">Abrir información de la película</string>
     <string name="av_theaters_but">Comprar entradas</string>
     <string name="av_calendar_but">Enviar al calendario</string>
     <string name="av_hype_but">Guardar película</string>

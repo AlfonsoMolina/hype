@@ -582,6 +582,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             return intent;
         }
 
+    //todo: if a movie is removed from saved while in hype section, show a pop up before
     void flagHype(View v) {
         Movie movie = getMovie(expandedItem);
         Log.d(TAG, "Button \"Hype\" touched on movie " + movie.getTitle());
@@ -667,7 +668,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Resources res = mMainActivity.getResources();
 
         if (section == THEATERS){
-            message = res.getString(R.string.share_theaters,movie.getTitle());
+            message = res.getString(R.string.share_theaters, movie.getTitle());
         } else if (section == RELEASES){
             SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
             try {
@@ -677,17 +678,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 Date date2 = new Date();
                 long diff = date1.getTime() - date2.getTime();
                 int numDays = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1;
-                message = res.getString(R.string.share_release,numDays,movie.getTitle());
+                message = res.getQuantityString(R.plurals.share_release,numDays,numDays,movie.getTitle());
             } catch (ParseException e) {
                 e.printStackTrace();
                 message = res.getString(R.string.share_release_ind,movie.getTitle());
             }
         } else {
-            message = movie.getTitle();
+            message = res.getString(R.string.share_release_ind,movie.getTitle());
         }
 
-        // TODO: add language to link
-        message = message + "\n" + movie.getLink();
+        //Modify the link according to the phone language.
+        message = message + "\n" + movie.getLink()+"?language="+Locale.getDefault().toString()
+                + " - " + res.getString(R.string.share_ad);
 
         Intent intent = new Intent(android.content.Intent.ACTION_SEND);
         intent.setType("text/plain");

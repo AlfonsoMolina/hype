@@ -359,7 +359,7 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
 
         Log.d(TAG, "Button \"Share\" touched on movie " + movie.getTitle());
 
-        String mensaje;
+        String message;
         Resources res = mActivity.getResources();
 
         SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -371,20 +371,20 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
             long diff = date1.getTime() - date2.getTime();
             int numDays = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) + 1;
             if (diff <= 0)
-                mensaje = res.getString(R.string.share_theaters, movie.getTitle());
+                message = res.getString(R.string.share_theaters, movie.getTitle());
             else
-                mensaje = res.getString(R.string.share_release, numDays, movie.getTitle());
+                message = res.getQuantityString(R.plurals.share_release,numDays,numDays,movie.getTitle());
         } catch (ParseException e) {
             e.printStackTrace();
-            mensaje = res.getString(R.string.share_release_ind, movie.getTitle());
+            message = res.getString(R.string.share_release_ind, movie.getTitle());
         }
 
         // TODO: add language to link
-        mensaje = mensaje + "\n" + movie.getLink();
+        message = message + "\n" + movie.getLink();
 
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, mensaje);
+        intent.putExtra(Intent.EXTRA_TEXT, message);
         mActivity.startActivity(Intent.createChooser(intent, res.getString(R.string.share_msg, movie.getTitle())));
     }
 

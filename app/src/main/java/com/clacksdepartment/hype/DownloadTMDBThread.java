@@ -71,12 +71,8 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
         country = sharedPref.getString("pref_country", "");
         country = country.toUpperCase();
 
-        // Language is spanish, unless the country is one of the non-spanish supported countries.
-        language = "es-ES";
-        if (country.equalsIgnoreCase("uk") || country.equalsIgnoreCase("us")
-                || country.equalsIgnoreCase("fr")) {
-            language = "en-US";
-        }
+        // Get phone language
+        language = Locale.getDefault().toString();
     }
 
     @Override
@@ -105,6 +101,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         boolean status = true; // This loop will be iterated twice, for theaters and for releases
 
+        // Todo: do not remove saved movies.
         // Change the type to -1 of movies in theaters (1) and releases (2).
         // It will be updated later. At the end, any movie still at -1 is removed.
         values.put(FeedReaderContract.FeedEntryReleases.COLUMN_TYPE, -1);

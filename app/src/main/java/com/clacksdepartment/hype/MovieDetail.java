@@ -31,6 +31,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
@@ -63,7 +64,6 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     private String rating;
     private String votes;
     private String videoLink;
-    private String country;
     private FeedReaderDbHelper mFeedReaderDbHelper;
 
     // View to be updated
@@ -79,8 +79,6 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
         cast = new ArrayList<>();
         genre = new ArrayList<>();
         mFeedReaderDbHelper = new FeedReaderDbHelper(mView.get().getContext());
-
-        country = PreferenceManager.getDefaultSharedPreferences(mView.get().getContext()).getString("pref_country", "");
     }
 
     @Override
@@ -90,9 +88,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
             Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
 
             // Read HTML
-            String language = "es-ES";
-            if (country.equalsIgnoreCase("uk") || country.equalsIgnoreCase("us") || country.equalsIgnoreCase("fr"))
-                language = "en-US";
+            String language = Locale.getDefault().toString();
             String result = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+"&language=" + language + "&append_to_response=videos,credits");
 
             // Parse:
