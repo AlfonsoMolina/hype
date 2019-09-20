@@ -627,9 +627,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     Intent openIntoWeb() {
         Movie movie = getMovie(expandedItem);
+        String link = movie.getLink()+"?language="+Locale.getDefault().toString();
         Log.d(TAG, "Button \"Web\" touched on movie " + movie.getTitle());
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(movie.getLink()));
+        intent.setData(Uri.parse(link));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
     }
@@ -693,8 +694,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         Intent intent = new Intent(android.content.Intent.ACTION_SEND);
         intent.setType("text/plain");
-
-        //intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "He compartido \"" + movie.getTitle() + "\" a través de Hype!");
         intent.putExtra(android.content.Intent.EXTRA_TEXT, message);
         mMainActivity.startActivity(Intent.createChooser(intent,res.getString(R.string.share_msg,movie.getTitle())));
 

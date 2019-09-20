@@ -348,8 +348,10 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
     Intent openIntoWeb() {
         Movie movie = mSearchResults.get(expandedItem);
         Log.d(TAG, "Button \"Web\" touched on movie " + movie.getTitle());
+        String link = movie.getLink()+"?language="+Locale.getDefault().toString();
+        Log.d(TAG, "Button \"Web\" touched on movie " + movie.getTitle());
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(movie.getLink()));
+        intent.setData(Uri.parse(link));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
     }
@@ -379,8 +381,9 @@ public class SearchAdapter extends  RecyclerView.Adapter<SearchAdapter.ViewHolde
             message = res.getString(R.string.share_release_ind, movie.getTitle());
         }
 
-        // TODO: add language to link
-        message = message + "\n" + movie.getLink();
+        //Modify the link according to the phone language.
+        message = message + "\n" + movie.getLink()+"?language="+Locale.getDefault().toString()
+                + " - " + res.getString(R.string.share_ad);
 
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
