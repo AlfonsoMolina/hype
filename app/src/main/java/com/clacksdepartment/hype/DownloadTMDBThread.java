@@ -36,6 +36,8 @@ import static com.clacksdepartment.hype.FeedReaderContract.FeedEntryReleases;
 
 class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
+    //TODO: Improve API calls and change the image size (not original, too big)
+
     private static final String TAG = "DownloadTMDBThread";
     private static final String preImage = "https://image.tmdb.org/t/p/w154";
     private static final String preLink = "https://www.themoviedb.org/movie/";

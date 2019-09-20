@@ -207,10 +207,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             if (position == expandedItem) {
 
                 if (movie.getSynopsis().length() > 0){
-                    ((TextView) expanded.findViewById(R.id.av_synopsis)).setText(
-                            mMainActivity.getResources().getString(R.string.synopsis_list_structure,
-                            movie.getSynopsis().substring(0, Math.min(movie.getSynopsis().length(),
-                            200))));
+                    String syn = movie.getSynopsis().substring(0, Math.min(movie.getSynopsis().length(),
+                            200)) + ((movie.getSynopsis().length() > 200)? "...":"");
+                    ((TextView) expanded.findViewById(R.id.av_synopsis)).setText( syn );
                 }else{
                     ((TextView) expanded.findViewById(R.id.av_synopsis)).setText("");
                     expanded.findViewById(R.id.av_synopsis).setVisibility(View.GONE);
