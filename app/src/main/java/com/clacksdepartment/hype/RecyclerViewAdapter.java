@@ -800,24 +800,26 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         flagAds = sharedPreferences.getBoolean("pref_adds",true);
     }
 
-    private void updateWall(){
-        if (section == HYPE) {
-            footer.setVisibility(View.GONE);
-            footer.getLayoutParams().height = 0;
-        } else {
-            if ((mLinearLayoutManager.findLastCompletelyVisibleItemPosition()-mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() + 2 - getItemCount()) > 0){
+    private void updateWall() {
+        if (footer != null) {
+            if (section == HYPE) {
                 footer.setVisibility(View.GONE);
                 footer.getLayoutParams().height = 0;
-            } else if (mRecyclerView.canScrollVertically(-1)) {
-                footer.setVisibility(View.VISIBLE);
-                Resources resources = mMainActivity.getResources();
-                DisplayMetrics metrics = resources.getDisplayMetrics();
-                // 70 must be the height of the footer
-                footer.getLayoutParams().height = 70 * (metrics.densityDpi / 160);
-                ((TextView) footer.findViewById(R.id.num_pag)).setText(resources.getString(R.string.num_page,(getPage()+1), getLastPage()));
-            }else{
-                footer.setVisibility(View.GONE);
-                footer.getLayoutParams().height = 0;
+            } else {
+                if ((mLinearLayoutManager.findLastCompletelyVisibleItemPosition() - mLinearLayoutManager.findFirstCompletelyVisibleItemPosition() + 2 - getItemCount()) > 0) {
+                    footer.setVisibility(View.GONE);
+                    footer.getLayoutParams().height = 0;
+                } else if (mRecyclerView.canScrollVertically(-1)) {
+                    footer.setVisibility(View.VISIBLE);
+                    Resources resources = mMainActivity.getResources();
+                    DisplayMetrics metrics = resources.getDisplayMetrics();
+                    // 70 must be the height of the footer
+                    footer.getLayoutParams().height = 70 * (metrics.densityDpi / 160);
+                    ((TextView) footer.findViewById(R.id.num_pag)).setText(resources.getString(R.string.num_page, (getPage() + 1), getLastPage()));
+                } else {
+                    footer.setVisibility(View.GONE);
+                    footer.getLayoutParams().height = 0;
+                }
             }
         }
     }

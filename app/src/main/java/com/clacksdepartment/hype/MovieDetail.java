@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Process;
-import androidx.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
@@ -40,7 +39,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
 
     private static final String TAG = "MovieDetail";
     private static final String apiKey = "8ac0d37839748f4647039ef00d859d13";
-    private static final String preImage = "https://image.tmdb.org/t/p/original";
+    private static final String preImage = "https://image.tmdb.org/t/p/w342";
     private static final String preYoutube = "https://www.youtube.com/watch?v=";
 
     // Value of result progress
@@ -52,6 +51,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     private static final int progress_GENRE = 6;
     private static final int progress_RATING = 7;
     private static final int progress_TRAILER = 8;
+    private static final int progress_SYNOPSIS = 9;
 
     private String link;
     private String id;
@@ -65,6 +65,7 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     private String votes;
     private String videoLink;
     private FeedReaderDbHelper mFeedReaderDbHelper;
+    private String synopsis;
 
     // View to be updated
     // WeakReference to avoid leaking the context
@@ -89,13 +90,25 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
 
             // Read HTML
             String language = Locale.getDefault().toString();
-            String result = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+"&language=" + language + "&append_to_response=videos,credits");
+            String result = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="+apiKey+
+                    "&language=" + language + "&append_to_response=videos,credits");
 
             // Parse:
             JSONObject jObject;
             JSONArray jArray;
 
             jObject = new JSONObject(result);
+
+            // First, check the synopsis. If it is empty, retrieve it from the default language.
+            if (jObject.getString("overview").isEmpty()){
+                String result2 = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="
+                        +apiKey+ "&append_to_response=videos,credits");
+                synopsis = (new JSONObject(result2)).getString("overview");
+                Log.d(TAG,"Synopsis obtained from the local language");
+                Log.d(TAG,synopsis);
+                publishProgress(progress_SYNOPSIS);
+
+            }
 
             duration = jObject.getString("runtime") + " min";
             Log.d(TAG, duration);
@@ -116,16 +129,14 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
 
             jArray = jObject.getJSONArray("genres");
 
-            boolean mustContinue = true;
-            int cont = 0;
-
-            while (mustContinue){
+            for (int i=0; i< jArray.length(); i++){
                 try{
-                    genre.add(jArray.getJSONObject(cont).getString("name"));
-                    cont++;
+                    genre.add(jArray.getJSONObject(i).getString("name"));
                 }catch (Exception e){
-                    genre=null;
-                    mustContinue = false;
+                    if(e.getMessage() != null)
+                        Log.d(TAG,"Error during genre parsing " + e.getMessage());
+                    else
+                        Log.d(TAG, "Something happened during genre parsing");
                 }
             }
 
@@ -133,16 +144,14 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
 
             jArray = jObject.getJSONObject("credits").getJSONArray("cast");
 
-            mustContinue = true;
-            cont = 0;
-
-            while (mustContinue){
+            for (int i=0; i< jArray.length(); i++){
                 try{
-                    cast.add(jArray.getJSONObject(cont).getString("name"));
-                    cont++;
+                    cast.add(jArray.getJSONObject(i).getString("name"));
                 }catch (Exception e){
-                    cast = null;
-                    mustContinue = false;
+                    if(e.getMessage() != null)
+                        Log.d(TAG,"Error during cast parsing " + e.getMessage());
+                    else
+                        Log.d(TAG, "Something happened during cast parsing");
                 }
             }
 
@@ -150,19 +159,18 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
 
             jArray = jObject.getJSONObject("credits").getJSONArray("crew");
 
-            mustContinue = true;
-            cont = 0;
 
-            while (mustContinue){
+            for (int i=0; i< jArray.length(); i++){
                 try{
-                    if (jArray.getJSONObject(cont).getString("job").equalsIgnoreCase("director")) {
-                        director.add(jArray.getJSONObject(cont).getString("name"));
+                    if (jArray.getJSONObject(i).getString("job").equalsIgnoreCase("director")) {
+                        director.add(jArray.getJSONObject(i).getString("name"));
                         Log.d(TAG, "Director found: " + director.get(director.size()-1));
                     }
-                    cont++;
                 }catch (Exception e){
-                    director = null;
-                    mustContinue = false;
+                    if(e.getMessage() != null)
+                        Log.d(TAG,"Error during director parsing " + e.getMessage());
+                    else
+                        Log.d(TAG, "Something happened during director parsing");
                 }
             }
             publishProgress(progress_DIRECTOR);
@@ -210,6 +218,11 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
         switch (values[0]){
+            case progress_SYNOPSIS:
+                if(!synopsis.isEmpty()){
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_synopsis)).setText(synopsis);
+                }
+                break;
             case progress_COVER:
                 if (cover != null)
                     ((ImageView) mView.get().findViewById(R.id.movie_detail_cover)).setImageDrawable(cover);
@@ -227,22 +240,22 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
                     ((TextView) mView.get().findViewById(R.id.movie_detail_duration)).setText("N/A");
                 break;
             case progress_DIRECTOR:
-                if (director != null)
+                if (director != null && !director.isEmpty())
                     ((TextView) mView.get().findViewById(R.id.movie_detail_director)).setText(director.toString().replace("[", "").replace("]", ""));
                 else
                     ((TextView) mView.get().findViewById(R.id.movie_detail_director)).setText("N/A");
                 break;
-            case progress_CAST:
-                if(cast != null)
-                    ((TextView) mView.get().findViewById(R.id.movie_detail_cast)).setText(cast.toString().replace("[", "").replace("]", ""));
-                else
-                    ((TextView) mView.get().findViewById(R.id.movie_detail_cast)).setText("N/A");
-                break;
             case progress_GENRE:
-                if (genre != null)
+                if(genre != null && !genre.isEmpty())
                     ((TextView) mView.get().findViewById(R.id.movie_detail_genre)).setText(genre.toString().replace("[", "").replace("]", ""));
                 else
                     ((TextView) mView.get().findViewById(R.id.movie_detail_genre)).setText("N/A");
+                break;
+            case progress_CAST:
+                if(cast != null && !cast.isEmpty())
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_cast)).setText(cast.toString().replace("[", "").replace("]", ""));
+                else
+                    ((TextView) mView.get().findViewById(R.id.movie_detail_cast)).setText("N/A");
                 break;
             case progress_RATING:
                 if (rating != null && !votes.equalsIgnoreCase("0"))

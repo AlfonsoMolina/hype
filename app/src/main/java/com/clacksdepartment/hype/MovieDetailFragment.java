@@ -88,7 +88,6 @@ public class MovieDetailFragment extends Fragment {
             ((TextView) view.findViewById(R.id.movie_detail_synopsis)).setText(synopsis);
         }else{
             ((TextView) view.findViewById(R.id.movie_detail_synopsis)).setText("");
-            view.findViewById(R.id.movie_detail_synopsis).setVisibility(View.GONE);
         }
 
         MovieDetail movieDetail = new MovieDetail(link, view);

@@ -36,8 +36,6 @@ import static com.clacksdepartment.hype.FeedReaderContract.FeedEntryReleases;
 
 class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
-    //TODO: Improve API calls and change the image size (not original, too big)
-
     private static final String TAG = "DownloadTMDBThread";
     private static final String preImage = "https://image.tmdb.org/t/p/w154";
     private static final String preLink = "https://www.themoviedb.org/movie/";
@@ -72,7 +70,8 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
         country = country.toUpperCase();
 
         // Get phone language
-        language = Locale.getDefault().toString();
+        language = Locale.getDefault().toString().replace('_','-');
+        Log.d(TAG,"lang is "+language);
     }
 
     @Override
@@ -302,7 +301,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
             case INDEX_RELEASES:
                 staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+
                         "&sort_by=primary_release_date.asc&release_date.gte="+tomorrowAsString+
-                        "&with_release_type=2|3";
+                        "&with_release_type=3";
                 break;
             default:
                 return null;
@@ -367,6 +366,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
     }
 
     private String getDateText (String date){
+        // TODO: change to string
         String dateText;
         String[] months_es = {"enero", "febrero", "marzo", "abril", "mayo", "junio",
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
@@ -416,6 +416,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
         return dateFormat.format(today).compareToIgnoreCase(date) >= 0;
     }
 
+    // TODO: fix the progress download
     @Override
     protected void onProgressUpdate(Integer... i) {
         Log.d(TAG, "Download at " + ((i[0]+1)*10) + "%");
