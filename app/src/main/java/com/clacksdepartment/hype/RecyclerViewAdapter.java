@@ -592,25 +592,24 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         movie.setHype(!movie.getHype());
 
-        if (movie.getHype()) {
-            ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_black_24dp);
-        } else {
-            ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
-        }
+        contentValues.put(FeedReaderContract.FeedEntryReleases.COLUMN_HYPE, movie.getHype()?1:0);
 
-            contentValues.put(FeedReaderContract.FeedEntryReleases.COLUMN_HYPE, movie.getHype()?1:0);
+        String selection = FeedReaderContract.FeedEntryReleases.COLUMN_REF + " LIKE ?";
+        String[] selectionArgs = {movie.getLink()};
 
-            String selection = FeedReaderContract.FeedEntryReleases.COLUMN_REF + " LIKE ?";
-            String[] selectionArgs = {movie.getLink()};
-
-            dbw.update(
-                    FeedReaderContract.FeedEntryReleases.TABLE_NAME,
-                    contentValues,
-                    selection,
-                    selectionArgs);
+        dbw.update(
+                FeedReaderContract.FeedEntryReleases.TABLE_NAME,
+                contentValues,
+                selection,
+                selectionArgs);
 
         if (section != HYPE) {
             notifyItemChanged(expandedItem);
+            if (movie.getHype()) {
+                ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_black_24dp);
+            } else {
+                ((AppCompatImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
+            }
         }else{
             if (expandedItem != 0){
                 notifyItemRemoved(expandedItem);

@@ -67,5 +67,9 @@
     <string name="av_link_but">Abrir en la web</string>
     <string name="av_share_but">Compratir</string>
     <string name="trailer_but">Abrir trailer en youtube</string>
+    <string name="dialog_hype_title">Eliminar película</string>
+    <string name="dialog_hype_text">La película desaparecerá de esta lista. ¿Estás seguro?</string>
+    <string name="dialog_db_title">Vaciar base de datos</string>
+    <string name="dialog_db_text">Todo contenido será eliminado. ¿Estás seguro?</string>
 
 </resources>

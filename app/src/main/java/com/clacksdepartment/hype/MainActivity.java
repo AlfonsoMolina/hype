@@ -3,12 +3,15 @@ package com.clacksdepartment.hype;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.preference.PreferenceManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +46,10 @@ public class MainActivity extends AppCompatActivity implements
     RecyclerView mRecyclerView;
     RecyclerView.LayoutManager mLayoutManager;
     private RecyclerViewAdapter mRecyclerViewAdapter;
+    static final int HYPE = 0;
+    static final int THEATERS = 1;
+    static final int RELEASES = 2;
+    private int section;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements
         mGUIManager = new GUIManager(this, mRecyclerViewAdapter);
         mGUIManager.selectInTheatersSection();
         showTheatersSection(findViewById(R.id.theaters));
+
     }
 
 
@@ -268,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void showHypeSection(View view){
         Log.d(TAG, "Displaying Hype view.");
+        section = HYPE;
         if (mRecyclerViewAdapter.getSection() != RecyclerViewAdapter.HYPE){
             mGUIManager.animateList();
             mRecyclerViewAdapter.showHypeSection();
@@ -283,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void showTheatersSection(View view){
         Log.d(TAG, "Displaying In theaters view.");
+        section = THEATERS;
         if (mRecyclerViewAdapter.getSection() != RecyclerViewAdapter.THEATERS) {
             mGUIManager.animateList();
             mRecyclerViewAdapter.showTheatersSection();
@@ -297,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void showReleasesSection(View view){
         Log.d(TAG, "Displaying Releases view");
+        section = RELEASES;
         if (mRecyclerViewAdapter.getSection() != RecyclerViewAdapter.RELEASES) {
             mGUIManager.animateList();
             mRecyclerViewAdapter.showReleasesSection();
@@ -314,7 +325,23 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void flagHype(View view){
-        mRecyclerViewAdapter.flagHype(view);
+        // If we are in HYPE section, notify the user that the movie will be removed.
+        // In the other sections it is not needed, because the movie will still appear afterwards.
+        if (section == HYPE) {
+            new AlertDialog.Builder(view.getContext())
+                    .setTitle(getResources().getString(R.string.dialog_hype_title))
+                    .setMessage(getResources().getString(R.string.dialog_hype_text))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mRecyclerViewAdapter.flagHype(null);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, null).show();
+
+        } else
+            mRecyclerViewAdapter.flagHype(view);
      }
 
     public void sendToCalendar(View view) {

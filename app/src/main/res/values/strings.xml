@@ -67,4 +67,8 @@
     <string name="av_share_but">Share</string>
     <string name="trailer_but">Open trailer in youtube</string>
     <string name="share_ad">Hype!</string>
+    <string name="dialog_hype_title">Remove saved movie</string>
+    <string name="dialog_hype_text">This movie will disappear from this view. Are you sure?</string>
+    <string name="dialog_db_title">Dump database</string>
+    <string name="dialog_db_text">All data will be deleted. Are you sure?</string>
 </resources>
