@@ -80,6 +80,8 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
         cast = new ArrayList<>();
         genre = new ArrayList<>();
         mFeedReaderDbHelper = new FeedReaderDbHelper(mView.get().getContext());
+        synopsis = ((TextView) mView.get().findViewById(R.id.movie_detail_synopsis)).getText().toString();
+
     }
 
     @Override
@@ -100,14 +102,18 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
             jObject = new JSONObject(result);
 
             // First, check the synopsis. If it is empty, retrieve it from the default language.
-            if (jObject.getString("overview").isEmpty()){
-                String result2 = getHTML("https://api.themoviedb.org/3/movie/"+id+"?api_key="
-                        +apiKey+ "&append_to_response=videos,credits");
-                synopsis = (new JSONObject(result2)).getString("overview");
-                Log.d(TAG,"Synopsis obtained from the local language");
-                Log.d(TAG,synopsis);
+            if (synopsis.isEmpty()) {
+                if (jObject.getString("overview").isEmpty()) {
+                    String result2 = getHTML("https://api.themoviedb.org/3/movie/" + id + "?api_key="
+                            + apiKey + "&append_to_response=videos,credits");
+                    synopsis = (new JSONObject(result2)).getString("overview");
+                    Log.d(TAG, "Synopsis obtained from default language");
+                    Log.d(TAG, synopsis);
+                } else {
+                    synopsis = jObject.getString("overview");
+                }
                 publishProgress(progress_SYNOPSIS);
-
+                saveSynopsisInDatabase(synopsis);
             }
 
             duration = jObject.getString("runtime") + " min";
@@ -201,6 +207,20 @@ public class MovieDetail extends AsyncTask<Void,Integer,Void> {
         }
 
         return null;
+    }
+
+    private void saveSynopsisInDatabase(String synopsis) {
+        SQLiteDatabase dbw = mFeedReaderDbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FeedReaderContract.FeedEntryReleases.COLUMN_SYNOPSIS, synopsis);
+        dbw.update(FeedReaderContract.FeedEntryReleases.TABLE_NAME, values,
+                FeedReaderContract.FeedEntryReleases.COLUMN_REF + "='" +
+                        link + "'", null);
+        values.clear();
+        dbw.close();
+
+        // It will be updated on the main view when it is restored.
     }
 
     @Override
