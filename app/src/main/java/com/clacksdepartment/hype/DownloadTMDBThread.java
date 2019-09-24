@@ -102,13 +102,12 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         boolean status = true; // This loop will be iterated twice, for theaters and for releases
 
-        // Todo: do not remove saved movies.
         // Change the type to -1 of movies in theaters (1) and releases (2).
         // It will be updated later. At the end, any movie still at -1 is removed.
         values.put(FeedReaderContract.FeedEntryReleases.COLUMN_TYPE, -1);
 
-        String clause = FeedReaderContract.FeedEntryReleases.COLUMN_TYPE + "='1' OR " +
-                FeedReaderContract.FeedEntryReleases.COLUMN_TYPE + "='2'";
+        String clause = FeedEntryReleases.COLUMN_HYPE + "='0' AND ("+
+                FeedEntryReleases.COLUMN_TYPE + "='1' OR "+FeedEntryReleases.COLUMN_TYPE + "='2')";
         db[1].update(FeedEntryReleases.TABLE_NAME, values,
                 clause, null);
 
@@ -183,6 +182,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     values.put(FeedEntryReleases.COLUMN_RELEASE_DATE, releaseDate);
                     values.put(FeedReaderContract.FeedEntryReleases.COLUMN_TYPE, status?1:2);
 
+                    // Different type for releases or in theaters
                     db[1].insert(FeedReaderContract.FeedEntryReleases.TABLE_NAME, null, values);
 
                     values.clear();
@@ -190,7 +190,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
                 // If it is stored, update it.
                 }else {
-                    // Update the elements only if it has changed (less DB load I guess?).
+                    // Update the elements only if it has changed
                     cursor.moveToFirst();
                     if(!cursor.getString(cursor.getColumnIndexOrThrow(FeedEntryReleases.COLUMN_TITLE)).equalsIgnoreCase(movie.getTitle())) {
                         values.put(FeedReaderContract.FeedEntryReleases.COLUMN_TITLE, movie.getTitle());
@@ -207,7 +207,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
                         values.put(FeedReaderContract.FeedEntryReleases.COLUMN_RELEASE_DATE_STRING, movie.getReleaseDateString());
                     }
 
-                    // Different type for releases or in theaters
+
                     values.put(FeedReaderContract.FeedEntryReleases.COLUMN_TYPE, status?1:2);
 
                     Log.d(TAG, "Updating movie " + movie.getTitle());
@@ -334,14 +334,16 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
                         switch (type) {
                             case INDEX_THEATER:
                                 if (isItReleased(date)){
-                                    movieList.add(new Movie(id, link, cover, title, synopsis, textDate, date, false));
+                                    movieList.add(new Movie(id, link, cover, title, synopsis,
+                                            textDate, date, false));
                                 }else{
                                     Log.d(TAG, "Skipping movie in wrong section: " + title);
                                 }
                                 break;
                             case INDEX_RELEASES:
                                 if (!isItReleased(date)){
-                                    movieList.add(new Movie(id, link, cover, title, synopsis, textDate, date, false));
+                                    movieList.add(new Movie(id, link, cover, title, synopsis,
+                                            textDate, date, false));
                                 }else{
                                     Log.d(TAG, "Skipping movie in wrong section: " + title);
                                 }

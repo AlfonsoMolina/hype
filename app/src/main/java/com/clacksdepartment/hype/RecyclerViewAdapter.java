@@ -582,7 +582,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             return intent;
         }
 
-    //todo: if a movie is removed from saved while in hype section, show a pop up before
     void flagHype(View v) {
         Movie movie = getMovie(expandedItem);
         Log.d(TAG, "Button \"Hype\" touched on movie " + movie.getTitle());

@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements
             int lastUpdatedDay = sharedPref.getInt("day",0);
             int today = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
             if (today != lastUpdatedDay) {
-                //Soft update.
                 mDownloadTMDBThread = new DownloadTMDBThread(this, mRecyclerViewAdapter,
                         ((LinearLayout) findViewById(R.id.load_bar)));
                 mDownloadTMDBThread.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
