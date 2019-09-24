@@ -43,6 +43,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
     private String language;        // Language for title and synopsis
     private String country;         // Country for theaters and releases
+    private String[] months;
 
     private SharedPreferences sharedPref;
 
@@ -60,6 +61,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
         this.movieList = movieList;
         this.loadBar = new WeakReference<>(loadBar);
         this.sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        this.months = context.getResources().getStringArray(R.array.months);
     }
 
     // Display load bar (and set gray) and a message.
@@ -366,20 +368,16 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
     }
 
     private String getDateText (String date){
-        // TODO: change to string
         String dateText;
-        String[] months_es = {"enero", "febrero", "marzo", "abril", "mayo", "junio",
-                "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
-        String[] months_en = {"january", "february", "march", "april", "may", "june",
-                "july", "august", "september", "october", "november", "december"};
 
         String [] splitDate = date.split("-");
 
         if (language.equalsIgnoreCase("es-ES")) {
-            dateText = splitDate[2] + " de " + months_es[Integer.parseInt(splitDate[1]) - 1] + " del " + splitDate[0];
+            dateText = splitDate[2] + " de " + months[Integer.parseInt(splitDate[1]) - 1] + " del " + splitDate[0];
         }else{
-            dateText = splitDate[2] + " " + months_en[Integer.parseInt(splitDate[1]) - 1] + " " + splitDate[0];
+            dateText = splitDate[2] + " " + months[Integer.parseInt(splitDate[1]) - 1] + " " + splitDate[0];
         }
+
         return dateText;
     }
 
