@@ -1,4 +1,4 @@
-package com.clacksdepartment.hype;
+package com.clacksdepartment.hyped;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

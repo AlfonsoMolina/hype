@@ -1,4 +1,4 @@
-package com.clacksdepartment.hype;
+package com.clacksdepartment.hyped;
 
 import android.app.SearchManager;
 import android.content.ComponentName;
@@ -30,8 +30,6 @@ import com.google.android.gms.ads.initialization.OnInitializationCompleteListene
 
 import java.util.Calendar;
 import java.util.Locale;
-
-//TODO: adaptative icons
 
 public class MainActivity extends AppCompatActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener,

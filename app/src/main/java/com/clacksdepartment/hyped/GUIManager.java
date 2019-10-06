@@ -1,4 +1,4 @@
-package com.clacksdepartment.hype;
+package com.clacksdepartment.hyped;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;

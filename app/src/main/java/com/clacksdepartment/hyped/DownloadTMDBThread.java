@@ -1,4 +1,4 @@
-package com.clacksdepartment.hype;
+package com.clacksdepartment.hyped;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -32,7 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.clacksdepartment.hype.FeedReaderContract.FeedEntryReleases;
+import static com.clacksdepartment.hyped.FeedReaderContract.FeedEntryReleases;
 
 class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 

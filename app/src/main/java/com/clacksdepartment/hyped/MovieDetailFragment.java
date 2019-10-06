@@ -1,4 +1,4 @@
-package com.clacksdepartment.hype;
+package com.clacksdepartment.hyped;
 
 import android.os.AsyncTask;
 import android.os.Bundle;

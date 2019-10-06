@@ -1,4 +1,4 @@
-package com.clacksdepartment.hype;
+package com.clacksdepartment.hyped;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
-import static com.clacksdepartment.hype.FeedReaderContract.SQL_CREATE_ENTRIES_RELEASES;
-import static com.clacksdepartment.hype.FeedReaderContract.SQL_DELETE_ENTRIES_RELEASES;
+import static com.clacksdepartment.hyped.FeedReaderContract.SQL_CREATE_ENTRIES_RELEASES;
+import static com.clacksdepartment.hyped.FeedReaderContract.SQL_DELETE_ENTRIES_RELEASES;
 
 class ReadDBThread extends AsyncTask<Void, Integer, Void> {
 

@@ -1,12 +1,12 @@
-package com.clacksdepartment.hype;
+package com.clacksdepartment.hyped;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import static com.clacksdepartment.hype.FeedReaderContract.SQL_CREATE_ENTRIES_RELEASES;
-import static com.clacksdepartment.hype.FeedReaderContract.SQL_DELETE_ENTRIES_RELEASES;
+import static com.clacksdepartment.hyped.FeedReaderContract.SQL_CREATE_ENTRIES_RELEASES;
+import static com.clacksdepartment.hyped.FeedReaderContract.SQL_DELETE_ENTRIES_RELEASES;
 
 
 public class FeedReaderDbHelper extends SQLiteOpenHelper {

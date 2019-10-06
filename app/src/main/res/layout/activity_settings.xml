@@ -20,7 +20,7 @@
         android:textSize="20sp"
         />
     </androidx.appcompat.widget.Toolbar>
-    <fragment android:name="com.clacksdepartment.hype.SettingsFragment"
+    <fragment android:name="com.clacksdepartment.hyped.SettingsFragment"
         android:id="@+id/fragment"
         android:layout_weight="1"
         android:layout_width="match_parent"

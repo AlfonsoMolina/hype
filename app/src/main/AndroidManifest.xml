@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.clacksdepartment.hype"
+    package="com.clacksdepartment.hyped"
     android:versionCode="10"
     android:versionName="3.0.0">
     <uses-permission android:name="android.permission.INTERNET" />
@@ -17,7 +17,7 @@
         android:hardwareAccelerated="true">
 
         <activity
-            android:name="com.clacksdepartment.hype.MainActivity"
+            android:name="com.clacksdepartment.hyped.MainActivity"
             android:label="Hype!"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -30,7 +30,7 @@
 
         </activity>
 
-        <activity android:name="com.clacksdepartment.hype.SettingsActivity" >
+        <activity android:name="com.clacksdepartment.hyped.SettingsActivity" >
             <!--Default Intent Filter-->
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
@@ -38,7 +38,7 @@
 
         </activity>
 
-        <activity android:name=".SearchableActivity" >
+        <activity android:name="com.clacksdepartment.hyped.SearchableActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -48,7 +48,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-6428634425759083~9960526018"/>
     </application>
 
 </manifest>
