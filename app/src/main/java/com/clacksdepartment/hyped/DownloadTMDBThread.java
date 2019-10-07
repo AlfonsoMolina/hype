@@ -104,12 +104,10 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         // Change the type to -1 of movies in theaters (1) and releases (2).
         // It will be updated later. At the end, any movie still at -1 is removed.
-        values.put(FeedReaderContract.FeedEntryReleases.COLUMN_TYPE, -1);
+        values.put(FeedEntryReleases.COLUMN_TYPE, -1);
 
-        String clause = FeedEntryReleases.COLUMN_HYPE + "='0' AND ("+
-                FeedEntryReleases.COLUMN_TYPE + "='1' OR "+FeedEntryReleases.COLUMN_TYPE + "='2')";
-        db[1].update(FeedEntryReleases.TABLE_NAME, values,
-                clause, null);
+        String clause = FeedEntryReleases.COLUMN_HYPE + " = 0";
+        db[1].update(FeedEntryReleases.TABLE_NAME, values, clause,null);
 
         String[] projection = {
                 //FeedEntryReleases._ID,
@@ -181,6 +179,7 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
                     values.put(FeedReaderContract.FeedEntryReleases.COLUMN_RELEASE_DATE_STRING, releaseDateString);
                     values.put(FeedEntryReleases.COLUMN_RELEASE_DATE, releaseDate);
                     values.put(FeedReaderContract.FeedEntryReleases.COLUMN_TYPE, status?1:2);
+                    values.put(FeedEntryReleases.COLUMN_HYPE,0);
 
                     // Different type for releases or in theaters
                     db[1].insert(FeedReaderContract.FeedEntryReleases.TABLE_NAME, null, values);
@@ -229,9 +228,9 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         // Any movie that was on the database but was not retrieved on the download is removed,
         // because it is no longer relevant.
-        String selection2 = FeedEntryReleases.COLUMN_TYPE + "<'0'";
+        String selection2 = FeedEntryReleases.COLUMN_TYPE + "<0";
         if (!isCancelled())
-            db[0].delete(FeedReaderContract.FeedEntryReleases.TABLE_NAME, selection2, null);
+            db[1].delete(FeedEntryReleases.TABLE_NAME, selection2, null);
 
         return null;
     }
@@ -287,18 +286,18 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         Date tomorrow = calendar.getTime();
         calendar.add(Calendar.WEEK_OF_YEAR, -9);
-        Date sixWeeksAgo = calendar.getTime();
+        Date nineWeeksAgo = calendar.getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
         String todayAsString = dateFormat.format(today);
         String tomorrowAsString = dateFormat.format(tomorrow);
-        String sixWeeksAgoAsString = dateFormat.format(sixWeeksAgo);
+        String nineWeeksAgoAsString = dateFormat.format(nineWeeksAgo);
 
         switch (type){
             case INDEX_THEATER:
                 staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+
                         "&sort_by=primary_release_date.desc&release_date.lte="+todayAsString+
-                        "&release_date.gte="+sixWeeksAgoAsString+"&with_release_type=3";
+                        "&release_date.gte="+nineWeeksAgoAsString+"&with_release_type=3";
                 break;
             case INDEX_RELEASES:
                 staticUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+
@@ -311,9 +310,10 @@ class DownloadTMDBThread extends AsyncTask<SQLiteDatabase,Integer,Void> {
 
         try {
             do {
-                Log.d(TAG, staticUrl);
-                response = getHTML(staticUrl + "&language=" + language + "&page=" + page +
-                        "&region=" + country + "&adult=true");
+                String url= staticUrl + "&language=" + language + "&page=" + page +
+                        "&region=" + country + "&adult=true";
+                Log.d(TAG, "Downloading from url: "+ url);
+                response = getHTML(url);
 
                 jObject = new JSONObject(response);
                 numPages = jObject.getInt("total_pages");
